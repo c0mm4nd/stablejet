@@ -91,3 +91,80 @@ export function toWei(amount: number): string {
 export function fromWei(amountWei: string): number {
   return parseFloat(amountWei) / 1e6;
 }
+
+// 不稳定代币列表（需要过滤的代币地址）
+// 包括：原生代币、WETH、WBTC等可能导致价格失准的代币
+// 数据来源：各链官方区块链浏览器（Etherscan, Polygonscan, Arbiscan等）
+export const UNSTABLE_TOKENS: Record<string, string[]> = {
+  // 原生代币地址（KyberSwap通常使用此地址表示原生代币）
+  native: [
+    "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "0x0000000000000000000000000000000000000000"
+  ],
+  // Ethereum
+  ethereum: [
+    "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", // WETH
+    "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599", // WBTC
+  ],
+  // Polygon
+  polygon: [
+    "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619", // WETH (Bridged)
+    "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6", // WBTC (PoS)
+  ],
+  // Arbitrum
+  arbitrum: [
+    "0x82af49447d8a07e3bd95bd0d56f35241523fbab1", // WETH
+    "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f", // WBTC
+  ],
+  // Optimism
+  optimism: [
+    "0x4200000000000000000000000000000000000006", // WETH
+    "0x68f180fcce6836688e9084f035309e29bf0a2095", // WBTC
+  ],
+  // Base
+  base: [
+    "0x4200000000000000000000000000000000000006", // WETH
+    "0x0555e30da8f98308edb960aa94c0db47230d2b9c", // WBTC (LayerZero Bridged)
+  ],
+  // BSC
+  bsc: [
+    "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c", // WBNB (Wrapped BNB)
+    "0x2170ed0880ac9a755fd29b2688956bd959f933f8", // ETH (Binance-Peg Ethereum)
+    "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c", // BTCB (Binance-Peg Bitcoin)
+    "0x4db5a66e937a9f4473fa95b1caf1d1e1d62e29ea", // WETH (Wormhole)
+  ],
+  // Avalanche
+  avalanche: [
+    "0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab", // WETH.e (Avalanche Bridge)
+    "0x50b7545627a5162f82a992c33b87adc75187b218", // WBTC.e (Avalanche Bridge)
+  ],
+  // Mantle
+  mantle: [
+    "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111", // WETH (Mantle Bridged)
+    "0xcabae6f6ea1ecab08ad02fe02ce9a44f09aebfa2", // WBTC (Mantle Bridged)
+  ],
+  // Sonic
+  sonic: [
+    "0x50c42deacd8fc9773493ed674b675be577f2634b", // WETH (Sonic Labs)
+    "0x0555e30da8f98308edb960aa94c0db47230d2b9c", // WBTC
+  ],
+  // Unichain
+  unichain: [
+    "0x4200000000000000000000000000000000000006", // WETH
+    "0x927b51f251480a681271180da4de28d44ec4afb8", // WBTC
+  ],
+  // Berachain
+  berachain: [
+    "0x6969696969696969696969696969696969696969", // WBERA (Wrapped Bera)
+    "0x2f6f07cdcf3588944bf4c42ac74ff24bf56e7590", // WETH
+  ],
+};
+
+// 获取所有不稳定代币地址（用于快速查找）
+export function getAllUnstableTokens(): Set<string> {
+  const allTokens = new Set<string>();
+  Object.values(UNSTABLE_TOKENS).forEach(tokens => {
+    tokens.forEach(token => allTokens.add(token.toLowerCase()));
+  });
+  return allTokens;
+}

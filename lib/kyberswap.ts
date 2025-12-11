@@ -1,5 +1,28 @@
 import { QuoteResult, KyberSwapQuoteResponse, ChainSwapData } from './types';
-import { USDT_USDC_CHAINS, AMOUNTS, toWei, fromWei } from './config';
+import { USDT_USDC_CHAINS, AMOUNTS, toWei, fromWei, getAllUnstableTokens } from './config';
+
+// 检查路由路径是否包含不稳定代币
+function hasUnstableTokenInRoute(route: Array<Array<{
+  pool: string;
+  tokenIn: string;
+  tokenOut: string;
+  swapAmount: string;
+}>>): boolean {
+  const unstableTokens = getAllUnstableTokens();
+
+  for (const path of route) {
+    for (const hop of path) {
+      // 检查路径中的每个代币是否在不稳定代币列表中
+      if (unstableTokens.has(hop.tokenIn.toLowerCase()) ||
+          unstableTokens.has(hop.tokenOut.toLowerCase())) {
+        
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
 
 // 调用 KyberSwap API 获取报价
 export async function getQuote(
@@ -35,6 +58,14 @@ export async function getQuote(
     const data: KyberSwapQuoteResponse = await response.json();
 
     if (data.code === 0 && data.data?.routeSummary) {
+      // 检查路由路径是否包含不稳定代币
+      if (data.data.routeSummary.route && hasUnstableTokenInRoute(data.data.routeSummary.route)) {
+        return {
+          success: false,
+          error: 'Route contains unstable tokens (ETH/WETH/WBTC)'
+        };
+      }
+
       return {
         success: true,
         amountOut: data.data.routeSummary.amountOut,

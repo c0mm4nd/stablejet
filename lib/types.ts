@@ -33,6 +33,14 @@ export interface KyberSwapQuoteResponse {
     routeSummary?: {
       amountOut: string;
       amountOutUsd: string;
+      tokenIn: string;
+      tokenOut: string;
+      route: Array<Array<{
+        pool: string;
+        tokenIn: string;
+        tokenOut: string;
+        swapAmount: string;
+      }>>;
     };
   };
 }
