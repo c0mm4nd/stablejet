@@ -1,9 +1,6 @@
-import SwapDataGrid from '@/components/SwapDataGrid';
+'use client';
 
-export const metadata = {
-  title: 'StableJet Monitor - USDC/USDT 跨链兑换监控',
-  description: '使用 KyberSwap API 监控多链 USDC/USDT 兑换汇率',
-};
+import SwapDataGrid from '@/components/SwapDataGrid';
 
 export default function Home() {
   return <SwapDataGrid />;

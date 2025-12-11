@@ -1,19 +1,30 @@
-import type { Metadata } from 'next';
+'use client';
+
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { useEffect } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: 'StableJet Monitor',
-  description: 'USDC/USDT 跨链兑换监控工具',
-};
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  useEffect(() => {
+    // 客户端设置页面标题
+    document.title = 'StableJet Monitor';
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'USDC/USDT 跨链兑换监控工具');
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'description';
+      meta.content = 'USDC/USDT 跨链兑换监控工具';
+      document.head.appendChild(meta);
+    }
+  }, []);
+
   return (
     <html lang="zh-CN">
       <body className={inter.className}>{children}</body>
