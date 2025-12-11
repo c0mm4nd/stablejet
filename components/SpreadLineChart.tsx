@@ -219,8 +219,8 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
               name={`${CHAIN_DISPLAY_NAMES[chain] || chain} (U→T)`}
               stroke={USDC_TO_USDT_COLORS[chain]}
               strokeWidth={2}
-              dot={{ r: 2 }}
-              activeDot={{ r: 5 }}
+              dot={false}
+              activeDot={{ r: 6 }}
               connectNulls
             />
           ))}
@@ -235,8 +235,8 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
               stroke={USDT_TO_USDC_COLORS[chain]}
               strokeWidth={2}
               strokeDasharray="5 5"
-              dot={{ r: 2 }}
-              activeDot={{ r: 5 }}
+              dot={false}
+              activeDot={{ r: 6 }}
               connectNulls
             />
           ))}

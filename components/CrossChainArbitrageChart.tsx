@@ -188,8 +188,8 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
               name={pairKey}
               stroke={CHAIN_PAIR_COLORS[index % CHAIN_PAIR_COLORS.length]}
               strokeWidth={2}
-              dot={{ r: 2 }}
-              activeDot={{ r: 5 }}
+              dot={false}
+              activeDot={{ r: 6 }}
               connectNulls
             />
           ))}
