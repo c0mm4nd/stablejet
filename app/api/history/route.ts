@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getHistoryInRange } from '@/lib/history';
+import backgroundFetcher from '@/lib/background-fetcher';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +8,12 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const hours = parseInt(searchParams.get('hours') || '24', 10);
+
+    // 确保后台数据获取任务已启动（首次请求时自动拉起）
+    const status = backgroundFetcher.getStatus();
+    if (!status.isRunning) {
+      backgroundFetcher.start();
+    }
 
     const history = getHistoryInRange(hours);
 
