@@ -8,12 +8,19 @@
     "start": "next start",
     "lint": "next lint"
   },
-  "keywords": ["kyberswap", "usdc", "usdt", "crypto", "monitoring", "nextjs"],
+  "keywords": [
+    "kyberswap",
+    "usdc",
+    "usdt",
+    "crypto",
+    "monitoring",
+    "nextjs"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "better-sqlite3": "^9.2.2",
-    "next": "^15.1.0",
+    "next": "^16.0.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^2.15.0"
