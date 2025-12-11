@@ -9,26 +9,59 @@ interface SpreadLineChartProps {
   amount: number;
 }
 
+// 链标识符到显示名称的映射
+const CHAIN_DISPLAY_NAMES: Record<string, string> = {
+  'ethereum': 'Ethereum',
+  'polygon': 'Polygon',
+  'arbitrum': 'Arbitrum',
+  'optimism': 'Optimism',
+  'base': 'Base',
+  'bsc': 'BSC',
+  'avalanche': 'Avalanche',
+  'hyperevm': 'HyperEVM',
+  'monad': 'Monad',
+  'sonic': 'Sonic',
+  'etherlink': 'Etherlink',
+  'mantle': 'Mantle',
+  'mantle_0': 'Mantle0',
+  'unichain': 'UniChain',
+  'berachain': 'Berachain',
+};
+
 // USDC → USDT 使用蓝色系（冷色调）
 const USDC_TO_USDT_COLORS: Record<string, string> = {
-  'Ethereum': '#3B82F6',      // 蓝色
-  'Polygon': '#8B5CF6',       // 紫色
-  'Arbitrum': '#06B6D4',      // 青色
-  'Optimism': '#6366F1',      // 靛蓝
-  'Base': '#0EA5E9',          // 天蓝
-  'BSC': '#14B8A6',           // 青绿
-  'Avalanche': '#0284C7',     // 深蓝
+  'ethereum': '#3B82F6',      // 蓝色
+  'polygon': '#8B5CF6',       // 紫色
+  'arbitrum': '#06B6D4',      // 青色
+  'optimism': '#6366F1',      // 靛蓝
+  'base': '#0EA5E9',          // 天蓝
+  'bsc': '#14B8A6',           // 青绿
+  'avalanche': '#0284C7',     // 深蓝
+  'hyperevm': '#0891B2',      // 蓝绿
+  'monad': '#4F46E5',         // 深靛蓝
+  'sonic': '#2563EB',         // 皇家蓝
+  'etherlink': '#7C3AED',     // 深紫
+  'mantle': '#059669',        // 祖母绿
+  'unichain': '#1D4ED8',      // 宝蓝
+  'berachain': '#0D9488',     // 水鸭青
 };
 
 // USDT → USDC 使用橙/红色系（暖色调）
 const USDT_TO_USDC_COLORS: Record<string, string> = {
-  'Ethereum': '#F59E0B',      // 琥珀色
-  'Polygon': '#EF4444',       // 红色
-  'Arbitrum': '#F97316',      // 橙色
-  'Optimism': '#EC4899',      // 粉红
-  'Base': '#FB923C',          // 橙黄
-  'BSC': '#FBBF24',           // 黄色
-  'Avalanche': '#DC2626',     // 深红
+  'ethereum': '#F59E0B',      // 琥珀色
+  'polygon': '#EF4444',       // 红色
+  'arbitrum': '#F97316',      // 橙色
+  'optimism': '#EC4899',      // 粉红
+  'base': '#FB923C',          // 橙黄
+  'bsc': '#FBBF24',           // 黄色
+  'avalanche': '#DC2626',     // 深红
+  'hyperevm': '#EA580C',      // 深橙
+  'monad': '#BE123C',         // 玫瑰红
+  'sonic': '#D97706',         // 金橙
+  'etherlink': '#DB2777',     // 洋红
+  'mantle': '#CA8A04',        // 金黄
+  'unichain': '#C2410C',      // 砖红
+  'berachain': '#B45309',     // 棕橙
 };
 
 // 自定义 Tooltip 组件
@@ -102,8 +135,16 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
         const usdcToUsdtSpread = calculateSpreadBps(item.usdcToUsdt.input, item.usdcToUsdt.output);
         const usdtToUsdcSpread = calculateSpreadBps(item.usdtToUsdc.input, item.usdtToUsdc.output);
 
-        allSpreads[`${item.chain} (U→T)`].push(usdcToUsdtSpread);
-        allSpreads[`${item.chain} (T→U)`].push(usdtToUsdcSpread);
+        // 确保数组已初始化（处理配置中有但颜色定义中没有的链）
+        if (!allSpreads[`${item.chainKey} (U→T)`]) {
+          allSpreads[`${item.chainKey} (U→T)`] = [];
+        }
+        if (!allSpreads[`${item.chainKey} (T→U)`]) {
+          allSpreads[`${item.chainKey} (T→U)`] = [];
+        }
+
+        allSpreads[`${item.chainKey} (U→T)`].push(usdcToUsdtSpread);
+        allSpreads[`${item.chainKey} (T→U)`].push(usdtToUsdcSpread);
       });
   });
 
@@ -125,19 +166,19 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
         const usdcToUsdtSpread = calculateSpreadBps(item.usdcToUsdt.input, item.usdcToUsdt.output);
         const filteredUsdcToUsdt = filterOutliers(
           usdcToUsdtSpread !== null ? parseFloat(usdcToUsdtSpread.toFixed(2)) : null,
-          allSpreads[`${item.chain} (U→T)`],
+          allSpreads[`${item.chainKey} (U→T)`],
           10
         );
-        dataPoint[`${item.chain} (U→T)`] = filteredUsdcToUsdt;
+        dataPoint[`${item.chainKey} (U→T)`] = filteredUsdcToUsdt;
 
         // USDT → USDC
         const usdtToUsdcSpread = calculateSpreadBps(item.usdtToUsdc.input, item.usdtToUsdc.output);
         const filteredUsdtToUsdc = filterOutliers(
           usdtToUsdcSpread !== null ? parseFloat(usdtToUsdcSpread.toFixed(2)) : null,
-          allSpreads[`${item.chain} (T→U)`],
+          allSpreads[`${item.chainKey} (T→U)`],
           10
         );
-        dataPoint[`${item.chain} (T→U)`] = filteredUsdtToUsdc;
+        dataPoint[`${item.chainKey} (T→U)`] = filteredUsdtToUsdc;
       });
 
     return dataPoint;
@@ -175,7 +216,7 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
               key={`${chain}-usdc-usdt`}
               type="monotone"
               dataKey={`${chain} (U→T)`}
-              name={`${chain} (U→T)`}
+              name={`${CHAIN_DISPLAY_NAMES[chain] || chain} (U→T)`}
               stroke={USDC_TO_USDT_COLORS[chain]}
               strokeWidth={2}
               dot={{ r: 2 }}
@@ -190,7 +231,7 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
               key={`${chain}-usdt-usdc`}
               type="monotone"
               dataKey={`${chain} (T→U)`}
-              name={`${chain} (T→U)`}
+              name={`${CHAIN_DISPLAY_NAMES[chain] || chain} (T→U)`}
               stroke={USDT_TO_USDC_COLORS[chain]}
               strokeWidth={2}
               strokeDasharray="5 5"
