@@ -84,16 +84,30 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
           chainPairs[pairKey] = [];
         }
 
-        // 在 buyChain 用 USDC 买 USDT，在 sellChain 用 USDT 买 USDC
-        const buySpread = calculateSpreadBps(buyChain.usdcToUsdt.input, buyChain.usdcToUsdt.output);
-        const sellSpread = calculateSpreadBps(sellChain.usdtToUsdc.input, sellChain.usdtToUsdc.output);
+        // 计算两个方向的套利，选择利润更高的
+        // 方向1: 在 buyChain 用 USDC 买 USDT，在 sellChain 用 USDT 买 USDC
+        const direction1_buySpread = calculateSpreadBps(buyChain.usdcToUsdt.input, buyChain.usdcToUsdt.output);
+        const direction1_sellSpread = calculateSpreadBps(sellChain.usdtToUsdc.input, sellChain.usdtToUsdc.output);
 
-        if (buySpread !== null && sellSpread !== null) {
-          const totalProfit = buySpread + sellSpread;
-          chainPairs[pairKey].push(totalProfit);
-        } else {
-          chainPairs[pairKey].push(null);
+        // 方向2: 在 buyChain 用 USDT 买 USDC，在 sellChain 用 USDC 买 USDT
+        const direction2_buySpread = calculateSpreadBps(buyChain.usdtToUsdc.input, buyChain.usdtToUsdc.output);
+        const direction2_sellSpread = calculateSpreadBps(sellChain.usdcToUsdt.input, sellChain.usdcToUsdt.output);
+
+        let bestProfit = null;
+
+        if (direction1_buySpread !== null && direction1_sellSpread !== null) {
+          const direction1_profit = direction1_buySpread + direction1_sellSpread;
+          bestProfit = direction1_profit;
         }
+
+        if (direction2_buySpread !== null && direction2_sellSpread !== null) {
+          const direction2_profit = direction2_buySpread + direction2_sellSpread;
+          if (bestProfit === null || direction2_profit > bestProfit) {
+            bestProfit = direction2_profit;
+          }
+        }
+
+        chainPairs[pairKey].push(bestProfit);
       }
     }
   });
@@ -129,15 +143,33 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
       const sellChain = amountData.find(item => item.chain === sellChainName);
 
       if (buyChain && sellChain) {
-        const buySpread = calculateSpreadBps(buyChain.usdcToUsdt.input, buyChain.usdcToUsdt.output);
-        const sellSpread = calculateSpreadBps(sellChain.usdtToUsdc.input, sellChain.usdtToUsdc.output);
+        // 计算两个方向的套利，选择利润更高的
+        // 方向1: 在 buyChain 用 USDC 买 USDT，在 sellChain 用 USDT 买 USDC
+        const direction1_buySpread = calculateSpreadBps(buyChain.usdcToUsdt.input, buyChain.usdcToUsdt.output);
+        const direction1_sellSpread = calculateSpreadBps(sellChain.usdtToUsdc.input, sellChain.usdtToUsdc.output);
 
-        if (buySpread !== null && sellSpread !== null) {
-          let totalProfit = buySpread + sellSpread;
+        // 方向2: 在 buyChain 用 USDT 买 USDC，在 sellChain 用 USDC 买 USDT
+        const direction2_buySpread = calculateSpreadBps(buyChain.usdtToUsdc.input, buyChain.usdtToUsdc.output);
+        const direction2_sellSpread = calculateSpreadBps(sellChain.usdcToUsdt.input, sellChain.usdcToUsdt.output);
 
+        let bestProfit = null;
+
+        if (direction1_buySpread !== null && direction1_sellSpread !== null) {
+          const direction1_profit = direction1_buySpread + direction1_sellSpread;
+          bestProfit = direction1_profit;
+        }
+
+        if (direction2_buySpread !== null && direction2_sellSpread !== null) {
+          const direction2_profit = direction2_buySpread + direction2_sellSpread;
+          if (bestProfit === null || direction2_profit > bestProfit) {
+            bestProfit = direction2_profit;
+          }
+        }
+
+        if (bestProfit !== null) {
           // 过滤异常值
           const filtered = filterOutliers(
-            totalProfit,
+            bestProfit,
             chainPairs[pairKey],
             10
           );
@@ -204,8 +236,8 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
         </p>
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <p className="text-xs text-blue-800">
-            <strong>套利说明：</strong>在链A用USDC购买USDT，然后在链B用USDT购买USDC。
-            收益为正表示最终获得的USDC多于初始投入。
+            <strong>套利说明：</strong>对于每个链对，系统会自动计算两个方向的套利（USDC→USDT→USDC 和 USDT→USDC→USDT），
+            并显示利润更高的那个方向。收益为正表示存在套利机会。
           </p>
         </div>
       </div>

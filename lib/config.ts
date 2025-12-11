@@ -80,7 +80,7 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
 };
 
 // 测试金额（以美元为单位）
-export const AMOUNTS = [1000, 10000, 20000, 50000];
+export const AMOUNTS = [5000, 10000, 30000, 50000];
 
 // 将美元金额转换为 wei（6位小数的稳定币）
 export function toWei(amount: number): string {
