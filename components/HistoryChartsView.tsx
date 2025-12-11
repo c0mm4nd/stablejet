@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
-import { AMOUNTS } from '@/lib/config';
+import { useConfig } from '@/contexts/ConfigContext';
 import SpreadLineChart from './SpreadLineChart';
 import CrossChainArbitrageChart from './CrossChainArbitrageChart';
 
@@ -11,6 +11,7 @@ interface HistoryChartsViewProps {
 }
 
 export default function HistoryChartsView({ history }: HistoryChartsViewProps) {
+  const { amounts, chains } = useConfig();
   // 全局时间窗口状态（单位：分钟）
   const [timeWindow, setTimeWindow] = useState(10);
 
@@ -26,10 +27,22 @@ export default function HistoryChartsView({ history }: HistoryChartsViewProps) {
   // 根据时间窗口过滤历史数据
   const now = Date.now();
   const windowMs = timeWindow * 60 * 1000;
-  const filteredHistory = history.filter(point => {
-    const pointTime = new Date(point.timestamp).getTime();
-    return now - pointTime <= windowMs;
-  });
+  const enabledChainNames = Object.values(chains).map(c => c.name);
+
+  const filteredHistory = history
+    .filter(point => {
+      const pointTime = new Date(point.timestamp).getTime();
+      return now - pointTime <= windowMs;
+    })
+    .map(point => ({
+      ...point,
+      // 只保留配置中启用的链和金额
+      data: point.data.filter(item =>
+        enabledChainNames.includes(item.chain) &&
+        amounts.includes(item.amount)
+      )
+    }))
+    .filter(point => point.data.length > 0); // 过滤掉没有数据的时间点
 
   return (
     <div className="space-y-8">
@@ -58,7 +71,7 @@ export default function HistoryChartsView({ history }: HistoryChartsViewProps) {
 
       {/* 图表区域 */}
       <div className="space-y-12">
-        {AMOUNTS.map((amount) => (
+        {amounts.map((amount, index) => (
           <div key={amount} className="space-y-6">
             {/* 双向价差对比图 */}
             <SpreadLineChart history={filteredHistory} amount={amount} />

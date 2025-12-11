@@ -1,20 +1,17 @@
 import { NextResponse } from 'next/server';
-import { getAllSwapData } from '@/lib/kyberswap';
-import { saveDataPoint } from '@/lib/history';
+import backgroundFetcher from '@/lib/background-fetcher';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+// 手动触发一次数据获取（用于立即刷新）
+export async function POST() {
   try {
-    const data = await getAllSwapData();
-
-    // 保存到历史记录
-    saveDataPoint(data);
+    await backgroundFetcher.fetchData();
 
     return NextResponse.json({
       success: true,
       timestamp: new Date().toISOString(),
-      data
+      message: 'Data fetch triggered successfully'
     });
   } catch (error) {
     return NextResponse.json(

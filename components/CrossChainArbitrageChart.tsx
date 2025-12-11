@@ -34,42 +34,109 @@ const CHAIN_PAIR_COLORS: string[] = [
 ];
 
 // 自定义 Tooltip 组件
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label, detailsMap }: any) => {
   if (!active || !payload || !payload.length) return null;
 
-  // 按收益排序
+  // 按收益排序，只显示前8个
   const sortedPayload = [...payload].sort((a, b) => (b.value || 0) - (a.value || 0));
+  const displayPayload = sortedPayload.slice(0, 8);
+  const hasMore = sortedPayload.length > 8;
 
   return (
-    <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-3 min-w-[300px] max-h-[400px] overflow-y-auto">
-      <p className="font-semibold text-gray-800 mb-3 text-sm border-b pb-2">{label}</p>
-      <div className="space-y-1">
-        {sortedPayload.slice(0, 15).map((entry: any, index: number) => (
-          <div key={entry.dataKey} className="flex items-center gap-2 text-xs">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-            <span className="font-medium text-gray-700 flex-1">
-              {entry.dataKey}:
-            </span>
-            <span className={`font-bold ${entry.value >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {entry.value.toFixed(2)} bps
-            </span>
-          </div>
-        ))}
-        {sortedPayload.length > 15 && (
-          <p className="text-xs text-gray-500 mt-2">... 还有 {sortedPayload.length - 15} 个链对</p>
-        )}
+    <div className="bg-white border-2 border-gray-400 rounded-lg shadow-2xl min-w-[440px] max-w-[500px]">
+      {/* 标题 */}
+      <div className="font-semibold text-gray-800 px-4 pt-3 pb-2 text-sm border-b bg-gray-50 rounded-t-lg">
+        {label} {hasMore && <span className="text-gray-500 font-normal">(显示前 8 个)</span>}
+      </div>
+
+      {/* 内容区域 - 紧凑布局 */}
+      <div className="px-3 py-2 space-y-2">
+        {displayPayload.map((entry: any) => {
+          const detail = detailsMap?.[entry.dataKey];
+
+          return (
+            <div key={entry.dataKey} className="border-l-4 pl-2.5 py-1.5 bg-gray-50 rounded-r" style={{ borderColor: entry.color }}>
+              {/* 链对名称和总利润 */}
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="font-bold text-gray-800 text-xs">
+                  {entry.dataKey}
+                </span>
+                <span className={`font-bold text-base ${entry.value >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {entry.value >= 0 ? '+' : ''}{entry.value.toFixed(2)} bps
+                </span>
+              </div>
+
+              {/* 详细路径 - 横向布局 */}
+              {detail && (
+                <div className="text-[11px] space-y-1">
+                  {/* 方向 */}
+                  <div className="font-semibold text-purple-700 text-xs mb-1">
+                    {detail.direction}
+                  </div>
+
+                  {/* 步骤1和2横向排列 */}
+                  <div className="flex items-start gap-3">
+                    {/* 步骤1 */}
+                    <div className="flex-1 bg-white rounded px-2 py-1">
+                      <div className="text-gray-500 mb-0.5">① {detail.step1Chain}</div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-blue-600 font-medium">{detail.step1Pair}</span>
+                        <span className={`font-bold ${detail.step1Bps >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {detail.step1Bps >= 0 ? '+' : ''}{detail.step1Bps}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 步骤2 */}
+                    <div className="flex-1 bg-white rounded px-2 py-1">
+                      <div className="text-gray-500 mb-0.5">② {detail.step2Chain}</div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-blue-600 font-medium">{detail.step2Pair}</span>
+                        <span className={`font-bold ${detail.step2Bps >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {detail.step2Bps >= 0 ? '+' : ''}{detail.step2Bps}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 底部统计 */}
+      <div className="px-4 py-2 text-xs text-gray-500 border-t bg-gray-50 rounded-b-lg flex justify-between">
+        <span>共 {sortedPayload.length} 个链对</span>
+        {hasMore && <span className="text-orange-600">还有 {sortedPayload.length - 8} 个未显示</span>}
       </div>
     </div>
   );
 };
 
+interface ArbitrageDetail {
+  profit: number;
+  direction: 'USDC→USDT→USDC' | 'USDT→USDC→USDT';
+  step1Chain: string;
+  step1Pair: string;
+  step1Bps: number;
+  step2Chain: string;
+  step2Pair: string;
+  step2Bps: number;
+}
+
 export default function CrossChainArbitrageChart({ history, amount }: CrossChainArbitrageChartProps) {
   // 首先收集所有链对的套利数据
   const chainPairs: { [key: string]: (number | null)[] } = {};
+  const chainPairDetails: { [timestamp: string]: { [pairKey: string]: ArbitrageDetail | null } } = {};
 
   // 收集所有套利值
   history.forEach(point => {
     const amountData = point.data.filter(item => item.amount === amount);
+
+    if (!chainPairDetails[point.timestamp]) {
+      chainPairDetails[point.timestamp] = {};
+    }
 
     // 计算所有可能的链对组合
     for (let i = 0; i < amountData.length; i++) {
@@ -94,20 +161,42 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
         const direction2_sellSpread = calculateSpreadBps(sellChain.usdcToUsdt.input, sellChain.usdcToUsdt.output);
 
         let bestProfit = null;
+        let bestDetail: ArbitrageDetail | null = null;
 
         if (direction1_buySpread !== null && direction1_sellSpread !== null) {
           const direction1_profit = direction1_buySpread + direction1_sellSpread;
           bestProfit = direction1_profit;
+          bestDetail = {
+            profit: direction1_profit,
+            direction: 'USDC→USDT→USDC',
+            step1Chain: buyChain.chain,
+            step1Pair: 'USDC→USDT',
+            step1Bps: direction1_buySpread,
+            step2Chain: sellChain.chain,
+            step2Pair: 'USDT→USDC',
+            step2Bps: direction1_sellSpread
+          };
         }
 
         if (direction2_buySpread !== null && direction2_sellSpread !== null) {
           const direction2_profit = direction2_buySpread + direction2_sellSpread;
           if (bestProfit === null || direction2_profit > bestProfit) {
             bestProfit = direction2_profit;
+            bestDetail = {
+              profit: direction2_profit,
+              direction: 'USDT→USDC→USDT',
+              step1Chain: buyChain.chain,
+              step1Pair: 'USDT→USDC',
+              step1Bps: direction2_buySpread,
+              step2Chain: sellChain.chain,
+              step2Pair: 'USDC→USDT',
+              step2Bps: direction2_sellSpread
+            };
           }
         }
 
         chainPairs[pairKey].push(bestProfit);
+        chainPairDetails[point.timestamp][pairKey] = bestDetail;
       }
     }
   });
@@ -133,7 +222,11 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
       second: '2-digit'
     });
 
-    const dataPoint: any = { timestamp };
+    const dataPoint: any = {
+      timestamp,
+      _rawTimestamp: point.timestamp, // 保存原始时间戳用于查找详细信息
+      _details: chainPairDetails[point.timestamp] || {} // 保存详细信息
+    };
     const amountData = point.data.filter(item => item.amount === amount);
 
     // 只显示最有利可图的链对
@@ -206,7 +299,11 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
             style={{ fontSize: '12px' }}
             label={{ value: '套利收益 (bps)', angle: -90, position: 'insideLeft' }}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={(props) => {
+            // 从当前数据点获取详细信息
+            const detailsMap = props.payload?.[0]?.payload?._details || {};
+            return <CustomTooltip {...props} detailsMap={detailsMap} />;
+          }} />
           <Legend
             wrapperStyle={{ paddingTop: '20px', fontSize: '11px' }}
             iconType="line"
