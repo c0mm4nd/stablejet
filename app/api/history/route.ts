@@ -3,6 +3,7 @@ import { getHistoryInRange } from '@/lib/history';
 import backgroundFetcher from '@/lib/background-fetcher';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function GET(request: Request) {
   try {

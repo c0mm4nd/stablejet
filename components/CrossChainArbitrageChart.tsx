@@ -116,7 +116,7 @@ const CustomTooltip = ({ active, payload, label, detailsMap }: any) => {
 
 interface ArbitrageDetail {
   profit: number;
-  direction: 'USDC→USDT→USDC' | 'USDT→USDC→USDT';
+  direction: 'USDC→USDT→USDC', //| 'USDT→USDC→USDT';
   step1Chain: string;
   step1Pair: string;
   step1Bps: number;
@@ -157,8 +157,8 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
         const direction1_sellSpread = calculateSpreadBps(sellChain.usdtToUsdc.input, sellChain.usdtToUsdc.output);
 
         // 方向2: 在 buyChain 用 USDT 买 USDC，在 sellChain 用 USDC 买 USDT
-        const direction2_buySpread = calculateSpreadBps(buyChain.usdtToUsdc.input, buyChain.usdtToUsdc.output);
-        const direction2_sellSpread = calculateSpreadBps(sellChain.usdcToUsdt.input, sellChain.usdcToUsdt.output);
+        // const direction2_buySpread = calculateSpreadBps(buyChain.usdtToUsdc.input, buyChain.usdtToUsdc.output);
+        // const direction2_sellSpread = calculateSpreadBps(sellChain.usdcToUsdt.input, sellChain.usdcToUsdt.output);
 
         let bestProfit = null;
         let bestDetail: ArbitrageDetail | null = null;
@@ -178,22 +178,22 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
           };
         }
 
-        if (direction2_buySpread !== null && direction2_sellSpread !== null) {
-          const direction2_profit = direction2_buySpread + direction2_sellSpread;
-          if (bestProfit === null || direction2_profit > bestProfit) {
-            bestProfit = direction2_profit;
-            bestDetail = {
-              profit: direction2_profit,
-              direction: 'USDT→USDC→USDT',
-              step1Chain: buyChain.chain,
-              step1Pair: 'USDT→USDC',
-              step1Bps: direction2_buySpread,
-              step2Chain: sellChain.chain,
-              step2Pair: 'USDC→USDT',
-              step2Bps: direction2_sellSpread
-            };
-          }
-        }
+        // if (direction2_buySpread !== null && direction2_sellSpread !== null) {
+        //   const direction2_profit = direction2_buySpread + direction2_sellSpread;
+        //   if (bestProfit === null || direction2_profit > bestProfit) {
+        //     bestProfit = direction2_profit;
+        //     bestDetail = {
+        //       profit: direction2_profit,
+        //       direction: 'USDT→USDC→USDT',
+        //       step1Chain: buyChain.chain,
+        //       step1Pair: 'USDT→USDC',
+        //       step1Bps: direction2_buySpread,
+        //       step2Chain: sellChain.chain,
+        //       step2Pair: 'USDC→USDT',
+        //       step2Bps: direction2_sellSpread
+        //     };
+        //   }
+        // }
 
         chainPairs[pairKey].push(bestProfit);
         chainPairDetails[point.timestamp][pairKey] = bestDetail;

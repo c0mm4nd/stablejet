@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import backgroundFetcher from '@/lib/background-fetcher';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 // 启动或更新后台任务
 export async function POST(request: NextRequest) {

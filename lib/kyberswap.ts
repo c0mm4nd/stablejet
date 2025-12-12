@@ -59,12 +59,12 @@ export async function getQuote(
 
     if (data.code === 0 && data.data?.routeSummary) {
       // 检查路由路径是否包含不稳定代币
-      if (data.data.routeSummary.route && hasUnstableTokenInRoute(data.data.routeSummary.route)) {
-        return {
-          success: false,
-          error: 'Route contains unstable tokens (ETH/WETH/WBTC)'
-        };
-      }
+      // if (data.data.routeSummary.route && hasUnstableTokenInRoute(data.data.routeSummary.route)) {
+      //   return {
+      //     success: false,
+      //     error: 'Route contains unstable tokens (ETH/WETH/WBTC)'
+      //   };
+      // }
 
       return {
         success: true,
