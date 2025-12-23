@@ -52,7 +52,7 @@ export default function Header({ countdown }: HeaderProps) {
               <h3 className="font-semibold mb-2 text-blue-200">📊 支持网络</h3>
               <p className="opacity-80 leading-relaxed">
                 Ethereum • Polygon • Arbitrum • Optimism • Base • BSC • Avalanche •
-                HyperEVM • Monad • Sonic • Etherlink • Mantle • UniChain • Berachain
+                HyperEVM • Monad • Sonic • Etherlink • Mantle (USDC/USDT + USDC/USDT0) • UniChain • Berachain
               </p>
             </div>
             <div>

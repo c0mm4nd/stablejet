@@ -58,12 +58,12 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     usdt: "0x2C03058C8AFC06713be23e58D2febC8337dbfE6A",
   },
   mantle: {
-    name: "Mantle0",
+    name: "Mantle (USDC/USDT)",
     usdc: "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
     usdt: "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
   },
   mantle_0: {
-    name: "Mantle0",
+    name: "Mantle (USDC/USDT0)",
     usdc: "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
     usdt: "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
   },
