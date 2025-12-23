@@ -1,6 +1,6 @@
 import { ChainConfig } from "./types";
 
-// 配置：支持的链和代币地址
+// 配置：支持的链和代币地址 (KyberSwap)
 export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
   ethereum: {
     name: "Ethereum",
@@ -76,6 +76,33 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     name: "Berachain",
     usdc: "0x549943e04f40284185054145c6E4e9568C1D3241",
     usdt: "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+  },
+
+  // 以下链：KyberSwap 往往不支持或不稳定，默认走 OpenOcean
+  fantom: {
+    name: "Fantom",
+    usdc: "0x04068da6c83afcfa0e13ba15a6696662335d5b75",
+    usdt: "0x049d68029688eabf473097a2fc38ef61633a3c7a",
+  },
+  gnosis: {
+    name: "Gnosis",
+    usdc: "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83",
+    usdt: "0x4ecaba5870353805a9f068101a40e0f32ed605c6",
+  },
+  zksync: {
+    name: "zkSync Era",
+    usdc: "0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
+    usdt: "0x493257fd37edb34451f62edf8d2a0c418852ba4c",
+  },
+  linea: {
+    name: "Linea",
+    usdc: "0x176211869ca2b568f2a7d4ee941e073a821ee1ff",
+    usdt: "0xa219439258ca9da29e9cc4ce5596924745e12b93",
+  },
+  scroll: {
+    name: "Scroll",
+    usdc: "0x06efdbff2a14a7c8e15944d1f4a48f9f95f663a4",
+    usdt: "0xf55bec9cafdbe8730f096aa55dad6d22d44099df",
   },
 };
 
@@ -168,3 +195,40 @@ export function getAllUnstableTokens(): Set<string> {
   });
   return allTokens;
 }
+
+// OpenOcean API v4 的 chain path 参数（https://open-api.openocean.finance/v4/:chain/quote）
+// 注意：这里是 OpenOcean 的“链代号”，不是 chainId。
+export const OPENOCEAN_CHAIN_CODE_BY_CHAIN_KEY: Record<string, string> = {
+  ethereum: 'eth',
+  polygon: 'polygon',
+  arbitrum: 'arbitrum',
+  optimism: 'optimism',
+  base: 'base',
+  bsc: 'bsc',
+  avalanche: 'avax',
+
+  // OpenOcean 覆盖 KyberSwap 不支持/不稳定的链
+  fantom: 'fantom',
+  gnosis: 'gnosis',
+  zksync: 'zksync',
+  linea: 'linea',
+  scroll: 'scroll',
+
+  // 你现有配置里的一些新链（OpenOcean 文档里也有列出合约）
+  sonic: 'sonic',
+  hyperevm: 'hyperevm',
+  monad: 'monad',
+  unichain: 'unichain',
+  berachain: 'berachain',
+  mantle: 'mantle',
+  mantle_0: 'mantle',
+};
+
+// 明确指定：这些链默认走 OpenOcean（避免先打 KyberSwap 再 404）
+export const OPENOCEAN_ONLY_CHAINS = new Set<string>([
+  'fantom',
+  'gnosis',
+  'zksync',
+  'linea',
+  'scroll',
+]);

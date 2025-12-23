@@ -25,10 +25,27 @@ export default function SwapDataGrid() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
+  const buildApiUrl = (path: string, query?: Record<string, string | number | boolean | undefined>) => {
+    // Always use a no-trailing-slash form for API routes
+    const cleanPath = path.endsWith('/') ? path.slice(0, -1) : path;
+    const params = new URLSearchParams();
+    if (query) {
+      for (const [key, value] of Object.entries(query)) {
+        if (value === undefined) continue;
+        params.set(key, String(value));
+      }
+    }
+    const qs = params.toString();
+    return qs ? `${cleanPath}?${qs}` : cleanPath;
+  };
+
   const fetchData = useCallback(async () => {
     try {
       // 只获取历史数据（数据由服务器后台任务定期更新）
-      const historyResponse = await fetch('/api/history?hours=24');
+      const historyResponse = await fetch(
+        buildApiUrl('/api/history', { hours: 24, _ts: Date.now() }),
+        { cache: 'no-store' }
+      );
       const historyResult: HistoryResponse = await historyResponse.json();
 
       if (historyResult.success && historyResult.data.length > 0) {

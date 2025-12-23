@@ -1,5 +1,8 @@
 import { getAllSwapData } from './kyberswap';
 import { saveDataPoint } from './history';
+import { getKyberSwapRateLimiterStatus } from './kyberswap';
+import { getOpenOceanRateLimiterStatus } from './openocean';
+import { getBinanceRateLimiterStatus } from './binance';
 
 class BackgroundFetcher {
   private intervalId: NodeJS.Timeout | null = null;
@@ -45,14 +48,14 @@ class BackgroundFetcher {
   async fetchData() {
     // 防止重复请求
     if (this.isFetching) {
-      console.log('Already fetching data, skipping...');
+      console.log('[BackgroundFetcher] Already fetching data, skipping...');
       return;
     }
 
     // 防抖：如果距离上次请求不到1秒，跳过
     const now = Date.now();
     if (now - this.lastFetchTime < 1000) {
-      console.log('Fetched too recently, skipping...');
+      console.log('[BackgroundFetcher] Fetched too recently, skipping...');
       return;
     }
 
@@ -60,12 +63,78 @@ class BackgroundFetcher {
     this.lastFetchTime = now;
 
     try {
-      console.log(`[${new Date().toISOString()}] Fetching swap data...`);
+      console.log(`\n${'='.repeat(70)}`);
+      console.log(`[BackgroundFetcher] [${new Date().toISOString()}] Starting data fetch...`);
+      console.log(`${'='.repeat(70)}`);
+      
+      // getAllSwapData 会按链选择数据源（KyberSwap/OpenOcean/Binance）并返回统一结构
       const data = await getAllSwapData();
+      
+      // 统计成功和失败
+      let successCount = 0;
+      let failureCount = 0;
+      const dataSourceStats: Record<string, { success: number; failed: number }> = {};
+      
+      for (const item of data) {
+        const source = item.dataSource || 'kyberswap';
+        if (!dataSourceStats[source]) {
+          dataSourceStats[source] = { success: 0, failed: 0 };
+        }
+        
+        const hasUsdcToUsdtSuccess = item.usdcToUsdt.output !== null && item.usdcToUsdt.output > 0;
+        const hasUsdtToUsdcSuccess = item.usdtToUsdc.output !== null && item.usdtToUsdc.output > 0;
+        
+        if (hasUsdcToUsdtSuccess) {
+          dataSourceStats[source].success++;
+          successCount++;
+        } else {
+          dataSourceStats[source].failed++;
+          failureCount++;
+        }
+        
+        if (hasUsdtToUsdcSuccess) {
+          dataSourceStats[source].success++;
+          successCount++;
+        } else {
+          dataSourceStats[source].failed++;
+          failureCount++;
+        }
+      }
+      
       saveDataPoint(data);
-      console.log(`[${new Date().toISOString()}] Data saved successfully`);
+      
+      console.log(`\n[BackgroundFetcher] ✓ Data fetch completed`);
+      console.log(`  Total requests: ${successCount + failureCount}`);
+      console.log(`  Successful: ${successCount} (${((successCount / (successCount + failureCount)) * 100).toFixed(1)}%)`);
+      console.log(`  Failed: ${failureCount}`);
+      console.log('\n  By data source:');
+      for (const [source, stats] of Object.entries(dataSourceStats)) {
+        const total = stats.success + stats.failed;
+        const rate = ((stats.success / total) * 100).toFixed(1);
+        console.log(`    ${source}: ${stats.success}/${total} (${rate}%)`);
+      }
+      
+      // 显示速率限制器状态
+      console.log('\n  Rate limiters:');
+      try {
+        const kyberStatus = getKyberSwapRateLimiterStatus();
+        console.log(`    KyberSwap: ${kyberStatus.current}/${kyberStatus.max} @ ${kyberStatus.rate}`);
+      } catch (e) { /* ignore */ }
+      
+      try {
+        const openoceanStatus = getOpenOceanRateLimiterStatus();
+        console.log(`    OpenOcean: ${openoceanStatus.current}/${openoceanStatus.max} @ ${openoceanStatus.rate}`);
+      } catch (e) { /* ignore */ }
+      
+      try {
+        const binanceStatus = getBinanceRateLimiterStatus();
+        console.log(`    Binance: ${binanceStatus.rate}`);
+      } catch (e) { /* ignore */ }
+      
+      console.log(`${'='.repeat(70)}\n`);
     } catch (error) {
-      console.error('Error fetching data in background:', error);
+      console.error('\n[BackgroundFetcher] ✗ Error fetching data:', error instanceof Error ? error.message : 'Unknown error');
+      console.error(`${'='.repeat(70)}\n`);
     } finally {
       this.isFetching = false;
     }

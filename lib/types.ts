@@ -15,6 +15,7 @@ export interface ChainSwapData {
   chain: string;
   chainKey: string;
   amount: number;
+  dataSource?: 'kyberswap' | 'openocean' | 'binance'; // 数据来源
   usdcToUsdt: SwapResult;
   usdtToUsdc: SwapResult;
 }
@@ -49,5 +50,28 @@ export interface QuoteResult {
   success: boolean;
   amountOut?: string;
   amountOutUsd?: string;
+  error?: string;
+}
+
+export interface OpenOceanQuoteResponse {
+  code: number;
+  data?: {
+    inToken: {
+      symbol: string;
+      name: string;
+      address: string;
+      decimals: number;
+    };
+    outToken: {
+      symbol: string;
+      name: string;
+      address: string;
+      decimals: number;
+    };
+    inAmount: string;
+    outAmount: string;
+    estimatedGas: string;
+    path?: any;
+  };
   error?: string;
 }

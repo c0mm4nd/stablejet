@@ -126,6 +126,9 @@ interface ArbitrageDetail {
 }
 
 export default function CrossChainArbitrageChart({ history, amount }: CrossChainArbitrageChartProps) {
+  const sourceSuffix = (source?: string) => (source === 'openocean' ? 'OO' : 'KS');
+  const itemLabel = (item: any) => `${item.chain} [${sourceSuffix(item.dataSource)}]`;
+
   // 首先收集所有链对的套利数据
   const chainPairs: { [key: string]: (number | null)[] } = {};
   const chainPairDetails: { [timestamp: string]: { [pairKey: string]: ArbitrageDetail | null } } = {};
@@ -145,7 +148,7 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
 
         const buyChain = amountData[i];
         const sellChain = amountData[j];
-        const pairKey = `${buyChain.chain}→${sellChain.chain}`;
+        const pairKey = `${itemLabel(buyChain)}→${itemLabel(sellChain)}`;
 
         if (!chainPairs[pairKey]) {
           chainPairs[pairKey] = [];
@@ -169,10 +172,10 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
           bestDetail = {
             profit: direction1_profit,
             direction: 'USDC→USDT→USDC',
-            step1Chain: buyChain.chain,
+            step1Chain: itemLabel(buyChain),
             step1Pair: 'USDC→USDT',
             step1Bps: direction1_buySpread,
-            step2Chain: sellChain.chain,
+            step2Chain: itemLabel(sellChain),
             step2Pair: 'USDT→USDC',
             step2Bps: direction1_sellSpread
           };
@@ -228,12 +231,13 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
       _details: chainPairDetails[point.timestamp] || {} // 保存详细信息
     };
     const amountData = point.data.filter(item => item.amount === amount);
+    const amountDataByLabel = new Map<string, any>(amountData.map(item => [itemLabel(item), item]));
 
     // 只显示最有利可图的链对
     profitablePairs.forEach(pairKey => {
       const [buyChainName, sellChainName] = pairKey.split('→');
-      const buyChain = amountData.find(item => item.chain === buyChainName);
-      const sellChain = amountData.find(item => item.chain === sellChainName);
+      const buyChain = amountDataByLabel.get(buyChainName);
+      const sellChain = amountDataByLabel.get(sellChainName);
 
       if (buyChain && sellChain) {
         // 计算两个方向的套利，选择利润更高的

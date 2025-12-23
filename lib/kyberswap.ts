@@ -1,5 +1,71 @@
+import axios from 'axios';
 import { QuoteResult, KyberSwapQuoteResponse, ChainSwapData } from './types';
-import { USDT_USDC_CHAINS, AMOUNTS, toWei, fromWei, getAllUnstableTokens } from './config';
+import { USDT_USDC_CHAINS, AMOUNTS, toWei, fromWei, getAllUnstableTokens, OPENOCEAN_ONLY_CHAINS } from './config';
+import { getOpenOceanQuoteByChainKey } from './openocean';
+import { getBinanceSwapData } from './binance';
+
+// axios 会自动使用环境变量中的代理：HTTP_PROXY, HTTPS_PROXY, NO_PROXY
+const axiosInstance = axios.create({
+  timeout: 15000, // 15秒超时
+  headers: {
+    'x-client-id': 'stablejet-monitor',
+    'Accept': 'application/json',
+    'User-Agent': 'stablejet-monitor/1.0'
+  }
+});
+
+// 延迟函数
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// KyberSwap 速率限制器 - 10 RPS (100 requests / 10 seconds)
+class KyberSwapRateLimiter {
+  private requestTimes: number[] = [];
+  private readonly maxRequests = 100; // 10秒内最多100个请求
+  private readonly windowMs = 10000; // 10秒窗口
+  private readonly minInterval = 100; // 最小间隔100ms (10 RPS)
+
+  async waitForSlot(): Promise<void> {
+    const now = Date.now();
+    
+    // 清理超过时间窗口的请求记录
+    this.requestTimes = this.requestTimes.filter(time => now - time < this.windowMs);
+    
+    // 如果达到限制，等待直到有空位
+    while (this.requestTimes.length >= this.maxRequests) {
+      const oldestRequest = this.requestTimes[0];
+      const waitTime = this.windowMs - (now - oldestRequest) + 100;
+      await delay(waitTime);
+      
+      const newNow = Date.now();
+      this.requestTimes = this.requestTimes.filter(time => newNow - time < this.windowMs);
+    }
+    
+    // 确保最小间隔
+    if (this.requestTimes.length > 0) {
+      const lastRequest = this.requestTimes[this.requestTimes.length - 1];
+      const timeSinceLastRequest = now - lastRequest;
+      if (timeSinceLastRequest < this.minInterval) {
+        const waitTime = this.minInterval - timeSinceLastRequest;
+        await delay(waitTime);
+      }
+    }
+    
+    // 记录这次请求
+    this.requestTimes.push(Date.now());
+  }
+  
+  getStatus(): { current: number; max: number; rate: string } {
+    const now = Date.now();
+    this.requestTimes = this.requestTimes.filter(time => now - time < this.windowMs);
+    return {
+      current: this.requestTimes.length,
+      max: this.maxRequests,
+      rate: '10 RPS (100 req/10s)'
+    };
+  }
+}
+
+const rateLimiter = new KyberSwapRateLimiter();
 
 // 检查路由路径是否包含不稳定代币
 function hasUnstableTokenInRoute(route: Array<Array<{
@@ -43,19 +109,11 @@ export async function getQuote(
   });
 
   try {
-    const response = await fetch(`${url}?${params}`, {
-      headers: {
-        'x-client-id': 'stablejet-monitor'
-      },
-      // 添加缓存策略以避免过多请求
-      next: { revalidate: 10 }
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data: KyberSwapQuoteResponse = await response.json();
+    // 等待速率限制器允许
+    await rateLimiter.waitForSlot();
+    
+    const response = await axiosInstance.get<KyberSwapQuoteResponse>(`${url}?${params}`);
+    const data = response.data;
 
     if (data.code === 0 && data.data?.routeSummary) {
       // 检查路由路径是否包含不稳定代币
@@ -72,47 +130,66 @@ export async function getQuote(
         amountOutUsd: data.data.routeSummary.amountOutUsd
       };
     } else {
+      console.error(`[KyberSwap] No route found for ${chainClean}: ${data.message || 'Unknown'}`);
       return {
         success: false,
         error: data.message || 'No route found'
       };
     }
   } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const statusText = error.response?.statusText || '';
+      const message = `${error.message} (status: ${error.response?.status || 'N/A'}${statusText ? ', ' + statusText : ''})`;
+      console.error(`[KyberSwap] Error for ${chainClean}:`, message);
+      return {
+        success: false,
+        error: message
+      };
+    }
+    
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`[KyberSwap] Error for ${chainClean}:`, message);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: message
     };
   }
+}
+
+// 导出速率限制器状态
+export function getKyberSwapRateLimiterStatus() {
+  return rateLimiter.getStatus();
 }
 
 // 获取所有链的兑换数据
 export async function getAllSwapData(): Promise<ChainSwapData[]> {
   const results: ChainSwapData[] = [];
+  const binanceDataPromise = getBinanceSwapData(AMOUNTS);
 
   for (const [chainKey, chainConfig] of Object.entries(USDT_USDC_CHAINS)) {
     for (const amount of AMOUNTS) {
       const amountInWei = toWei(amount);
 
+      const chainCleanKey = chainKey.split('_')[0];
+      const useOpenOcean = OPENOCEAN_ONLY_CHAINS.has(chainKey) || OPENOCEAN_ONLY_CHAINS.has(chainCleanKey);
+
       // USDC -> USDT
-      const usdcToUsdt = await getQuote(
-        chainKey,
-        chainConfig.usdc,
-        chainConfig.usdt,
-        amountInWei
-      );
+      const usdcToUsdt = useOpenOcean
+        ? await getOpenOceanQuoteByChainKey(chainKey, chainConfig.usdc, chainConfig.usdt, amountInWei)
+        : await getQuote(chainKey, chainConfig.usdc, chainConfig.usdt, amountInWei);
 
       // USDT -> USDC
-      const usdtToUsdc = await getQuote(
-        chainKey,
-        chainConfig.usdt,
-        chainConfig.usdc,
-        amountInWei
-      );
+      const usdtToUsdc = useOpenOcean
+        ? await getOpenOceanQuoteByChainKey(chainKey, chainConfig.usdt, chainConfig.usdc, amountInWei)
+        : await getQuote(chainKey, chainConfig.usdt, chainConfig.usdc, amountInWei);
+
+      const dataSource: 'kyberswap' | 'openocean' = useOpenOcean ? 'openocean' : 'kyberswap';
 
       results.push({
         chain: chainConfig.name,
         chainKey,
         amount,
+        dataSource,
         usdcToUsdt: {
           input: amount,
           output: usdcToUsdt.success && usdcToUsdt.amountOut ? fromWei(usdcToUsdt.amountOut) : null,
@@ -127,6 +204,13 @@ export async function getAllSwapData(): Promise<ChainSwapData[]> {
         }
       });
     }
+  }
+
+  try {
+    const binanceData = await binanceDataPromise;
+    results.push(...binanceData);
+  } catch {
+    // getBinanceSwapData already returns per-amount errors; this is a safety net.
   }
 
   return results;

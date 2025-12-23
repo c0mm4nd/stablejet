@@ -52,6 +52,7 @@ export function initDatabase() {
       history_point_id INTEGER NOT NULL,
       chain TEXT NOT NULL,
       chain_key TEXT NOT NULL,
+      data_source TEXT NOT NULL DEFAULT 'kyberswap',
       amount INTEGER NOT NULL,
 
       usdc_to_usdt_input REAL NOT NULL,
@@ -70,6 +71,20 @@ export function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_history_point ON chain_data(history_point_id);
     CREATE INDEX IF NOT EXISTS idx_chain_amount ON chain_data(chain, amount);
   `);
+
+  // 轻量迁移：如果旧表缺少 data_source 列，则补齐
+  try {
+    const cols = db.prepare(`PRAGMA table_info(chain_data)`).all() as Array<{ name: string }>;
+    const hasDataSource = cols.some(c => c.name === 'data_source');
+    if (!hasDataSource) {
+      db.exec(`ALTER TABLE chain_data ADD COLUMN data_source TEXT`);
+      db.exec(`UPDATE chain_data SET data_source = 'kyberswap' WHERE data_source IS NULL`);
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_source_chain_amount ON chain_data(data_source, chain, amount)`);
+      console.log('Database migrated: added chain_data.data_source');
+    }
+  } catch (error) {
+    console.warn('Database migration check failed:', error);
+  }
 
   console.log('Database initialized successfully');
 }

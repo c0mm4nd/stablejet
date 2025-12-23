@@ -26,6 +26,7 @@ const CHAIN_DISPLAY_NAMES: Record<string, string> = {
   'mantle_0': 'Mantle0',
   'unichain': 'UniChain',
   'berachain': 'Berachain',
+  'binance': 'Binance',
 };
 
 // USDC → USDT 使用蓝色系（冷色调）
@@ -84,7 +85,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               <div key={entry.dataKey} className="flex items-center gap-2 text-xs">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
                 <span className="font-medium text-gray-700 min-w-[70px]">
-                  {entry.dataKey.replace(' (U→T)', '')}:
+                  {entry.name}:
                 </span>
                 <span className={`font-bold ${entry.value >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {entry.value} bps
@@ -103,7 +104,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               <div key={entry.dataKey} className="flex items-center gap-2 text-xs">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
                 <span className="font-medium text-gray-700 min-w-[70px]">
-                  {entry.dataKey.replace(' (T→U)', '')}:
+                  {entry.name}:
                 </span>
                 <span className={`font-bold ${entry.value >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {entry.value} bps
@@ -118,13 +119,26 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function SpreadLineChart({ history, amount }: SpreadLineChartProps) {
+  const seriesBases = Array.from(
+    new Set(
+      history
+        .flatMap(point => point.data)
+        .filter(item => item.amount === amount)
+        .map(item => `${item.chainKey}@${item.dataSource || 'kyberswap'}`)
+    )
+  ).sort();
+
+  const sourceSuffix = (source: string) => (source === 'openocean' ? 'OO' : 'KS');
+  const splitBase = (base: string) => {
+    const [chainKey, dataSource] = base.split('@');
+    return { chainKey, dataSource: dataSource || 'kyberswap' };
+  };
+
   // 首先收集所有价差值用于计算中位数
   const allSpreads: { [key: string]: (number | null)[] } = {};
-  const chains = Object.keys(USDC_TO_USDT_COLORS);
-
-  chains.forEach(chain => {
-    allSpreads[`${chain} (U→T)`] = [];
-    allSpreads[`${chain} (T→U)`] = [];
+  seriesBases.forEach(base => {
+    allSpreads[`${base} (U→T)`] = [];
+    allSpreads[`${base} (T→U)`] = [];
   });
 
   // 收集所有价差值
@@ -132,19 +146,20 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
     point.data
       .filter(item => item.amount === amount)
       .forEach(item => {
+        const base = `${item.chainKey}@${item.dataSource || 'kyberswap'}`;
         const usdcToUsdtSpread = calculateSpreadBps(item.usdcToUsdt.input, item.usdcToUsdt.output);
         const usdtToUsdcSpread = calculateSpreadBps(item.usdtToUsdc.input, item.usdtToUsdc.output);
 
         // 确保数组已初始化（处理配置中有但颜色定义中没有的链）
-        if (!allSpreads[`${item.chainKey} (U→T)`]) {
-          allSpreads[`${item.chainKey} (U→T)`] = [];
+        if (!allSpreads[`${base} (U→T)`]) {
+          allSpreads[`${base} (U→T)`] = [];
         }
-        if (!allSpreads[`${item.chainKey} (T→U)`]) {
-          allSpreads[`${item.chainKey} (T→U)`] = [];
+        if (!allSpreads[`${base} (T→U)`]) {
+          allSpreads[`${base} (T→U)`] = [];
         }
 
-        allSpreads[`${item.chainKey} (U→T)`].push(usdcToUsdtSpread);
-        allSpreads[`${item.chainKey} (T→U)`].push(usdtToUsdcSpread);
+        allSpreads[`${base} (U→T)`].push(usdcToUsdtSpread);
+        allSpreads[`${base} (T→U)`].push(usdtToUsdcSpread);
       });
   });
 
@@ -162,23 +177,24 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
     point.data
       .filter(item => item.amount === amount)
       .forEach(item => {
+        const base = `${item.chainKey}@${item.dataSource || 'kyberswap'}`;
         // USDC → USDT
         const usdcToUsdtSpread = calculateSpreadBps(item.usdcToUsdt.input, item.usdcToUsdt.output);
         const filteredUsdcToUsdt = filterOutliers(
           usdcToUsdtSpread !== null ? parseFloat(usdcToUsdtSpread.toFixed(2)) : null,
-          allSpreads[`${item.chainKey} (U→T)`],
+          allSpreads[`${base} (U→T)`],
           10
         );
-        dataPoint[`${item.chainKey} (U→T)`] = filteredUsdcToUsdt;
+        dataPoint[`${base} (U→T)`] = filteredUsdcToUsdt;
 
         // USDT → USDC
         const usdtToUsdcSpread = calculateSpreadBps(item.usdtToUsdc.input, item.usdtToUsdc.output);
         const filteredUsdtToUsdc = filterOutliers(
           usdtToUsdcSpread !== null ? parseFloat(usdtToUsdcSpread.toFixed(2)) : null,
-          allSpreads[`${item.chainKey} (T→U)`],
+          allSpreads[`${base} (T→U)`],
           10
         );
-        dataPoint[`${item.chainKey} (T→U)`] = filteredUsdtToUsdc;
+        dataPoint[`${base} (T→U)`] = filteredUsdtToUsdc;
       });
 
     return dataPoint;
@@ -211,35 +227,47 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
           />
 
           {/* USDC → USDT 线条（蓝色系） */}
-          {chains.map(chain => (
-            <Line
-              key={`${chain}-usdc-usdt`}
-              type="monotone"
-              dataKey={`${chain} (U→T)`}
-              name={`${CHAIN_DISPLAY_NAMES[chain] || chain} (U→T)`}
-              stroke={USDC_TO_USDT_COLORS[chain]}
-              strokeWidth={2}
-              dot={false}
-              activeDot={{ r: 6 }}
-              connectNulls
-            />
-          ))}
+          {seriesBases.map(base => {
+            const { chainKey, dataSource } = splitBase(base);
+            const palette = Object.values(USDC_TO_USDT_COLORS);
+            const stroke = USDC_TO_USDT_COLORS[chainKey] || palette[Math.abs(chainKey.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % palette.length];
+
+            return (
+              <Line
+                key={`${base}-usdc-usdt`}
+                type="monotone"
+                dataKey={`${base} (U→T)`}
+                name={`${CHAIN_DISPLAY_NAMES[chainKey] || chainKey} [${sourceSuffix(dataSource)}] (U→T)`}
+                stroke={stroke}
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 6 }}
+                connectNulls
+              />
+            );
+          })}
 
           {/* USDT → USDC 线条（橙/红色系） */}
-          {chains.map(chain => (
-            <Line
-              key={`${chain}-usdt-usdc`}
-              type="monotone"
-              dataKey={`${chain} (T→U)`}
-              name={`${CHAIN_DISPLAY_NAMES[chain] || chain} (T→U)`}
-              stroke={USDT_TO_USDC_COLORS[chain]}
-              strokeWidth={2}
-              strokeDasharray="5 5"
-              dot={false}
-              activeDot={{ r: 6 }}
-              connectNulls
-            />
-          ))}
+          {seriesBases.map(base => {
+            const { chainKey, dataSource } = splitBase(base);
+            const palette = Object.values(USDT_TO_USDC_COLORS);
+            const stroke = USDT_TO_USDC_COLORS[chainKey] || palette[Math.abs(chainKey.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % palette.length];
+
+            return (
+              <Line
+                key={`${base}-usdt-usdc`}
+                type="monotone"
+                dataKey={`${base} (T→U)`}
+                name={`${CHAIN_DISPLAY_NAMES[chainKey] || chainKey} [${sourceSuffix(dataSource)}] (T→U)`}
+                stroke={stroke}
+                strokeWidth={2}
+                strokeDasharray="5 5"
+                dot={false}
+                activeDot={{ r: 6 }}
+                connectNulls
+              />
+            );
+          })}
         </LineChart>
       </ResponsiveContainer>
 

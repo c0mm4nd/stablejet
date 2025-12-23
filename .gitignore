@@ -39,3 +39,19 @@ next-env.d.ts
 *.db
 *.db-shm
 *.db-wal
+
+# Temporary logs
+/tmp/*.log
+*.log
+
+# Test results
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# macOS
+.DS_Store
+
+# Development
+.env.local
+.env.development.local

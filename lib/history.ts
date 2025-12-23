@@ -25,10 +25,10 @@ export function saveDataPoint(data: ChainSwapData[]) {
 
     const insertChainData = db.prepare(`
       INSERT INTO chain_data (
-        history_point_id, chain, chain_key, amount,
+        history_point_id, chain, chain_key, data_source, amount,
         usdc_to_usdt_input, usdc_to_usdt_output, usdc_to_usdt_output_usd, usdc_to_usdt_error,
         usdt_to_usdc_input, usdt_to_usdc_output, usdt_to_usdc_output_usd, usdt_to_usdc_error
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const transaction = db.transaction((data: ChainSwapData[]) => {
@@ -42,6 +42,7 @@ export function saveDataPoint(data: ChainSwapData[]) {
           historyPointId,
           item.chain,
           item.chainKey,
+          item.dataSource || 'kyberswap',
           item.amount,
           item.usdcToUsdt.input,
           item.usdcToUsdt.output,
@@ -110,6 +111,7 @@ export function getHistoryInRange(hours: number = 24): HistoryDataPoint[] {
       const data: ChainSwapData[] = chainDataRows.map(row => ({
         chain: row.chain,
         chainKey: row.chain_key,
+        dataSource: (row.data_source || 'kyberswap'),
         amount: row.amount,
         usdcToUsdt: {
           input: row.usdc_to_usdt_input,
