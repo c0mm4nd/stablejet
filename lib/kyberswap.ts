@@ -3,6 +3,8 @@ import { QuoteResult, KyberSwapQuoteResponse, ChainSwapData } from './types';
 import { USDT_USDC_CHAINS, AMOUNTS, toWei, fromWei, getAllUnstableTokens, OPENOCEAN_ONLY_CHAINS } from './config';
 import { getOpenOceanQuoteByChainKey } from './openocean';
 import { getBinanceSwapData } from './binance';
+import { getMexcSwapData } from './mexc';
+import { getBybitSwapData } from './bybit';
 
 // axios 会自动使用环境变量中的代理：HTTP_PROXY, HTTPS_PROXY, NO_PROXY
 const axiosInstance = axios.create({
@@ -164,9 +166,18 @@ export function getKyberSwapRateLimiterStatus() {
 // 获取所有链的兑换数据
 export async function getAllSwapData(): Promise<ChainSwapData[]> {
   const results: ChainSwapData[] = [];
+  
+  // 并发启动所有 CEX 数据获取
   const binanceDataPromise = getBinanceSwapData(AMOUNTS);
+  const mexcDataPromise = getMexcSwapData(AMOUNTS);
+  const bybitDataPromise = getBybitSwapData(AMOUNTS);
 
   for (const [chainKey, chainConfig] of Object.entries(USDT_USDC_CHAINS)) {
+    // 跳过 CEX，它们单独处理
+    if (chainKey === 'binance' || chainKey === 'mexc' || chainKey === 'bybit') {
+      continue;
+    }
+
     for (const amount of AMOUNTS) {
       const amountInWei = toWei(amount);
 
@@ -206,11 +217,17 @@ export async function getAllSwapData(): Promise<ChainSwapData[]> {
     }
   }
 
+  // 等待所有 CEX 数据
   try {
-    const binanceData = await binanceDataPromise;
-    results.push(...binanceData);
-  } catch {
-    // getBinanceSwapData already returns per-amount errors; this is a safety net.
+    const [binanceData, mexcData, bybitData] = await Promise.all([
+      binanceDataPromise,
+      mexcDataPromise,
+      bybitDataPromise
+    ]);
+    results.push(...binanceData, ...mexcData, ...bybitData);
+  } catch (error) {
+    console.error('[CEX] Error fetching CEX data:', error);
+    // CEX 数据失败不影响整体
   }
 
   return results;

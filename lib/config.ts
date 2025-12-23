@@ -81,6 +81,27 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Berachain (example)
   },
 
+  // CEX: Binance (使用订单簿计算，不需要链地址)
+  binance: {
+    name: "Binance (CEX)",
+    usdc: "USDC", // 占位符，实际使用订单簿
+    usdt: "USDT",
+  },
+
+  // CEX: MEXC
+  mexc: {
+    name: "MEXC (CEX)",
+    usdc: "USDC",
+    usdt: "USDT",
+  },
+
+  // CEX: Bybit
+  bybit: {
+    name: "Bybit (CEX)",
+    usdc: "USDC",
+    usdt: "USDT",
+  },
+
   // 以下链：KyberSwap 往往不支持或不稳定，默认走 OpenOcean
   fantom: {
     name: "Fantom",

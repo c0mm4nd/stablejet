@@ -26,7 +26,9 @@ const CHAIN_DISPLAY_NAMES: Record<string, string> = {
   'mantle_0': 'Mantle (USDC/USDT0)',
   'unichain': 'UniChain',
   'berachain': 'Berachain',
-  'binance': 'Binance',
+  'binance': 'Binance (CEX)',
+  'mexc': 'MEXC (CEX)',
+  'bybit': 'Bybit (CEX)',
 };
 
 // USDC → USDT 使用蓝色系（冷色调）
@@ -45,6 +47,9 @@ const USDC_TO_USDT_COLORS: Record<string, string> = {
   'mantle': '#059669',        // 祖母绿
   'unichain': '#1D4ED8',      // 宝蓝
   'berachain': '#0D9488',     // 水鸭青
+  'binance': '#F0B90B',       // Binance 金色
+  'mexc': '#00C087',          // MEXC 绿色
+  'bybit': '#F7A600',         // Bybit 橙色
 };
 
 // USDT → USDC 使用橙/红色系（暖色调）
@@ -63,6 +68,9 @@ const USDT_TO_USDC_COLORS: Record<string, string> = {
   'mantle': '#CA8A04',        // 金黄
   'unichain': '#C2410C',      // 砖红
   'berachain': '#B45309',     // 棕橙
+  'binance': '#E8A317',       // Binance 暖金色
+  'mexc': '#009966',          // MEXC 深绿
+  'bybit': '#E89500',         // Bybit 深橙
 };
 
 // 自定义 Tooltip 组件

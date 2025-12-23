@@ -26,7 +26,7 @@ export interface ChainSwapData {
   chainKey: string;
   amount: number;
   pairId?: string; // Trading pair identifier
-  dataSource?: 'kyberswap' | 'openocean' | 'binance'; // 数据来源
+  dataSource?: 'kyberswap' | 'openocean' | 'binance' | 'mexc' | 'bybit'; // 数据来源
   usdcToUsdt: SwapResult;
   usdtToUsdc: SwapResult;
   // Generic swap results for any pair
