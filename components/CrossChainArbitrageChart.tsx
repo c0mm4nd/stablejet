@@ -282,26 +282,26 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
   });
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <h2 className="text-xl font-bold text-primary mb-2 text-center">
+    <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+      <h2 className="text-lg font-semibold text-gray-800 mb-2">
         ${amount.toLocaleString()} - 跨链套利机会
       </h2>
-      <p className="text-sm text-gray-600 mb-4 text-center">
+      <p className="text-xs text-gray-500 mb-4">
         收益 = 在链A买入USDT的价差 + 在链B卖出USDT的价差
       </p>
 
-      <ResponsiveContainer width="100%" height={500}>
-        <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+      <ResponsiveContainer width="100%" height={450}>
+        <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="timestamp"
-            stroke="#666"
+            stroke="#9ca3af"
             style={{ fontSize: '11px' }}
           />
           <YAxis
-            stroke="#666"
-            style={{ fontSize: '12px' }}
-            label={{ value: '套利收益 (bps)', angle: -90, position: 'insideLeft' }}
+            stroke="#9ca3af"
+            style={{ fontSize: '11px' }}
+            label={{ value: '套利收益 (bps)', angle: -90, position: 'insideLeft', style: { fontSize: '11px' } }}
           />
           <Tooltip content={(props) => {
             // 从当前数据点获取详细信息
@@ -309,7 +309,7 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
             return <CustomTooltip {...props} detailsMap={detailsMap} />;
           }} />
           <Legend
-            wrapperStyle={{ paddingTop: '20px', fontSize: '11px' }}
+            wrapperStyle={{ paddingTop: '15px', fontSize: '11px' }}
             iconType="line"
           />
 

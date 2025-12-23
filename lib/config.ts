@@ -1,4 +1,4 @@
-import { ChainConfig } from "./types";
+import { ChainConfig, TradingPair } from "./types";
 
 // 配置：支持的链和代币地址 (KyberSwap)
 export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
@@ -6,6 +6,7 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     name: "Ethereum",
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     usdt: "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    usde: "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3", // USDe on Ethereum
   },
   polygon: {
     name: "Polygon",
@@ -16,6 +17,7 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     name: "Arbitrum",
     usdc: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
     usdt: "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9",
+    usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Arbitrum
   },
   optimism: {
     name: "Optimism",
@@ -76,6 +78,7 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     name: "Berachain",
     usdc: "0x549943e04f40284185054145c6E4e9568C1D3241",
     usdt: "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+    usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Berachain (example)
   },
 
   // 以下链：KyberSwap 往往不支持或不稳定，默认走 OpenOcean
@@ -232,3 +235,34 @@ export const OPENOCEAN_ONLY_CHAINS = new Set<string>([
   'linea',
   'scroll',
 ]);
+
+// Trading Pairs Configuration
+export const TRADING_PAIRS: Record<string, TradingPair> = {
+  usdc_usdt: {
+    id: "usdc_usdt",
+    name: "USDC/USDT",
+    tokenA: "USDC",
+    tokenB: "USDT",
+    getAddressA: (chain) => chain.usdc,
+    getAddressB: (chain) => chain.usdt,
+  },
+  usde_usdt: {
+    id: "usde_usdt",
+    name: "USDe/USDT",
+    tokenA: "USDe",
+    tokenB: "USDT",
+    getAddressA: (chain) => chain.usde,
+    getAddressB: (chain) => chain.usdt,
+  },
+  usde_usdc: {
+    id: "usde_usdc",
+    name: "USDe/USDC",
+    tokenA: "USDe",
+    tokenB: "USDC",
+    getAddressA: (chain) => chain.usde,
+    getAddressB: (chain) => chain.usdc,
+  },
+};
+
+// Default trading pair
+export const DEFAULT_TRADING_PAIR = "usdc_usdt";

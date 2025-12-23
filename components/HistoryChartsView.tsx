@@ -17,7 +17,7 @@ export default function HistoryChartsView({ history }: HistoryChartsViewProps) {
 
   if (history.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+      <div className="bg-white rounded-2xl shadow-sm p-8 text-center border border-gray-100">
         <p className="text-gray-600">暂无历史数据，请等待数据收集...</p>
         <p className="text-sm text-gray-500 mt-2">数据每 10 秒更新一次</p>
       </div>
@@ -45,32 +45,32 @@ export default function HistoryChartsView({ history }: HistoryChartsViewProps) {
     .filter(point => point.data.length > 0); // 过滤掉没有数据的时间点
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* 全局时间窗口选择器 */}
-      <div className="bg-white rounded-xl shadow-lg p-4">
-        <div className="flex justify-center items-center gap-3">
-          <span className="text-sm font-medium text-gray-700">时间窗口：</span>
+      <div className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100">
+        <div className="flex justify-center items-center gap-3 flex-wrap">
+          <span className="text-sm font-medium text-gray-600">时间范围</span>
           {[5, 10, 30, 60].map(minutes => (
             <button
               key={minutes}
               onClick={() => setTimeWindow(minutes)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                 timeWindow === minutes
-                  ? 'bg-primary text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
               }`}
             >
               {minutes < 60 ? `${minutes}分钟` : '1小时'}
             </button>
           ))}
-          <span className="text-sm text-gray-500 ml-2">
-            ({filteredHistory.length} 个数据点)
+          <span className="text-sm text-gray-400">
+            {filteredHistory.length} 个数据点
           </span>
         </div>
       </div>
 
       {/* 图表区域 */}
-      <div className="space-y-12">
+      <div className="space-y-8">
         {amounts.map((amount, index) => (
           <div key={amount} className="space-y-6">
             {/* 双向价差对比图 */}
@@ -80,7 +80,9 @@ export default function HistoryChartsView({ history }: HistoryChartsViewProps) {
             <CrossChainArbitrageChart history={filteredHistory} amount={amount} />
 
             {/* 分隔线 */}
-            <div className="border-t-2 border-gray-200 my-8"></div>
+            {index < amounts.length - 1 && (
+              <div className="border-t border-white/10 my-8"></div>
+            )}
           </div>
         ))}
       </div>

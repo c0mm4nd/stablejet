@@ -202,27 +202,27 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
 
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <h2 className="text-xl font-bold text-primary mb-4 text-center">
+    <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+      <h2 className="text-lg font-semibold text-gray-800 mb-4">
         ${amount.toLocaleString()} - 双向价差对比
       </h2>
 
-      <ResponsiveContainer width="100%" height={500}>
-        <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+      <ResponsiveContainer width="100%" height={450}>
+        <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="timestamp"
-            stroke="#666"
+            stroke="#9ca3af"
             style={{ fontSize: '11px' }}
           />
           <YAxis
-            stroke="#666"
-            style={{ fontSize: '12px' }}
-            label={{ value: '价差 (bps)', angle: -90, position: 'insideLeft' }}
+            stroke="#9ca3af"
+            style={{ fontSize: '11px' }}
+            label={{ value: '价差 (bps)', angle: -90, position: 'insideLeft', style: { fontSize: '11px' } }}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend
-            wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }}
+            wrapperStyle={{ paddingTop: '15px', fontSize: '11px' }}
             iconType="line"
           />
 

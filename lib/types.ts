@@ -2,6 +2,16 @@ export interface ChainConfig {
   name: string;
   usdc: string;
   usdt: string;
+  usde?: string; // USDe address for USDe pairs
+}
+
+export interface TradingPair {
+  id: string; // e.g., "usdc_usdt", "usde_usdt", "usde_usdc"
+  name: string; // e.g., "USDC/USDT", "USDe/USDT", "USDe/USDC"
+  tokenA: string; // token symbol: "USDC", "USDT", "USDe"
+  tokenB: string;
+  getAddressA: (chain: ChainConfig) => string | undefined;
+  getAddressB: (chain: ChainConfig) => string | undefined;
 }
 
 export interface SwapResult {
@@ -15,9 +25,13 @@ export interface ChainSwapData {
   chain: string;
   chainKey: string;
   amount: number;
+  pairId?: string; // Trading pair identifier
   dataSource?: 'kyberswap' | 'openocean' | 'binance'; // 数据来源
   usdcToUsdt: SwapResult;
   usdtToUsdc: SwapResult;
+  // Generic swap results for any pair
+  tokenAToB?: SwapResult; // tokenA -> tokenB
+  tokenBToA?: SwapResult; // tokenB -> tokenA
 }
 
 export interface SwapDataResponse {
