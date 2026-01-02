@@ -117,7 +117,7 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
           </div>
         ) : (
           <>
-            <HistoryChartsView history={history} />
+            <HistoryChartsView history={history} pairId={pairId} />
 
             {timestamp && (
               <div className="text-center text-gray-400 mt-8 text-sm">

@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { QuoteResult, KyberSwapQuoteResponse, ChainSwapData } from './types';
-import { USDT_USDC_CHAINS, AMOUNTS, toWei, fromWei, getAllUnstableTokens, OPENOCEAN_ONLY_CHAINS } from './config';
+import { QuoteResult, KyberSwapQuoteResponse, ChainSwapData, TradingPair } from './types';
+import { USDT_USDC_CHAINS, AMOUNTS, toWei, fromWei, getAllUnstableTokens, OPENOCEAN_ONLY_CHAINS, TRADING_PAIRS } from './config';
 import { getOpenOceanQuoteByChainKey } from './openocean';
 import { getBinanceSwapData } from './binance';
 import { getMexcSwapData } from './mexc';
@@ -165,16 +165,46 @@ export function getKyberSwapRateLimiterStatus() {
 
 // 获取所有链的兑换数据
 export async function getAllSwapData(): Promise<ChainSwapData[]> {
+  // 默认获取 USDC/USDT
+  return getSwapDataForPair('usdc_usdt');
+}
+
+// 获取指定交易对的兑换数据
+export async function getSwapDataForPair(pairId: string = 'usdc_usdt'): Promise<ChainSwapData[]> {
   const results: ChainSwapData[] = [];
   
-  // 并发启动所有 CEX 数据获取
-  const binanceDataPromise = getBinanceSwapData(AMOUNTS);
-  const mexcDataPromise = getMexcSwapData(AMOUNTS);
-  const bybitDataPromise = getBybitSwapData(AMOUNTS);
+  // 获取交易对配置
+  const pair = TRADING_PAIRS[pairId];
+  if (!pair) {
+    console.error(`[SwapData] Unknown trading pair: ${pairId}`);
+    return results;
+  }
+
+  console.log(`[SwapData] Fetching data for pair: ${pair.name} (${pairId})`);
+  
+  // 只有 USDC/USDT 支持 CEX
+  const isCexSupported = pairId === 'usdc_usdt';
+  
+  // 并发启动所有 CEX 数据获取（仅 USDC/USDT）
+  const cexPromises = isCexSupported ? [
+    getBinanceSwapData(AMOUNTS),
+    getMexcSwapData(AMOUNTS),
+    getBybitSwapData(AMOUNTS)
+  ] : [];
 
   for (const [chainKey, chainConfig] of Object.entries(USDT_USDC_CHAINS)) {
     // 跳过 CEX，它们单独处理
     if (chainKey === 'binance' || chainKey === 'mexc' || chainKey === 'bybit') {
+      continue;
+    }
+
+    // 获取该链上的代币地址
+    const tokenAAddress = pair.getAddressA(chainConfig);
+    const tokenBAddress = pair.getAddressB(chainConfig);
+
+    // 如果该链不支持这个交易对，跳过
+    if (!tokenAAddress || !tokenBAddress) {
+      console.log(`[SwapData] Skipping ${chainKey} - ${pair.name} not available`);
       continue;
     }
 
@@ -184,51 +214,70 @@ export async function getAllSwapData(): Promise<ChainSwapData[]> {
       const chainCleanKey = chainKey.split('_')[0];
       const useOpenOcean = OPENOCEAN_ONLY_CHAINS.has(chainKey) || OPENOCEAN_ONLY_CHAINS.has(chainCleanKey);
 
-      // USDC -> USDT
-      const usdcToUsdt = useOpenOcean
-        ? await getOpenOceanQuoteByChainKey(chainKey, chainConfig.usdc, chainConfig.usdt, amountInWei)
-        : await getQuote(chainKey, chainConfig.usdc, chainConfig.usdt, amountInWei);
+      // TokenA -> TokenB
+      const tokenAToB = useOpenOcean
+        ? await getOpenOceanQuoteByChainKey(chainKey, tokenAAddress, tokenBAddress, amountInWei)
+        : await getQuote(chainKey, tokenAAddress, tokenBAddress, amountInWei);
 
-      // USDT -> USDC
-      const usdtToUsdc = useOpenOcean
-        ? await getOpenOceanQuoteByChainKey(chainKey, chainConfig.usdt, chainConfig.usdc, amountInWei)
-        : await getQuote(chainKey, chainConfig.usdt, chainConfig.usdc, amountInWei);
+      // TokenB -> TokenA
+      const tokenBToA = useOpenOcean
+        ? await getOpenOceanQuoteByChainKey(chainKey, tokenBAddress, tokenAAddress, amountInWei)
+        : await getQuote(chainKey, tokenBAddress, tokenAAddress, amountInWei);
 
       const dataSource: 'kyberswap' | 'openocean' = useOpenOcean ? 'openocean' : 'kyberswap';
+
+      // 为了向后兼容，USDC/USDT 数据放在 usdcToUsdt/usdtToUsdc 字段
+      // 其他交易对放在 tokenAToB/tokenBToA 字段
+      const isUsdcUsdt = pairId === 'usdc_usdt';
 
       results.push({
         chain: chainConfig.name,
         chainKey,
         amount,
+        pairId,
         dataSource,
-        usdcToUsdt: {
+        // 向后兼容字段（USDC/USDT）
+        usdcToUsdt: isUsdcUsdt ? {
           input: amount,
-          output: usdcToUsdt.success && usdcToUsdt.amountOut ? fromWei(usdcToUsdt.amountOut) : null,
-          outputUsd: usdcToUsdt.success && usdcToUsdt.amountOutUsd ? parseFloat(usdcToUsdt.amountOutUsd) : null,
-          error: usdcToUsdt.error
+          output: tokenAToB.success && tokenAToB.amountOut ? fromWei(tokenAToB.amountOut) : null,
+          outputUsd: tokenAToB.success && tokenAToB.amountOutUsd ? parseFloat(tokenAToB.amountOutUsd) : null,
+          error: tokenAToB.error
+        } : { input: amount, output: null, outputUsd: null },
+        usdtToUsdc: isUsdcUsdt ? {
+          input: amount,
+          output: tokenBToA.success && tokenBToA.amountOut ? fromWei(tokenBToA.amountOut) : null,
+          outputUsd: tokenBToA.success && tokenBToA.amountOutUsd ? parseFloat(tokenBToA.amountOutUsd) : null,
+          error: tokenBToA.error
+        } : { input: amount, output: null, outputUsd: null },
+        // 通用字段（所有交易对）
+        tokenAToB: {
+          input: amount,
+          output: tokenAToB.success && tokenAToB.amountOut ? fromWei(tokenAToB.amountOut) : null,
+          outputUsd: tokenAToB.success && tokenAToB.amountOutUsd ? parseFloat(tokenAToB.amountOutUsd) : null,
+          error: tokenAToB.error
         },
-        usdtToUsdc: {
+        tokenBToA: {
           input: amount,
-          output: usdtToUsdc.success && usdtToUsdc.amountOut ? fromWei(usdtToUsdc.amountOut) : null,
-          outputUsd: usdtToUsdc.success && usdtToUsdc.amountOutUsd ? parseFloat(usdtToUsdc.amountOutUsd) : null,
-          error: usdtToUsdc.error
+          output: tokenBToA.success && tokenBToA.amountOut ? fromWei(tokenBToA.amountOut) : null,
+          outputUsd: tokenBToA.success && tokenBToA.amountOutUsd ? parseFloat(tokenBToA.amountOutUsd) : null,
+          error: tokenBToA.error
         }
       });
     }
   }
 
-  // 等待所有 CEX 数据
-  try {
-    const [binanceData, mexcData, bybitData] = await Promise.all([
-      binanceDataPromise,
-      mexcDataPromise,
-      bybitDataPromise
-    ]);
-    results.push(...binanceData, ...mexcData, ...bybitData);
-  } catch (error) {
-    console.error('[CEX] Error fetching CEX data:', error);
-    // CEX 数据失败不影响整体
+  // 等待所有 CEX 数据（仅 USDC/USDT）
+  if (isCexSupported && cexPromises.length > 0) {
+    try {
+      const cexResults = await Promise.all(cexPromises);
+      for (const cexData of cexResults) {
+        results.push(...cexData.map(d => ({ ...d, pairId })));
+      }
+    } catch (error) {
+      console.error('[CEX] Error fetching CEX data:', error);
+    }
   }
 
+  console.log(`[SwapData] Fetched ${results.length} data points for ${pair.name}`);
   return results;
 }

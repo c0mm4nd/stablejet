@@ -12,6 +12,7 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     name: "Polygon",
     usdc: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
     usdt: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+    usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Polygon
   },
   arbitrum: {
     name: "Arbitrum",
@@ -23,21 +24,25 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     name: "Optimism",
     usdc: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
     usdt: "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58",
+    usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Optimism
   },
   base: {
     name: "Base",
     usdc: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
     usdt: "0x102d758f688a4C1C5a80b116bD945d4455460282",
+    usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Base
   },
   bsc: {
     name: "BSC",
     usdc: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
     usdt: "0x55d398326f99059ff775485246999027b3197955",
+    usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on BSC
   },
   avalanche: {
     name: "Avalanche",
     usdc: "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
     usdt: "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
+    usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Avalanche
   },
   hyperevm: {
     name: "HyperEVM",
@@ -58,21 +63,25 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     name: "Etherlink",
     usdc: "0x796Ea11Fa2dD751eD01b53C372fFDB4AAa8f00F9",
     usdt: "0x2C03058C8AFC06713be23e58D2febC8337dbfE6A",
+    usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Etherlink via Stargate
   },
   mantle: {
     name: "Mantle (USDC/USDT)",
     usdc: "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
     usdt: "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
+    usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Mantle via Stargate
   },
   mantle_0: {
     name: "Mantle (USDC/USDT0)",
     usdc: "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
     usdt: "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+    usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Mantle
   },
   unichain: {
     name: "UniChain",
     usdc: "0x078D782b760474a361dDA0AF3839290b0EF57AD6",
     usdt: "0x9151434b16b9763660705744891fA906F660EcC5",
+    usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on UniChain via Stargate
   },
   berachain: {
     name: "Berachain",
@@ -122,11 +131,13 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     name: "Linea",
     usdc: "0x176211869ca2b568f2a7d4ee941e073a821ee1ff",
     usdt: "0xa219439258ca9da29e9cc4ce5596924745e12b93",
+    usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Linea via Stargate
   },
   scroll: {
     name: "Scroll",
     usdc: "0x06efdbff2a14a7c8e15944d1f4a48f9f95f663a4",
     usdt: "0xf55bec9cafdbe8730f096aa55dad6d22d44099df",
+    usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Scroll via Stargate
   },
 };
 

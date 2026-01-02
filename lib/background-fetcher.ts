@@ -1,8 +1,9 @@
-import { getAllSwapData } from './kyberswap';
+import { getAllSwapData, getSwapDataForPair } from './kyberswap';
 import { saveDataPoint } from './history';
 import { getKyberSwapRateLimiterStatus } from './kyberswap';
 import { getOpenOceanRateLimiterStatus } from './openocean';
 import { getBinanceRateLimiterStatus } from './binance';
+import { TRADING_PAIRS } from './config';
 
 class BackgroundFetcher {
   private intervalId: NodeJS.Timeout | null = null;
@@ -67,74 +68,90 @@ class BackgroundFetcher {
       console.log(`[BackgroundFetcher] [${new Date().toISOString()}] Starting data fetch...`);
       console.log(`${'='.repeat(70)}`);
       
-      // getAllSwapData 会按链选择数据源（KyberSwap/OpenOcean/Binance）并返回统一结构
-      const data = await getAllSwapData();
+      // 获取所有交易对的数据
+      const allPairs = Object.keys(TRADING_PAIRS);
+      console.log(`[BackgroundFetcher] Fetching data for ${allPairs.length} trading pairs: ${allPairs.join(', ')}`);
       
-      // 统计成功和失败
-      let successCount = 0;
-      let failureCount = 0;
-      const dataSourceStats: Record<string, { success: number; failed: number }> = {};
-      
-      for (const item of data) {
-        const source = item.dataSource || 'kyberswap';
-        if (!dataSourceStats[source]) {
-          dataSourceStats[source] = { success: 0, failed: 0 };
-        }
-        
-        const hasUsdcToUsdtSuccess = item.usdcToUsdt.output !== null && item.usdcToUsdt.output > 0;
-        const hasUsdtToUsdcSuccess = item.usdtToUsdc.output !== null && item.usdtToUsdc.output > 0;
-        
-        if (hasUsdcToUsdtSuccess) {
-          dataSourceStats[source].success++;
-          successCount++;
-        } else {
-          dataSourceStats[source].failed++;
-          failureCount++;
-        }
-        
-        if (hasUsdtToUsdcSuccess) {
-          dataSourceStats[source].success++;
-          successCount++;
-        } else {
-          dataSourceStats[source].failed++;
-          failureCount++;
+      for (const pairId of allPairs) {
+        try {
+          console.log(`\n[BackgroundFetcher] === Fetching ${pairId} ===`);
+          const data = await getSwapDataForPair(pairId);
+          
+          // 统计成功和失败
+          let successCount = 0;
+          let failureCount = 0;
+          const dataSourceStats: Record<string, { success: number; failed: number }> = {};
+          
+          for (const item of data) {
+            const source = item.dataSource || 'kyberswap';
+            if (!dataSourceStats[source]) {
+              dataSourceStats[source] = { success: 0, failed: 0 };
+            }
+            
+            // 检查通用字段
+            const hasTokenASuccess = item.tokenAToB?.output !== null && item.tokenAToB?.output && item.tokenAToB.output > 0;
+            const hasTokenBSuccess = item.tokenBToA?.output !== null && item.tokenBToA?.output && item.tokenBToA.output > 0;
+            
+            if (hasTokenASuccess) {
+              dataSourceStats[source].success++;
+              successCount++;
+            } else {
+              dataSourceStats[source].failed++;
+              failureCount++;
+            }
+            
+            if (hasTokenBSuccess) {
+              dataSourceStats[source].success++;
+              successCount++;
+            } else {
+              dataSourceStats[source].failed++;
+              failureCount++;
+            }
+          }
+          
+          // 保存数据到历史记录
+          if (data.length > 0) {
+            saveDataPoint(data, pairId);
+            console.log(`[BackgroundFetcher] ✓ ${pairId}: Saved ${data.length} data points`);
+          }
+          
+          // 打印统计信息
+          console.log(`[BackgroundFetcher] ${pairId} Statistics:`);
+          console.log(`  Total: ${successCount + failureCount} swap directions`);
+          console.log(`  Success: ${successCount}`);
+          console.log(`  Failed: ${failureCount}`);
+          console.log(`  By source:`);
+          for (const [source, stats] of Object.entries(dataSourceStats)) {
+            console.log(`    - ${source}: ${stats.success} success, ${stats.failed} failed`);
+          }
+        } catch (error) {
+          console.error(`[BackgroundFetcher] Error fetching ${pairId}:`, error);
         }
       }
       
-      saveDataPoint(data);
-      
-      console.log(`\n[BackgroundFetcher] ✓ Data fetch completed`);
-      console.log(`  Total requests: ${successCount + failureCount}`);
-      console.log(`  Successful: ${successCount} (${((successCount / (successCount + failureCount)) * 100).toFixed(1)}%)`);
-      console.log(`  Failed: ${failureCount}`);
-      console.log('\n  By data source:');
-      for (const [source, stats] of Object.entries(dataSourceStats)) {
-        const total = stats.success + stats.failed;
-        const rate = ((stats.success / total) * 100).toFixed(1);
-        console.log(`    ${source}: ${stats.success}/${total} (${rate}%)`);
-      }
+      console.log(`\n${'='.repeat(70)}`);
+      console.log(`[BackgroundFetcher] Data fetch completed for all pairs`);
+      console.log(`${'='.repeat(70)}\n`);
       
       // 显示速率限制器状态
-      console.log('\n  Rate limiters:');
+      console.log('\n[BackgroundFetcher] Rate limiters:');
       try {
         const kyberStatus = getKyberSwapRateLimiterStatus();
-        console.log(`    KyberSwap: ${kyberStatus.current}/${kyberStatus.max} @ ${kyberStatus.rate}`);
+        console.log(`  KyberSwap: ${kyberStatus.current}/${kyberStatus.max} @ ${kyberStatus.rate}`);
       } catch (e) { /* ignore */ }
       
       try {
         const openoceanStatus = getOpenOceanRateLimiterStatus();
-        console.log(`    OpenOcean: ${openoceanStatus.current}/${openoceanStatus.max} @ ${openoceanStatus.rate}`);
+        console.log(`  OpenOcean: ${openoceanStatus.current}/${openoceanStatus.max} @ ${openoceanStatus.rate}`);
       } catch (e) { /* ignore */ }
       
       try {
         const binanceStatus = getBinanceRateLimiterStatus();
-        console.log(`    Binance: ${binanceStatus.rate}`);
+        console.log(`  Binance: ${binanceStatus.rate}`);
       } catch (e) { /* ignore */ }
       
-      console.log(`${'='.repeat(70)}\n`);
     } catch (error) {
       console.error('\n[BackgroundFetcher] ✗ Error fetching data:', error instanceof Error ? error.message : 'Unknown error');
-      console.error(`${'='.repeat(70)}\n`);
     } finally {
       this.isFetching = false;
     }

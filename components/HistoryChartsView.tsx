@@ -8,9 +8,10 @@ import CrossChainArbitrageChart from './CrossChainArbitrageChart';
 
 interface HistoryChartsViewProps {
   history: HistoryDataPoint[];
+  pairId: string;
 }
 
-export default function HistoryChartsView({ history }: HistoryChartsViewProps) {
+export default function HistoryChartsView({ history, pairId }: HistoryChartsViewProps) {
   const { amounts, chains } = useConfig();
   // 全局时间窗口状态（单位：分钟）
   const [timeWindow, setTimeWindow] = useState(10);
@@ -74,7 +75,7 @@ export default function HistoryChartsView({ history }: HistoryChartsViewProps) {
         {amounts.map((amount, index) => (
           <div key={amount} className="space-y-6">
             {/* 双向价差对比图 */}
-            <SpreadLineChart history={filteredHistory} amount={amount} />
+            <SpreadLineChart history={filteredHistory} amount={amount} pairId={pairId} />
 
             {/* 跨链套利机会图 */}
             <CrossChainArbitrageChart history={filteredHistory} amount={amount} />

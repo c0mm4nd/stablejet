@@ -3,10 +3,12 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { HistoryDataPoint } from '@/lib/history';
 import { calculateSpreadBps, filterOutliers } from '@/lib/utils';
+import { DEFAULT_TRADING_PAIR, TRADING_PAIRS } from '@/lib/config';
 
 interface SpreadLineChartProps {
   history: HistoryDataPoint[];
   amount: number;
+  pairId?: string; // 添加 pairId 参数
 }
 
 // 链标识符到显示名称的映射
@@ -74,22 +76,24 @@ const USDT_TO_USDC_COLORS: Record<string, string> = {
 };
 
 // 自定义 Tooltip 组件
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (!active || !payload || !payload.length) return null;
+const CustomTooltip = ({ active, payload, label, pairConfig }: any) => {
+  if (!active || !payload || !payload.length || !pairConfig) return null;
+
+  const { tokenA, tokenB } = pairConfig;
 
   // 按方向分组
-  const usdcToUsdt = payload.filter((p: any) => p.dataKey.includes('(U→T)'));
-  const usdtToUsdc = payload.filter((p: any) => p.dataKey.includes('(T→U)'));
+  const tokenAToB = payload.filter((p: any) => p.dataKey.includes(`(${tokenA}→${tokenB})`));
+  const tokenBToA = payload.filter((p: any) => p.dataKey.includes(`(${tokenB}→${tokenA})`));
 
   return (
     <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-3 min-w-[280px]">
       <p className="font-semibold text-gray-800 mb-3 text-sm border-b pb-2">{label}</p>
 
-      {usdcToUsdt.length > 0 && (
+      {tokenAToB.length > 0 && (
         <div className="mb-2">
-          <p className="text-xs font-semibold text-blue-600 mb-1">USDC → USDT</p>
+          <p className="text-xs font-semibold text-blue-600 mb-1">{tokenA} → {tokenB}</p>
           <div className="space-y-1">
-            {usdcToUsdt.map((entry: any) => (
+            {tokenAToB.map((entry: any) => (
               <div key={entry.dataKey} className="flex items-center gap-2 text-xs">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
                 <span className="font-medium text-gray-700 min-w-[70px]">
@@ -104,11 +108,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         </div>
       )}
 
-      {usdtToUsdc.length > 0 && (
+      {tokenBToA.length > 0 && (
         <div>
-          <p className="text-xs font-semibold text-orange-600 mb-1">USDT → USDC</p>
+          <p className="text-xs font-semibold text-orange-600 mb-1">{tokenB} → {tokenA}</p>
           <div className="space-y-1">
-            {usdtToUsdc.map((entry: any) => (
+            {tokenBToA.map((entry: any) => (
               <div key={entry.dataKey} className="flex items-center gap-2 text-xs">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
                 <span className="font-medium text-gray-700 min-w-[70px]">
@@ -126,7 +130,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-export default function SpreadLineChart({ history, amount }: SpreadLineChartProps) {
+export default function SpreadLineChart({ history, amount, pairId = DEFAULT_TRADING_PAIR }: SpreadLineChartProps) {
+  const pair = TRADING_PAIRS[pairId] || TRADING_PAIRS[DEFAULT_TRADING_PAIR];
+  const tokenAShort = pair.tokenA;
+  const tokenBShort = pair.tokenB;
+
   const seriesBases = Array.from(
     new Set(
       history
@@ -145,8 +153,8 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
   // 首先收集所有价差值用于计算中位数
   const allSpreads: { [key: string]: (number | null)[] } = {};
   seriesBases.forEach(base => {
-    allSpreads[`${base} (U→T)`] = [];
-    allSpreads[`${base} (T→U)`] = [];
+    allSpreads[`${base} (${tokenAShort}→${tokenBShort})`] = [];
+    allSpreads[`${base} (${tokenBShort}→${tokenAShort})`] = [];
   });
 
   // 收集所有价差值
@@ -155,19 +163,21 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
       .filter(item => item.amount === amount)
       .forEach(item => {
         const base = `${item.chainKey}@${item.dataSource || 'kyberswap'}`;
-        const usdcToUsdtSpread = calculateSpreadBps(item.usdcToUsdt.input, item.usdcToUsdt.output);
-        const usdtToUsdcSpread = calculateSpreadBps(item.usdtToUsdc.input, item.usdtToUsdc.output);
+        const tokenAToB = item.tokenAToB || item.usdcToUsdt;
+        const tokenBToA = item.tokenBToA || item.usdtToUsdc;
+        const tokenAToBSpread = calculateSpreadBps(tokenAToB.input, tokenAToB.output);
+        const tokenBToASpread = calculateSpreadBps(tokenBToA.input, tokenBToA.output);
 
         // 确保数组已初始化（处理配置中有但颜色定义中没有的链）
-        if (!allSpreads[`${base} (U→T)`]) {
-          allSpreads[`${base} (U→T)`] = [];
+        if (!allSpreads[`${base} (${tokenAShort}→${tokenBShort})`]) {
+          allSpreads[`${base} (${tokenAShort}→${tokenBShort})`] = [];
         }
-        if (!allSpreads[`${base} (T→U)`]) {
-          allSpreads[`${base} (T→U)`] = [];
+        if (!allSpreads[`${base} (${tokenBShort}→${tokenAShort})`]) {
+          allSpreads[`${base} (${tokenBShort}→${tokenAShort})`] = [];
         }
 
-        allSpreads[`${base} (U→T)`].push(usdcToUsdtSpread);
-        allSpreads[`${base} (T→U)`].push(usdtToUsdcSpread);
+        allSpreads[`${base} (${tokenAShort}→${tokenBShort})`].push(tokenAToBSpread);
+        allSpreads[`${base} (${tokenBShort}→${tokenAShort})`].push(tokenBToASpread);
       });
   });
 
@@ -186,23 +196,28 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
       .filter(item => item.amount === amount)
       .forEach(item => {
         const base = `${item.chainKey}@${item.dataSource || 'kyberswap'}`;
-        // USDC → USDT
-        const usdcToUsdtSpread = calculateSpreadBps(item.usdcToUsdt.input, item.usdcToUsdt.output);
-        const filteredUsdcToUsdt = filterOutliers(
-          usdcToUsdtSpread !== null ? parseFloat(usdcToUsdtSpread.toFixed(2)) : null,
-          allSpreads[`${base} (U→T)`],
+        
+        // 使用通用字段或回退到 USDC/USDT 字段
+        const tokenAToB = item.tokenAToB || item.usdcToUsdt;
+        const tokenBToA = item.tokenBToA || item.usdtToUsdc;
+        
+        // TokenA → TokenB
+        const tokenAToBSpread = calculateSpreadBps(tokenAToB.input, tokenAToB.output);
+        const filteredTokenAToB = filterOutliers(
+          tokenAToBSpread !== null ? parseFloat(tokenAToBSpread.toFixed(2)) : null,
+          allSpreads[`${base} (${tokenAShort}→${tokenBShort})`],
           10
         );
-        dataPoint[`${base} (U→T)`] = filteredUsdcToUsdt;
+        dataPoint[`${base} (${tokenAShort}→${tokenBShort})`] = filteredTokenAToB;
 
-        // USDT → USDC
-        const usdtToUsdcSpread = calculateSpreadBps(item.usdtToUsdc.input, item.usdtToUsdc.output);
-        const filteredUsdtToUsdc = filterOutliers(
-          usdtToUsdcSpread !== null ? parseFloat(usdtToUsdcSpread.toFixed(2)) : null,
-          allSpreads[`${base} (T→U)`],
+        // TokenB → TokenA
+        const tokenBToASpread = calculateSpreadBps(tokenBToA.input, tokenBToA.output);
+        const filteredTokenBToA = filterOutliers(
+          tokenBToASpread !== null ? parseFloat(tokenBToASpread.toFixed(2)) : null,
+          allSpreads[`${base} (${tokenBShort}→${tokenAShort})`],
           10
         );
-        dataPoint[`${base} (T→U)`] = filteredUsdtToUsdc;
+        dataPoint[`${base} (${tokenBShort}→${tokenAShort})`] = filteredTokenBToA;
       });
 
     return dataPoint;
@@ -212,7 +227,7 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">
-        ${amount.toLocaleString()} - 双向价差对比
+        ${amount.toLocaleString()} - 双向价差对比 ({pair?.name || 'USDC/USDT'})
       </h2>
 
       <ResponsiveContainer width="100%" height={450}>
@@ -228,13 +243,13 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
             style={{ fontSize: '11px' }}
             label={{ value: '价差 (bps)', angle: -90, position: 'insideLeft', style: { fontSize: '11px' } }}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip pairConfig={pair} />} />
           <Legend
             wrapperStyle={{ paddingTop: '15px', fontSize: '11px' }}
             iconType="line"
           />
 
-          {/* USDC → USDT 线条（蓝色系） */}
+          {/* TokenA → TokenB 线条（蓝色系） */}
           {seriesBases.map(base => {
             const { chainKey, dataSource } = splitBase(base);
             const palette = Object.values(USDC_TO_USDT_COLORS);
@@ -242,10 +257,10 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
 
             return (
               <Line
-                key={`${base}-usdc-usdt`}
+                key={`${base}-tokena-tokenb`}
                 type="monotone"
-                dataKey={`${base} (U→T)`}
-                name={`${CHAIN_DISPLAY_NAMES[chainKey] || chainKey} [${sourceSuffix(dataSource)}] (U→T)`}
+                dataKey={`${base} (${tokenAShort}→${tokenBShort})`}
+                name={`${CHAIN_DISPLAY_NAMES[chainKey] || chainKey} [${sourceSuffix(dataSource)}] (${tokenAShort}→${tokenBShort})`}
                 stroke={stroke}
                 strokeWidth={2}
                 dot={false}
@@ -255,7 +270,7 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
             );
           })}
 
-          {/* USDT → USDC 线条（橙/红色系） */}
+          {/* TokenB → TokenA 线条（橙/红色系） */}
           {seriesBases.map(base => {
             const { chainKey, dataSource } = splitBase(base);
             const palette = Object.values(USDT_TO_USDC_COLORS);
@@ -263,10 +278,10 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
 
             return (
               <Line
-                key={`${base}-usdt-usdc`}
+                key={`${base}-tokenb-tokena`}
                 type="monotone"
-                dataKey={`${base} (T→U)`}
-                name={`${CHAIN_DISPLAY_NAMES[chainKey] || chainKey} [${sourceSuffix(dataSource)}] (T→U)`}
+                dataKey={`${base} (${tokenBShort}→${tokenAShort})`}
+                name={`${CHAIN_DISPLAY_NAMES[chainKey] || chainKey} [${sourceSuffix(dataSource)}] (${tokenBShort}→${tokenAShort})`}
                 stroke={stroke}
                 strokeWidth={2}
                 strokeDasharray="5 5"
@@ -283,11 +298,11 @@ export default function SpreadLineChart({ history, amount }: SpreadLineChartProp
         <div className="flex items-center justify-center gap-6 text-sm">
           <div className="flex items-center gap-2">
             <div className="w-8 h-0.5 bg-blue-500"></div>
-            <span className="text-gray-700">USDC → USDT（蓝色系）</span>
+            <span className="text-gray-700">{pair.tokenA} → {pair.tokenB}（蓝色系）</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-8 h-0.5 bg-orange-500 border-t-2 border-dashed border-orange-500"></div>
-            <span className="text-gray-700">USDT → USDC（橙色系，虚线）</span>
+            <span className="text-gray-700">{pair.tokenB} → {pair.tokenA}（橙色系，虚线）</span>
           </div>
         </div>
         <p className="text-xs text-gray-600 text-center">
