@@ -127,7 +127,7 @@ interface ArbitrageDetail {
 
 export default function CrossChainArbitrageChart({ history, amount }: CrossChainArbitrageChartProps) {
   const sourceSuffix = (source?: string) => (source === 'openocean' ? 'OO' : 'KS');
-  const itemLabel = (item: any) => `${item.chain} [${sourceSuffix(item.dataSource)}]`;
+  const itemLabel = (item: any) => `${item.chain} [${sourceSuffix(item.dataSource || 'kyberswap')}]`;
 
   // 首先收集所有链对的套利数据
   const chainPairs: { [key: string]: (number | null)[] } = {};

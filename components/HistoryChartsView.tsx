@@ -5,6 +5,7 @@ import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
 import SpreadLineChart from './SpreadLineChart';
 import CrossChainArbitrageChart from './CrossChainArbitrageChart';
+import LiveQuotesTable from './LiveQuotesTable';
 
 interface HistoryChartsViewProps {
   history: HistoryDataPoint[];
@@ -74,6 +75,9 @@ export default function HistoryChartsView({ history, pairId }: HistoryChartsView
       <div className="space-y-8">
         {amounts.map((amount, index) => (
           <div key={amount} className="space-y-6">
+            {/* 实时报价数据表 - 显示所有数据，不受配置过滤影响 */}
+            <LiveQuotesTable history={history} amount={amount} pairId={pairId} />
+
             {/* 双向价差对比图 */}
             <SpreadLineChart history={filteredHistory} amount={amount} pairId={pairId} />
 
