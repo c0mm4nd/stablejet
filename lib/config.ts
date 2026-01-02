@@ -144,14 +144,67 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
 // 测试金额（以美元为单位）
 export const AMOUNTS = [30000, 50000];
 
-// 将美元金额转换为 wei（6位小数的稳定币）
-export function toWei(amount: number): string {
-  return (amount * 1e6).toString();
+// Token decimals (用于 amountIn/amountOut 的换算)
+// 注意：USDe 为 18 decimals；USDC/USDT 一般为 6 decimals。
+export const TOKEN_DECIMALS_BY_SYMBOL: Record<string, number> = {
+  USDC: 6,
+  USDT: 6,
+  USDe: 18,
+  USDE: 18,
+};
+
+export function getTokenDecimals(tokenSymbol: string): number {
+  return TOKEN_DECIMALS_BY_SYMBOL[tokenSymbol] ?? TOKEN_DECIMALS_BY_SYMBOL[tokenSymbol.toUpperCase()] ?? 6;
 }
 
-// 从 wei 转换回美元金额
-export function fromWei(amountWei: string): number {
-  return parseFloat(amountWei) / 1e6;
+function isScientificNotation(value: string): boolean {
+  return /e/i.test(value);
+}
+
+// 将金额转换为链上整数（按指定 decimals）
+// amount 通常是以“币数量/美元数量”输入（稳定币近似 1:1）。
+export function toWei(amount: number, decimals: number = 6): string {
+  if (!Number.isFinite(amount)) return '0';
+
+  const negative = amount < 0;
+  const abs = Math.abs(amount);
+
+  // 避免科学计数法导致的解析问题
+  const raw = abs.toString();
+  const normalized = isScientificNotation(raw) ? abs.toFixed(decimals) : raw;
+
+  const [wholeRaw, fracRaw = ''] = normalized.split('.');
+  const whole = wholeRaw.replace(/^0+(?=\d)/, '') || '0';
+  const frac = (fracRaw + '0'.repeat(decimals)).slice(0, decimals);
+
+  const combined = (whole + frac).replace(/^0+(?=\d)/, '') || '0';
+  const asBigInt = BigInt(combined);
+  return (negative ? '-' : '') + asBigInt.toString();
+}
+
+// 从链上整数转换为可显示的数值（按指定 decimals）
+export function fromWei(amountWei: string, decimals: number = 6): number {
+  if (!amountWei) return 0;
+
+  const negative = amountWei.startsWith('-');
+  const raw = negative ? amountWei.slice(1) : amountWei;
+  if (!raw) return 0;
+
+  let bi: bigint;
+  try {
+    bi = BigInt(raw);
+  } catch {
+    return 0;
+  }
+
+  const base = BigInt(10) ** BigInt(decimals);
+  const whole = bi / base;
+  const fraction = bi % base;
+  const fracStr = fraction.toString().padStart(decimals, '0').replace(/0+$/, '');
+
+  const s = fracStr.length > 0 ? `${whole.toString()}.${fracStr}` : whole.toString();
+  const n = parseFloat(s);
+  return negative ? -n : n;
 }
 
 // 不稳定代币列表（需要过滤的代币地址）

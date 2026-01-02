@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { QuoteResult, KyberSwapQuoteResponse, ChainSwapData, TradingPair } from './types';
-import { USDT_USDC_CHAINS, AMOUNTS, toWei, fromWei, getAllUnstableTokens, OPENOCEAN_ONLY_CHAINS, TRADING_PAIRS } from './config';
+import { USDT_USDC_CHAINS, AMOUNTS, toWei, fromWei, getAllUnstableTokens, OPENOCEAN_ONLY_CHAINS, TRADING_PAIRS, getTokenDecimals } from './config';
 import { getOpenOceanQuoteByChainKey } from './openocean';
 import { getBinanceSwapData } from './binance';
 import { getMexcSwapData } from './mexc';
@@ -180,6 +180,9 @@ export async function getSwapDataForPair(pairId: string = 'usdc_usdt'): Promise<
     return results;
   }
 
+  const tokenADecimals = getTokenDecimals(pair.tokenA);
+  const tokenBDecimals = getTokenDecimals(pair.tokenB);
+
   console.log(`[SwapData] Fetching data for pair: ${pair.name} (${pairId})`);
   
   // 只有 USDC/USDT 支持 CEX
@@ -209,20 +212,22 @@ export async function getSwapDataForPair(pairId: string = 'usdc_usdt'): Promise<
     }
 
     for (const amount of AMOUNTS) {
-      const amountInWei = toWei(amount);
+      // amountIn 需要按“输入 token” 的 decimals 来编码
+      const amountInAToB = toWei(amount, tokenADecimals);
+      const amountInBToA = toWei(amount, tokenBDecimals);
 
       const chainCleanKey = chainKey.split('_')[0];
       const useOpenOcean = OPENOCEAN_ONLY_CHAINS.has(chainKey) || OPENOCEAN_ONLY_CHAINS.has(chainCleanKey);
 
       // TokenA -> TokenB
       const tokenAToB = useOpenOcean
-        ? await getOpenOceanQuoteByChainKey(chainKey, tokenAAddress, tokenBAddress, amountInWei)
-        : await getQuote(chainKey, tokenAAddress, tokenBAddress, amountInWei);
+        ? await getOpenOceanQuoteByChainKey(chainKey, tokenAAddress, tokenBAddress, amountInAToB)
+        : await getQuote(chainKey, tokenAAddress, tokenBAddress, amountInAToB);
 
       // TokenB -> TokenA
       const tokenBToA = useOpenOcean
-        ? await getOpenOceanQuoteByChainKey(chainKey, tokenBAddress, tokenAAddress, amountInWei)
-        : await getQuote(chainKey, tokenBAddress, tokenAAddress, amountInWei);
+        ? await getOpenOceanQuoteByChainKey(chainKey, tokenBAddress, tokenAAddress, amountInBToA)
+        : await getQuote(chainKey, tokenBAddress, tokenAAddress, amountInBToA);
 
       const dataSource: 'kyberswap' | 'openocean' = useOpenOcean ? 'openocean' : 'kyberswap';
 
@@ -239,26 +244,26 @@ export async function getSwapDataForPair(pairId: string = 'usdc_usdt'): Promise<
         // 向后兼容字段（USDC/USDT）
         usdcToUsdt: isUsdcUsdt ? {
           input: amount,
-          output: tokenAToB.success && tokenAToB.amountOut ? fromWei(tokenAToB.amountOut) : null,
+          output: tokenAToB.success && tokenAToB.amountOut ? fromWei(tokenAToB.amountOut, tokenBDecimals) : null,
           outputUsd: tokenAToB.success && tokenAToB.amountOutUsd ? parseFloat(tokenAToB.amountOutUsd) : null,
           error: tokenAToB.error
         } : { input: amount, output: null, outputUsd: null },
         usdtToUsdc: isUsdcUsdt ? {
           input: amount,
-          output: tokenBToA.success && tokenBToA.amountOut ? fromWei(tokenBToA.amountOut) : null,
+          output: tokenBToA.success && tokenBToA.amountOut ? fromWei(tokenBToA.amountOut, tokenADecimals) : null,
           outputUsd: tokenBToA.success && tokenBToA.amountOutUsd ? parseFloat(tokenBToA.amountOutUsd) : null,
           error: tokenBToA.error
         } : { input: amount, output: null, outputUsd: null },
         // 通用字段（所有交易对）
         tokenAToB: {
           input: amount,
-          output: tokenAToB.success && tokenAToB.amountOut ? fromWei(tokenAToB.amountOut) : null,
+          output: tokenAToB.success && tokenAToB.amountOut ? fromWei(tokenAToB.amountOut, tokenBDecimals) : null,
           outputUsd: tokenAToB.success && tokenAToB.amountOutUsd ? parseFloat(tokenAToB.amountOutUsd) : null,
           error: tokenAToB.error
         },
         tokenBToA: {
           input: amount,
-          output: tokenBToA.success && tokenBToA.amountOut ? fromWei(tokenBToA.amountOut) : null,
+          output: tokenBToA.success && tokenBToA.amountOut ? fromWei(tokenBToA.amountOut, tokenADecimals) : null,
           outputUsd: tokenBToA.success && tokenBToA.amountOutUsd ? parseFloat(tokenBToA.amountOutUsd) : null,
           error: tokenBToA.error
         }
