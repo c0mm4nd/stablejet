@@ -2,7 +2,7 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { HistoryDataPoint } from '@/lib/history';
-import { calculateSpreadBps, filterOutliers } from '@/lib/utils';
+import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, filterOutliers } from '@/lib/utils';
 import { DEFAULT_TRADING_PAIR, TRADING_PAIRS } from '@/lib/config';
 
 interface SpreadLineChartProps {
@@ -99,9 +99,13 @@ const CustomTooltip = ({ active, payload, label, pairConfig }: any) => {
                 <span className="font-medium text-gray-700 min-w-[70px]">
                   {entry.name}:
                 </span>
-                <span className={`font-bold ${entry.value >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {entry.value} bps
-                </span>
+                {entry.value !== null && entry.value !== undefined ? (
+                  <span className={`font-bold ${entry.value >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {entry.value.toFixed(2)} bps
+                  </span>
+                ) : (
+                  <span className="font-bold text-gray-400">N/A</span>
+                )}
               </div>
             ))}
           </div>
@@ -118,9 +122,13 @@ const CustomTooltip = ({ active, payload, label, pairConfig }: any) => {
                 <span className="font-medium text-gray-700 min-w-[70px]">
                   {entry.name}:
                 </span>
-                <span className={`font-bold ${entry.value >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {entry.value} bps
-                </span>
+                {entry.value !== null && entry.value !== undefined ? (
+                  <span className={`font-bold ${entry.value >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {entry.value.toFixed(2)} bps
+                  </span>
+                ) : (
+                  <span className="font-bold text-gray-400">N/A</span>
+                )}
               </div>
             ))}
           </div>
@@ -134,6 +142,29 @@ export default function SpreadLineChart({ history, amount, pairId = DEFAULT_TRAD
   const pair = TRADING_PAIRS[pairId] || TRADING_PAIRS[DEFAULT_TRADING_PAIR];
   const tokenAShort = pair.tokenA;
   const tokenBShort = pair.tokenB;
+
+  // 每个时间点的“基准汇率”（使用该时间点全体链/数据源的中位数）
+  const baselineByTimestamp: Record<string, { aToB: number | null; bToA: number | null }> = {};
+  history.forEach(point => {
+    const amountItems = point.data.filter(item => item.amount === amount);
+    const ratesAToB = amountItems
+      .map(item => {
+        const quote = item.tokenAToB || item.usdcToUsdt;
+        return calculateImpliedRate(quote.input, quote.output);
+      })
+      .filter((r): r is number => r !== null);
+    const ratesBToA = amountItems
+      .map(item => {
+        const quote = item.tokenBToA || item.usdtToUsdc;
+        return calculateImpliedRate(quote.input, quote.output);
+      })
+      .filter((r): r is number => r !== null);
+
+    baselineByTimestamp[point.timestamp] = {
+      aToB: ratesAToB.length > 0 ? calculateMedian(ratesAToB) : null,
+      bToA: ratesBToA.length > 0 ? calculateMedian(ratesBToA) : null,
+    };
+  });
 
   const seriesBases = Array.from(
     new Set(
@@ -165,8 +196,12 @@ export default function SpreadLineChart({ history, amount, pairId = DEFAULT_TRAD
         const base = `${item.chainKey}@${item.dataSource || 'kyberswap'}`;
         const tokenAToB = item.tokenAToB || item.usdcToUsdt;
         const tokenBToA = item.tokenBToA || item.usdtToUsdc;
-        const tokenAToBSpread = calculateSpreadBps(tokenAToB.input, tokenAToB.output);
-        const tokenBToASpread = calculateSpreadBps(tokenBToA.input, tokenBToA.output);
+
+        const baseline = baselineByTimestamp[point.timestamp] || { aToB: null, bToA: null };
+        const tokenAToBRate = calculateImpliedRate(tokenAToB.input, tokenAToB.output);
+        const tokenBToARate = calculateImpliedRate(tokenBToA.input, tokenBToA.output);
+        const tokenAToBSpread = calculateRateDeviationBps(tokenAToBRate, baseline.aToB);
+        const tokenBToASpread = calculateRateDeviationBps(tokenBToARate, baseline.bToA);
 
         // 确保数组已初始化（处理配置中有但颜色定义中没有的链）
         if (!allSpreads[`${base} (${tokenAShort}→${tokenBShort})`]) {
@@ -200,9 +235,12 @@ export default function SpreadLineChart({ history, amount, pairId = DEFAULT_TRAD
         // 使用通用字段或回退到 USDC/USDT 字段
         const tokenAToB = item.tokenAToB || item.usdcToUsdt;
         const tokenBToA = item.tokenBToA || item.usdtToUsdc;
+
+        const baseline = baselineByTimestamp[point.timestamp] || { aToB: null, bToA: null };
         
         // TokenA → TokenB
-        const tokenAToBSpread = calculateSpreadBps(tokenAToB.input, tokenAToB.output);
+        const tokenAToBRate = calculateImpliedRate(tokenAToB.input, tokenAToB.output);
+        const tokenAToBSpread = calculateRateDeviationBps(tokenAToBRate, baseline.aToB);
         const filteredTokenAToB = filterOutliers(
           tokenAToBSpread !== null ? parseFloat(tokenAToBSpread.toFixed(2)) : null,
           allSpreads[`${base} (${tokenAShort}→${tokenBShort})`],
@@ -211,7 +249,8 @@ export default function SpreadLineChart({ history, amount, pairId = DEFAULT_TRAD
         dataPoint[`${base} (${tokenAShort}→${tokenBShort})`] = filteredTokenAToB;
 
         // TokenB → TokenA
-        const tokenBToASpread = calculateSpreadBps(tokenBToA.input, tokenBToA.output);
+        const tokenBToARate = calculateImpliedRate(tokenBToA.input, tokenBToA.output);
+        const tokenBToASpread = calculateRateDeviationBps(tokenBToARate, baseline.bToA);
         const filteredTokenBToA = filterOutliers(
           tokenBToASpread !== null ? parseFloat(tokenBToASpread.toFixed(2)) : null,
           allSpreads[`${base} (${tokenBShort}→${tokenAShort})`],
@@ -227,7 +266,7 @@ export default function SpreadLineChart({ history, amount, pairId = DEFAULT_TRAD
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">
-        ${amount.toLocaleString()} - 双向价差对比 ({pair?.name || 'USDC/USDT'})
+        {amount.toLocaleString()} {tokenAShort} - 双向报价偏差 (bps) ({pair?.name || 'USDC/USDT'})
       </h2>
 
       <ResponsiveContainer width="100%" height={450}>
@@ -241,7 +280,7 @@ export default function SpreadLineChart({ history, amount, pairId = DEFAULT_TRAD
           <YAxis
             stroke="#9ca3af"
             style={{ fontSize: '11px' }}
-            label={{ value: '价差 (bps)', angle: -90, position: 'insideLeft', style: { fontSize: '11px' } }}
+            label={{ value: '报价偏差 (bps)', angle: -90, position: 'insideLeft', style: { fontSize: '11px' } }}
           />
           <Tooltip content={<CustomTooltip pairConfig={pair} />} />
           <Legend

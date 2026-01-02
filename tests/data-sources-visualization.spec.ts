@@ -33,11 +33,11 @@ test.describe('数据源和可视化验证', () => {
 
   test('应用程序正常加载', async ({ page }) => {
     // 检查页面标题或主要元素
-    await expect(page.locator('text=USDC ⇄ USDT')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=StableJet Monitor')).toBeVisible({ timeout: 10000 });
   });
 
   test('配置设置按钮可见并可点击', async ({ page }) => {
-    const settingsButton = page.locator('button:has-text("配置设置")');
+    const settingsButton = page.getByRole('button', { name: '配置设置' });
     await expect(settingsButton).toBeVisible();
     await settingsButton.click();
     
@@ -67,7 +67,7 @@ test.describe('数据源和可视化验证', () => {
     await page.waitForTimeout(5000);
     
     // 打开设置查看启用的链
-    await page.click('button:has-text("配置设置")');
+    await page.getByRole('button', { name: '配置设置' }).click();
     await page.waitForTimeout(1000);
     
     const chainCheckboxes = await page.locator('[type="checkbox"]').all();
@@ -232,7 +232,7 @@ test.describe('数据源和可视化验证', () => {
 
   test('验证金额配置', async ({ page }) => {
     // 打开设置
-    await page.click('button:has-text("配置设置")');
+    await page.getByRole('button', { name: '配置设置' }).click();
     await page.waitForTimeout(1000);
     
     // 检查金额配置（从实际config获取）
@@ -245,7 +245,7 @@ test.describe('数据源和可视化验证', () => {
       if (content.includes(amount.toString()) || 
           content.includes(amount.toLocaleString())) {
         foundAmounts++;
-        console.log(`✓ 发现金额配置: $${amount.toLocaleString()}`);
+        console.log(`✓ 发现金额配置: ${amount.toLocaleString()}`);
       }
     }
     

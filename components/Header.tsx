@@ -152,6 +152,7 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
               onClick={onSettingsClick}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               title="设置"
+              aria-label="配置设置"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

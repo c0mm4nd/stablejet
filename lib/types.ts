@@ -3,6 +3,9 @@ export interface ChainConfig {
   usdc: string;
   usdt: string;
   usde?: string; // USDe address for USDe pairs
+  susde?: string; // sUSDe address for sUSDe pairs (Stargate)
+  usr?: string; // Resolv USD (USR) address (Stargate)
+  wstusr?: string; // Wrapped Staked USR address (Stargate)
 }
 
 export interface TradingPair {

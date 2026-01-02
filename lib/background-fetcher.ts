@@ -171,7 +171,7 @@ class BackgroundFetcher {
 const backgroundFetcher = new BackgroundFetcher();
 
 // 在开发环境中自动启动
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development' && process.env.DISABLE_BACKGROUND_FETCHER !== '1') {
   backgroundFetcher.start(10);
 }
 

@@ -82,7 +82,7 @@ export default function HistoryChartsView({ history, pairId }: HistoryChartsView
             <SpreadLineChart history={filteredHistory} amount={amount} pairId={pairId} />
 
             {/* 跨链套利机会图 */}
-            <CrossChainArbitrageChart history={filteredHistory} amount={amount} />
+            <CrossChainArbitrageChart history={filteredHistory} amount={amount} pairId={pairId} />
 
             {/* 分隔线 */}
             {index < amounts.length - 1 && (

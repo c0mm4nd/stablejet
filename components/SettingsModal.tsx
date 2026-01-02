@@ -225,7 +225,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
           {/* 测试金额部分 */}
           <div>
-            <h3 className="text-xl font-bold text-gray-800 mb-4">测试金额（美元）</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-4">测试金额（输入数量）</h3>
 
             <div className="flex flex-wrap gap-2 mb-4">
               {editingAmounts.map((amount, index) => (
@@ -233,7 +233,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   key={index}
                   className="bg-primary text-white px-4 py-2 rounded-full flex items-center gap-2"
                 >
-                  <span className="font-semibold">${amount.toLocaleString()}</span>
+                  <span className="font-semibold">{amount.toLocaleString()}</span>
                   <button
                     onClick={() => handleDeleteAmount(index)}
                     className="hover:text-red-300 font-bold"
@@ -250,7 +250,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               <div className="flex gap-2">
                 <input
                   type="number"
-                  placeholder="金额（美元）"
+                  placeholder="输入数量"
                   value={newAmount}
                   onChange={(e) => setNewAmount(e.target.value)}
                   className="flex-1 px-3 py-2 border rounded text-sm"

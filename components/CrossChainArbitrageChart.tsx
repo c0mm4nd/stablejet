@@ -2,11 +2,13 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { HistoryDataPoint } from '@/lib/history';
-import { calculateSpreadBps, filterOutliers } from '@/lib/utils';
+import { TRADING_PAIRS } from '@/lib/config';
+import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, calculateRoundTripBps, filterOutliers } from '@/lib/utils';
 
 interface CrossChainArbitrageChartProps {
   history: HistoryDataPoint[];
   amount: number;
+  pairId: string;
 }
 
 // 链对的颜色映射（选择对比度高的颜色）
@@ -116,7 +118,7 @@ const CustomTooltip = ({ active, payload, label, detailsMap }: any) => {
 
 interface ArbitrageDetail {
   profit: number;
-  direction: 'USDC→USDT→USDC', //| 'USDT→USDC→USDT';
+  direction: string;
   step1Chain: string;
   step1Pair: string;
   step1Bps: number;
@@ -125,9 +127,14 @@ interface ArbitrageDetail {
   step2Bps: number;
 }
 
-export default function CrossChainArbitrageChart({ history, amount }: CrossChainArbitrageChartProps) {
+export default function CrossChainArbitrageChart({ history, amount, pairId }: CrossChainArbitrageChartProps) {
   const sourceSuffix = (source?: string) => (source === 'openocean' ? 'OO' : 'KS');
   const itemLabel = (item: any) => `${item.chain} [${sourceSuffix(item.dataSource || 'kyberswap')}]`;
+
+  const pair = TRADING_PAIRS[pairId];
+  if (!pair) {
+    return null;
+  }
 
   // 首先收集所有链对的套利数据
   const chainPairs: { [key: string]: (number | null)[] } = {};
@@ -136,6 +143,22 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
   // 收集所有套利值
   history.forEach(point => {
     const amountData = point.data.filter(item => item.amount === amount);
+
+    const ratesAtoB = amountData
+      .map(item => {
+        const tokenAToB = item.tokenAToB || item.usdcToUsdt;
+        return calculateImpliedRate(tokenAToB.input, tokenAToB.output);
+      })
+      .filter((r): r is number => r !== null);
+    const ratesBtoA = amountData
+      .map(item => {
+        const tokenBToA = item.tokenBToA || item.usdtToUsdc;
+        return calculateImpliedRate(tokenBToA.input, tokenBToA.output);
+      })
+      .filter((r): r is number => r !== null);
+
+    const baselineAtoB = ratesAtoB.length > 0 ? calculateMedian(ratesAtoB) : null;
+    const baselineBtoA = ratesBtoA.length > 0 ? calculateMedian(ratesBtoA) : null;
 
     if (!chainPairDetails[point.timestamp]) {
       chainPairDetails[point.timestamp] = {};
@@ -154,49 +177,53 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
           chainPairs[pairKey] = [];
         }
 
-        // 计算两个方向的套利，选择利润更高的
-        // 方向1: 在 buyChain 用 USDC 买 USDT，在 sellChain 用 USDT 买 USDC
-        const direction1_buySpread = calculateSpreadBps(buyChain.usdcToUsdt.input, buyChain.usdcToUsdt.output);
-        const direction1_sellSpread = calculateSpreadBps(sellChain.usdtToUsdc.input, sellChain.usdtToUsdc.output);
+        const buyAtoB = buyChain.tokenAToB || buyChain.usdcToUsdt;
+        const buyBtoA = buyChain.tokenBToA || buyChain.usdtToUsdc;
+        const sellAtoB = sellChain.tokenAToB || sellChain.usdcToUsdt;
+        const sellBtoA = sellChain.tokenBToA || sellChain.usdtToUsdc;
 
-        // 方向2: 在 buyChain 用 USDT 买 USDC，在 sellChain 用 USDC 买 USDT
-        // const direction2_buySpread = calculateSpreadBps(buyChain.usdtToUsdc.input, buyChain.usdtToUsdc.output);
-        // const direction2_sellSpread = calculateSpreadBps(sellChain.usdcToUsdt.input, sellChain.usdcToUsdt.output);
+        const buyRateAtoB = calculateImpliedRate(buyAtoB.input, buyAtoB.output);
+        const buyRateBtoA = calculateImpliedRate(buyBtoA.input, buyBtoA.output);
+        const sellRateAtoB = calculateImpliedRate(sellAtoB.input, sellAtoB.output);
+        const sellRateBtoA = calculateImpliedRate(sellBtoA.input, sellBtoA.output);
+
+        // 方向1: buyChain 做 A→B，然后 sellChain 做 B→A
+        const direction1_profit = calculateRoundTripBps(buyRateAtoB, sellRateBtoA);
+        // 方向2: buyChain 做 B→A，然后 sellChain 做 A→B
+        const direction2_profit = calculateRoundTripBps(buyRateBtoA, sellRateAtoB);
 
         let bestProfit = null;
         let bestDetail: ArbitrageDetail | null = null;
 
-        if (direction1_buySpread !== null && direction1_sellSpread !== null) {
-          const direction1_profit = direction1_buySpread + direction1_sellSpread;
+        if (direction1_profit !== null) {
           bestProfit = direction1_profit;
           bestDetail = {
             profit: direction1_profit,
-            direction: 'USDC→USDT→USDC',
+            direction: `${pair.tokenA}→${pair.tokenB}→${pair.tokenA}`,
             step1Chain: itemLabel(buyChain),
-            step1Pair: 'USDC→USDT',
-            step1Bps: direction1_buySpread,
+            step1Pair: `${pair.tokenA}→${pair.tokenB}`,
+            step1Bps: calculateRateDeviationBps(buyRateAtoB, baselineAtoB) ?? 0,
             step2Chain: itemLabel(sellChain),
-            step2Pair: 'USDT→USDC',
-            step2Bps: direction1_sellSpread
+            step2Pair: `${pair.tokenB}→${pair.tokenA}`,
+            step2Bps: calculateRateDeviationBps(sellRateBtoA, baselineBtoA) ?? 0
           };
         }
 
-        // if (direction2_buySpread !== null && direction2_sellSpread !== null) {
-        //   const direction2_profit = direction2_buySpread + direction2_sellSpread;
-        //   if (bestProfit === null || direction2_profit > bestProfit) {
-        //     bestProfit = direction2_profit;
-        //     bestDetail = {
-        //       profit: direction2_profit,
-        //       direction: 'USDT→USDC→USDT',
-        //       step1Chain: buyChain.chain,
-        //       step1Pair: 'USDT→USDC',
-        //       step1Bps: direction2_buySpread,
-        //       step2Chain: sellChain.chain,
-        //       step2Pair: 'USDC→USDT',
-        //       step2Bps: direction2_sellSpread
-        //     };
-        //   }
-        // }
+        if (direction2_profit !== null) {
+          if (bestProfit === null || direction2_profit > bestProfit) {
+            bestProfit = direction2_profit;
+            bestDetail = {
+              profit: direction2_profit,
+              direction: `${pair.tokenB}→${pair.tokenA}→${pair.tokenB}`,
+              step1Chain: itemLabel(buyChain),
+              step1Pair: `${pair.tokenB}→${pair.tokenA}`,
+              step1Bps: calculateRateDeviationBps(buyRateBtoA, baselineBtoA) ?? 0,
+              step2Chain: itemLabel(sellChain),
+              step2Pair: `${pair.tokenA}→${pair.tokenB}`,
+              step2Bps: calculateRateDeviationBps(sellRateAtoB, baselineAtoB) ?? 0
+            };
+          }
+        }
 
         chainPairs[pairKey].push(bestProfit);
         chainPairDetails[point.timestamp][pairKey] = bestDetail;
@@ -217,6 +244,8 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
     .slice(0, 20)
     .map(item => item.pair);
 
+  const totalPairsCount = Object.keys(chainPairs).length;
+
   // 转换数据格式供 Recharts 使用，并过滤异常值
   const chartData = history.map(point => {
     const timestamp = new Date(point.timestamp).toLocaleTimeString('zh-CN', {
@@ -230,52 +259,21 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
       _rawTimestamp: point.timestamp, // 保存原始时间戳用于查找详细信息
       _details: chainPairDetails[point.timestamp] || {} // 保存详细信息
     };
-    const amountData = point.data.filter(item => item.amount === amount);
-    const amountDataByLabel = new Map<string, any>(amountData.map(item => [itemLabel(item), item]));
-
     // 只显示最有利可图的链对
     profitablePairs.forEach(pairKey => {
-      const [buyChainName, sellChainName] = pairKey.split('→');
-      const buyChain = amountDataByLabel.get(buyChainName);
-      const sellChain = amountDataByLabel.get(sellChainName);
-
-      if (buyChain && sellChain) {
-        // 计算两个方向的套利，选择利润更高的
-        // 方向1: 在 buyChain 用 USDC 买 USDT，在 sellChain 用 USDT 买 USDC
-        const direction1_buySpread = calculateSpreadBps(buyChain.usdcToUsdt.input, buyChain.usdcToUsdt.output);
-        const direction1_sellSpread = calculateSpreadBps(sellChain.usdtToUsdc.input, sellChain.usdtToUsdc.output);
-
-        // 方向2: 在 buyChain 用 USDT 买 USDC，在 sellChain 用 USDC 买 USDT
-        const direction2_buySpread = calculateSpreadBps(buyChain.usdtToUsdc.input, buyChain.usdtToUsdc.output);
-        const direction2_sellSpread = calculateSpreadBps(sellChain.usdcToUsdt.input, sellChain.usdcToUsdt.output);
-
-        let bestProfit = null;
-
-        if (direction1_buySpread !== null && direction1_sellSpread !== null) {
-          const direction1_profit = direction1_buySpread + direction1_sellSpread;
-          bestProfit = direction1_profit;
-        }
-
-        if (direction2_buySpread !== null && direction2_sellSpread !== null) {
-          const direction2_profit = direction2_buySpread + direction2_sellSpread;
-          if (bestProfit === null || direction2_profit > bestProfit) {
-            bestProfit = direction2_profit;
-          }
-        }
-
-        if (bestProfit !== null) {
-          // 过滤异常值
-          const filtered = filterOutliers(
-            bestProfit,
-            chainPairs[pairKey],
-            10
-          );
-
-          dataPoint[pairKey] = filtered !== null ? parseFloat(filtered.toFixed(2)) : null;
-        } else {
-          dataPoint[pairKey] = null;
-        }
+      const profit = chainPairDetails[point.timestamp]?.[pairKey]?.profit ?? null;
+      if (profit === null) {
+        dataPoint[pairKey] = null;
+        return;
       }
+
+      const filtered = filterOutliers(
+        profit,
+        chainPairs[pairKey],
+        10
+      );
+
+      dataPoint[pairKey] = filtered !== null ? parseFloat(filtered.toFixed(2)) : null;
     });
 
     return dataPoint;
@@ -284,10 +282,10 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
       <h2 className="text-lg font-semibold text-gray-800 mb-2">
-        ${amount.toLocaleString()} - 跨链套利机会
+        输入数量: {amount.toLocaleString()} - 跨链套利机会 (bps)
       </h2>
       <p className="text-xs text-gray-500 mb-4">
-        收益 = 在链A买入USDT的价差 + 在链B卖出USDT的价差
+        收益 (bps) = (链A {pair.tokenA}→{pair.tokenB} 汇率 × 链B {pair.tokenB}→{pair.tokenA} 汇率 - 1) × 10000（自动选择更优方向）
       </p>
 
       <ResponsiveContainer width="100%" height={450}>
@@ -331,14 +329,14 @@ export default function CrossChainArbitrageChart({ history, amount }: CrossChain
 
       <div className="mt-4 space-y-2">
         <p className="text-xs text-gray-600 text-center">
-          显示平均收益最高的前 20 个链对（共 42 种可能组合） | 正值表示套利机会，负值表示亏损
+          显示平均收益最高的前 20 个链对（共 {totalPairsCount} 种可能组合） | 正值表示套利机会，负值表示亏损
           <br />
           已过滤超出中位数 ±10 bps 的异常值
         </p>
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <p className="text-xs text-blue-800">
-            <strong>套利说明：</strong>对于每个链对，系统会自动计算两个方向的套利（USDC→USDT→USDC 和 USDT→USDC→USDT），
-            并显示利润更高的那个方向。收益为正表示存在套利机会。
+            <strong>套利说明：</strong>对于每个链对，系统会自动计算两个方向的跨链往返（{pair.tokenA}→{pair.tokenB}→{pair.tokenA} 和 {pair.tokenB}→{pair.tokenA}→{pair.tokenB}），
+            并显示收益更高的那个方向。收益为正表示存在套利机会。
           </p>
         </div>
       </div>

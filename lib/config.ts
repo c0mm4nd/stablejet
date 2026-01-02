@@ -7,6 +7,10 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     usdt: "0xdac17f958d2ee523a2206206994597c13d831ec7",
     usde: "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3", // USDe on Ethereum
+    susde: "0x9D39A5DE30e57443BfF2A837A4256c8797A3497", // sUSDe on Ethereum (Stargate token list)
+    // Resolv (Stargate token list: https://stargate.finance/api/v1/tokens)
+    usr: "0x66a1E37c9b0eAddca17d3662D6c05F4DECf3e110",
+    wstusr: "0x1202F5C7b4B9E47a1A484E8B270be34dbbC75055",
   },
   polygon: {
     name: "Polygon",
@@ -19,30 +23,44 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     usdc: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
     usdt: "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9",
     usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Arbitrum
+    susde: "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2", // sUSDe on Arbitrum (Stargate token list)
+    // Resolv (Stargate)
+    usr: "0x2492D0006411Af6C8bbb1c8afc1B0197350a79e9",
+    wstusr: "0x66CFbD79257dC5217903A36293120282548E2254",
   },
   optimism: {
     name: "Optimism",
     usdc: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
     usdt: "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58",
     usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Optimism
+    susde: "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2", // sUSDe on Optimism (Stargate token list)
   },
   base: {
     name: "Base",
     usdc: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
     usdt: "0x102d758f688a4C1C5a80b116bD945d4455460282",
     usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Base
+    susde: "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2", // sUSDe on Base (Stargate token list)
+    // Resolv (Stargate)
+    usr: "0x35E5dB674D8e93a03d814FA0ADa70731efe8a4b9",
+    wstusr: "0xB67675158B412D53fe6B68946483ba920b135bA1",
   },
   bsc: {
     name: "BSC",
     usdc: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
     usdt: "0x55d398326f99059ff775485246999027b3197955",
     usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on BSC
+    susde: "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2", // sUSDe on BSC (Stargate token list)
+    // Resolv (Stargate)
+    usr: "0x2492D0006411Af6C8bbb1c8afc1B0197350a79e9",
+    wstusr: "0x4254813524695def4163A169e901f3d7a1a55429",
   },
   avalanche: {
     name: "Avalanche",
     usdc: "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
     usdt: "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
     usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Avalanche
+    susde: "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2", // sUSDe on Avalanche (Stargate token list)
   },
   hyperevm: {
     name: "HyperEVM",
@@ -70,12 +88,14 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     usdc: "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
     usdt: "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
     usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Mantle via Stargate
+    susde: "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2", // sUSDe on Mantle (Stargate token list)
   },
   mantle_0: {
     name: "Mantle (USDC/USDT0)",
     usdc: "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
     usdt: "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
     usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Mantle
+    susde: "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2", // sUSDe on Mantle (Stargate token list)
   },
   unichain: {
     name: "UniChain",
@@ -88,6 +108,9 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     usdc: "0x549943e04f40284185054145c6E4e9568C1D3241",
     usdt: "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
     usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Berachain (example)
+    // Resolv (Stargate token list uses chainKey 'bera'; addresses should match on Berachain)
+    usr: "0x2492D0006411Af6C8bbb1c8afc1B0197350a79e9",
+    wstusr: "0xCC601605Dc5011616934B6FDAC8A14d51B791A94",
   },
 
   // CEX: Binance (使用订单簿计算，不需要链地址)
@@ -138,10 +161,11 @@ export const USDT_USDC_CHAINS: Record<string, ChainConfig> = {
     usdc: "0x06efdbff2a14a7c8e15944d1f4a48f9f95f663a4",
     usdt: "0xf55bec9cafdbe8730f096aa55dad6d22d44099df",
     usde: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34", // USDe on Scroll via Stargate
+    susde: "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2", // sUSDe on Scroll (Stargate token list)
   },
 };
 
-// 测试金额（以美元为单位）
+// 测试金额（按“输入 token”的数量单位）
 export const AMOUNTS = [30000, 50000];
 
 // Token decimals (用于 amountIn/amountOut 的换算)
@@ -151,6 +175,10 @@ export const TOKEN_DECIMALS_BY_SYMBOL: Record<string, number> = {
   USDT: 6,
   USDe: 18,
   USDE: 18,
+  sUSDe: 18,
+  SUSDE: 18,
+  USR: 18,
+  WSTUSR: 18,
 };
 
 export function getTokenDecimals(tokenSymbol: string): number {
@@ -346,6 +374,57 @@ export const TRADING_PAIRS: Record<string, TradingPair> = {
     tokenB: "USDC",
     getAddressA: (chain) => chain.usde,
     getAddressB: (chain) => chain.usdc,
+  },
+
+  susde_usdt: {
+    id: "susde_usdt",
+    name: "sUSDe/USDT",
+    tokenA: "sUSDe",
+    tokenB: "USDT",
+    getAddressA: (chain) => chain.susde,
+    getAddressB: (chain) => chain.usdt,
+  },
+  susde_usdc: {
+    id: "susde_usdc",
+    name: "sUSDe/USDC",
+    tokenA: "sUSDe",
+    tokenB: "USDC",
+    getAddressA: (chain) => chain.susde,
+    getAddressB: (chain) => chain.usdc,
+  },
+
+  // Resolv
+  usr_usdc: {
+    id: "usr_usdc",
+    name: "USR/USDC",
+    tokenA: "USR",
+    tokenB: "USDC",
+    getAddressA: (chain) => chain.usr,
+    getAddressB: (chain) => chain.usdc,
+  },
+  usr_usdt: {
+    id: "usr_usdt",
+    name: "USR/USDT",
+    tokenA: "USR",
+    tokenB: "USDT",
+    getAddressA: (chain) => chain.usr,
+    getAddressB: (chain) => chain.usdt,
+  },
+  wstusr_usdc: {
+    id: "wstusr_usdc",
+    name: "wstUSR/USDC",
+    tokenA: "wstUSR",
+    tokenB: "USDC",
+    getAddressA: (chain) => chain.wstusr,
+    getAddressB: (chain) => chain.usdc,
+  },
+  wstusr_usdt: {
+    id: "wstusr_usdt",
+    name: "wstUSR/USDT",
+    tokenA: "wstUSR",
+    tokenB: "USDT",
+    getAddressA: (chain) => chain.wstusr,
+    getAddressB: (chain) => chain.usdt,
   },
 };
 

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
-import { calculateSpreadBps } from '@/lib/utils';
+import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, calculateRoundTripBps } from '@/lib/utils';
 import { TRADING_PAIRS } from '@/lib/config';
 
 interface LiveQuotesTableProps {
@@ -22,6 +22,16 @@ interface TableRow {
   spreadAtoB: number | null;
   spreadBtoA: number | null;
   arbitrageSpace: number | null;
+}
+
+interface RawRow {
+  chain: string;
+  dataSource: string;
+  outputAtoB: number | null;
+  outputBtoA: number | null;
+  arbitrageSpace: number | null;
+  rateAtoB: number | null;
+  rateBtoA: number | null;
 }
 
 export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesTableProps) {
@@ -62,29 +72,42 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
 
   // 准备表格数据
   const tableData: TableRow[] = useMemo(() => {
-    return latestData.data
+    const rawRows: RawRow[] = latestData.data
       .filter(item => item.amount === amount)
       .map(item => {
         const source = item.dataSource || 'kyberswap';
         const tokenAToB = item.tokenAToB || item.usdcToUsdt;
         const tokenBToA = item.tokenBToA || item.usdtToUsdc;
-        
-        const spreadAtoB = calculateSpreadBps(tokenAToB.input, tokenAToB.output);
-        const spreadBtoA = calculateSpreadBps(tokenBToA.input, tokenBToA.output);
-        const arbitrageSpace = (spreadAtoB !== null && spreadBtoA !== null) 
-          ? spreadAtoB + spreadBtoA 
-          : null;
+
+        const rateAtoB = calculateImpliedRate(tokenAToB.input, tokenAToB.output);
+        const rateBtoA = calculateImpliedRate(tokenBToA.input, tokenBToA.output);
 
         return {
           chain: item.chain,
           dataSource: source,
           outputAtoB: tokenAToB.output,
           outputBtoA: tokenBToA.output,
-          spreadAtoB,
-          spreadBtoA,
-          arbitrageSpace
+          // 往返收益 bps：rateAtoB * rateBtoA - 1
+          arbitrageSpace: calculateRoundTripBps(rateAtoB, rateBtoA),
+          rateAtoB,
+          rateBtoA,
         };
       });
+
+    const ratesAtoB = rawRows.map(r => r.rateAtoB).filter((r): r is number => r !== null);
+    const ratesBtoA = rawRows.map(r => r.rateBtoA).filter((r): r is number => r !== null);
+    const baselineAtoB = ratesAtoB.length > 0 ? calculateMedian(ratesAtoB) : null;
+    const baselineBtoA = ratesBtoA.length > 0 ? calculateMedian(ratesBtoA) : null;
+
+    return rawRows.map(r => ({
+      chain: r.chain,
+      dataSource: r.dataSource,
+      outputAtoB: r.outputAtoB,
+      outputBtoA: r.outputBtoA,
+      spreadAtoB: calculateRateDeviationBps(r.rateAtoB, baselineAtoB),
+      spreadBtoA: calculateRateDeviationBps(r.rateBtoA, baselineBtoA),
+      arbitrageSpace: r.arbitrageSpace,
+    }));
   }, [latestData, amount]);
 
   // 排序数据
@@ -134,7 +157,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
     <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800">
-          ${amount.toLocaleString()} - 实时报价数据 (共 {sortedData.length} 个链)
+          输入数量: {amount.toLocaleString()} - 实时报价数据 (共 {sortedData.length} 个链)
         </h2>
         <span className="text-sm text-gray-500">
           更新时间: {timestamp}
@@ -204,7 +227,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                 onClick={() => handleSort('arbitrageSpace')}
               >
                 <div className="flex items-center justify-end gap-2">
-                  套利空间
+                  套利空间 (bps)
                   <SortIcon columnKey="arbitrageSpace" />
                 </div>
               </th>
@@ -277,8 +300,8 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
       </div>
 
       <div className="mt-4 text-xs text-gray-500 text-center">
-        价差 = (输出金额 - 输入金额) / 输入金额 × 10000 (bps) | 
-        套利空间 = {pair.tokenA}→{pair.tokenB} 价差 + {pair.tokenB}→{pair.tokenA} 价差 |
+        价差 (bps) = 相对“全体中位数汇率”的偏差 | 
+        套利空间 (bps) = ({pair.tokenA}→{pair.tokenB} 汇率 × {pair.tokenB}→{pair.tokenA} 汇率 - 1) × 10000 |
         点击列标题可排序
       </div>
     </div>

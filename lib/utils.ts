@@ -1,16 +1,24 @@
 import { ChainSwapData } from './types';
 
-// 计算价差（基点 bps）
-export function calculateSpreadBps(input: number, output: number | null): number | null {
+// 计算隐含汇率：output / input
+export function calculateImpliedRate(input: number, output: number | null): number | null {
   if (output === null) return null;
-  // 基点 (basis points) = (output - input) / input * 10000
-  return ((output - input) / input) * 10000;
+  if (!Number.isFinite(input) || input === 0) return null;
+  return output / input;
 }
 
-// 计算绝对价差
-export function calculateAbsoluteSpread(input: number, output: number | null): number | null {
-  if (output === null) return null;
-  return output - input;
+// 基于汇率的偏差（bps）：(rate - baseline) / baseline * 10000
+export function calculateRateDeviationBps(rate: number | null, baselineRate: number | null): number | null {
+  if (rate === null || baselineRate === null) return null;
+  if (!Number.isFinite(rate) || !Number.isFinite(baselineRate) || baselineRate === 0) return null;
+  return ((rate - baselineRate) / baselineRate) * 10000;
+}
+
+// 往返收益（bps）：(rateForward * rateBackward - 1) * 10000
+export function calculateRoundTripBps(rateForward: number | null, rateBackward: number | null): number | null {
+  if (rateForward === null || rateBackward === null) return null;
+  if (!Number.isFinite(rateForward) || !Number.isFinite(rateBackward)) return null;
+  return (rateForward * rateBackward - 1) * 10000;
 }
 
 // 按金额分组数据
@@ -29,13 +37,6 @@ export function formatBps(bps: number | null): string {
   if (bps === null) return 'N/A';
   const sign = bps >= 0 ? '+' : '';
   return `${sign}${bps.toFixed(2)} bps`;
-}
-
-// 格式化美元金额
-export function formatUSD(amount: number | null): string {
-  if (amount === null) return 'N/A';
-  const sign = amount >= 0 ? '+' : '';
-  return `${sign}$${Math.abs(amount).toFixed(2)}`;
 }
 
 // 计算中位数
