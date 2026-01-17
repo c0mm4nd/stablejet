@@ -76,6 +76,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
   const sourceInfo: Record<string, { name: string; color: string }> = {
     kyberswap: { name: 'KyberSwap', color: 'text-blue-600' },
     nordstern: { name: 'Nordstern', color: 'text-cyan-600' },
+    lifi: { name: 'Li.Fi', color: 'text-teal-600' },
     binance: { name: 'Binance', color: 'text-yellow-600' },
     bybit: { name: 'Bybit', color: 'text-orange-600' },
     mexc: { name: 'MEXC', color: 'text-green-600' }
@@ -150,6 +151,12 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
     return [JSON.stringify(route, null, 2)];
   };
 
+  const getToolLabel = (route: any): string | null => {
+    if (!route) return null;
+    const raw = route.raw || {};
+    return raw.tool || raw.toolDetails?.name || null;
+  };
+
   const renderRouteModal = () => {
     if (!activeRoute) return null;
     const aLines = formatRouteBlocks(activeRoute.routeAtoB);
@@ -168,12 +175,18 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
             {aLines.length > 0 && (
               <div className="mb-6">
                 <div className="font-semibold text-gray-800 mb-2">A → B</div>
+                {getToolLabel(activeRoute.routeAtoB) && (
+                  <div className="mb-2 text-xs text-gray-500">Tool: {getToolLabel(activeRoute.routeAtoB)}</div>
+                )}
                 <pre className="whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-700">{aLines.join('\n')}</pre>
               </div>
             )}
             {bLines.length > 0 && (
               <div>
                 <div className="font-semibold text-gray-800 mb-2">B → A</div>
+                {getToolLabel(activeRoute.routeBtoA) && (
+                  <div className="mb-2 text-xs text-gray-500">Tool: {getToolLabel(activeRoute.routeBtoA)}</div>
+                )}
                 <pre className="whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-700">{bLines.join('\n')}</pre>
               </div>
             )}

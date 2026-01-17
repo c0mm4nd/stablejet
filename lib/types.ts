@@ -33,7 +33,7 @@ export interface RouteHop {
 }
 
 export interface RouteInfo {
-  type: 'kyberswap' | 'nordstern' | 'cex' | 'unknown';
+  type: 'kyberswap' | 'nordstern' | 'lifi' | 'cex' | 'unknown';
   paths?: RouteHop[][];
   swaps?: any[];
   tx?: any;
@@ -46,7 +46,7 @@ export interface ChainSwapData {
   chainKey: string;
   amount: number;
   pairId?: string; // Trading pair identifier
-  dataSource?: 'kyberswap' | 'nordstern' | 'binance' | 'mexc' | 'bybit'; // 数据来源
+  dataSource?: 'kyberswap' | 'nordstern' | 'lifi' | 'binance' | 'mexc' | 'bybit'; // 数据来源
   usdcToUsdt: SwapResult;
   usdtToUsdc: SwapResult;
   // Generic swap results for any pair
@@ -109,6 +109,7 @@ export interface ChainAppConfig {
   // API identifiers for aggregators
   kyberCode?: string;     // e.g. "ethereum"
   nordsternCode?: string; // e.g. "8118"
+  lifiChainId?: string;   // e.g. "1"
   disable?: boolean;
 }
 

@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { error } from './logger';
 import { QuoteResult, KyberSwapQuoteResponse, ChainSwapData, TradingPairConfig, ChainAppConfig } from './types';
-import { toWei, fromWei, getAllUnstableTokens, getTokenDecimals } from './config';
-import { getNordsternQuoteByChainKey } from './nordstern';
+import { getAllUnstableTokens, getTokenDecimals } from './config';
+import { getOnchainSwapDataForAmount } from './onchain-sources';
 import { getBinanceSwapData } from './binance';
 import { getMexcSwapData } from './mexc';
 import { getBybitSwapData } from './bybit';
@@ -217,77 +217,20 @@ export async function getSwapDataForPair(
 
     if (!tokenAAddress || !tokenBAddress) continue;
 
-    const useNordstern = !!appChainConfig.nordsternCode;
-
-    const kyberChainParam = appChainConfig.kyberCode || chainKey;
-    const nordsternChainParam = appChainConfig.nordsternCode || chainKey;
-
     for (const amount of amounts) {
-      // amountIn 需要按“输入 token” 的 decimals 来编码
-      const amountInAToB = toWei(amount, tokenADecimals);
-      const amountInBToA = toWei(amount, tokenBDecimals);
+      const onchainRows = await getOnchainSwapDataForAmount({
+        pairId,
+        chainKey,
+        chainName: appChainConfig.name,
+        amount,
+        tokenAAddress,
+        tokenBAddress,
+        tokenADecimals,
+        tokenBDecimals,
+        appChainConfig
+      });
 
-      const sources: Array<{ source: 'kyberswap' | 'nordstern'; aToB: QuoteResult; bToA: QuoteResult }> = [];
-
-      const kyberPromise = getQuote(kyberChainParam, tokenAAddress, tokenBAddress, amountInAToB)
-        .then(aToB => getQuote(kyberChainParam, tokenBAddress, tokenAAddress, amountInBToA)
-          .then(bToA => ({ source: 'kyberswap' as const, aToB, bToA })));
-
-      const nordsternPromise = useNordstern
-        ? getNordsternQuoteByChainKey(nordsternChainParam, tokenAAddress, tokenBAddress, amountInAToB)
-          .then(aToB => getNordsternQuoteByChainKey(nordsternChainParam, tokenBAddress, tokenAAddress, amountInBToA)
-            .then(bToA => ({ source: 'nordstern' as const, aToB, bToA })))
-        : null;
-
-      const fetched = await Promise.all([
-        kyberPromise,
-        ...(nordsternPromise ? [nordsternPromise] : [])
-      ]);
-
-      sources.push(...fetched);
-
-      // 为了向后兼容，USDC/USDT 数据放在 usdcToUsdt/usdtToUsdc 字段
-      const isUsdcUsdt = pairId === 'usdc_usdt';
-
-      for (const { source, aToB, bToA } of sources) {
-        results.push({
-          chain: appChainConfig.name,
-          chainKey,
-          amount,
-          pairId,
-          dataSource: source,
-          // 向后兼容字段（USDC/USDT）
-          usdcToUsdt: isUsdcUsdt ? {
-            input: amount,
-            output: aToB.success && aToB.amountOut ? fromWei(aToB.amountOut, tokenBDecimals) : null,
-            outputUsd: aToB.success && aToB.amountOutUsd ? parseFloat(aToB.amountOutUsd) : null,
-            error: aToB.error,
-            route: aToB.route
-          } : { input: amount, output: null, outputUsd: null },
-          usdtToUsdc: isUsdcUsdt ? {
-            input: amount,
-            output: bToA.success && bToA.amountOut ? fromWei(bToA.amountOut, tokenADecimals) : null,
-            outputUsd: bToA.success && bToA.amountOutUsd ? parseFloat(bToA.amountOutUsd) : null,
-            error: bToA.error,
-            route: bToA.route
-          } : { input: amount, output: null, outputUsd: null },
-          // 通用字段（所有交易对）
-          tokenAToB: {
-            input: amount,
-            output: aToB.success && aToB.amountOut ? fromWei(aToB.amountOut, tokenBDecimals) : null,
-            outputUsd: aToB.success && aToB.amountOutUsd ? parseFloat(aToB.amountOutUsd) : null,
-            error: aToB.error,
-            route: aToB.route
-          },
-          tokenBToA: {
-            input: amount,
-            output: bToA.success && bToA.amountOut ? fromWei(bToA.amountOut, tokenADecimals) : null,
-            outputUsd: bToA.success && bToA.amountOutUsd ? parseFloat(bToA.amountOutUsd) : null,
-            error: bToA.error,
-            route: bToA.route
-          }
-        });
-      }
+      results.push(...onchainRows);
     }
   }
 

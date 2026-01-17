@@ -3,27 +3,32 @@
         "ethereum": {
             "name": "Ethereum",
             "kyberCode": "ethereum",
-            "nordsternCode": "1"
+            "nordsternCode": "1",
+            "lifiChainId": "1"
         },
         "polygon": {
             "name": "Polygon",
             "kyberCode": "polygon",
-            "nordsternCode": "137"
+            "nordsternCode": "137",
+            "lifiChainId": "137"
         },
         "arbitrum": {
             "name": "Arbitrum",
             "kyberCode": "arbitrum",
-            "nordsternCode": "42161"
+            "nordsternCode": "42161",
+            "lifiChainId": "42161"
         },
         "optimism": {
             "name": "Optimism",
             "kyberCode": "optimism",
-            "nordsternCode": "10"
+            "nordsternCode": "10",
+            "lifiChainId": "10"
         },
         "base": {
             "name": "Base",
             "kyberCode": "base",
-            "nordsternCode": "8453"
+            "nordsternCode": "8453",
+            "lifiChainId": "8453"
         },
         "bsc": {
             "name": "BNB Chain",
@@ -32,7 +37,8 @@
         "avalanche": {
             "name": "Avalanche",
             "kyberCode": "avalanche",
-            "nordsternCode": "43114"
+            "nordsternCode": "43114",
+            "lifiChainId": "43114"
         },
         "fantom": {
             "name": "Fantom",
@@ -49,7 +55,8 @@
         "linea": {
             "name": "Linea",
             "kyberCode": "linea",
-            "nordsternCode": "59144"
+            "nordsternCode": "59144",
+            "lifiChainId": "59144"
         },
         "scroll": {
             "name": "Scroll",
@@ -58,22 +65,26 @@
         "sonic": {
             "name": "Sonic",
             "kyberCode": "sonic",
-            "nordsternCode": "146"
+            "nordsternCode": "146",
+            "lifiChainId": "146"
         },
         "unichain": {
             "name": "Unichain",
             "kyberCode": "unichain",
-            "nordsternCode": "130"
+            "nordsternCode": "130",
+            "lifiChainId": "130"
         },
         "berachain": {
             "name": "Berachain",
             "kyberCode": "berachain",
-            "nordsternCode": "80094"
+            "nordsternCode": "80094",
+            "lifiChainId": "80094"
         },
         "mantle": {
             "name": "Mantle",
             "kyberCode": "mantle",
-            "nordsternCode": "5000"
+            "nordsternCode": "5000",
+            "lifiChainId": "5000"
         },
         "binance": {
             "name": "Binance",

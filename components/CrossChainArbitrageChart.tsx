@@ -130,7 +130,14 @@ interface ArbitrageDetail {
 
 export default function CrossChainArbitrageChart({ history, amount, pairId }: CrossChainArbitrageChartProps) {
   const { pairs } = useConfig();
-  const sourceSuffix = (source?: string) => (source === 'nordstern' ? 'NS' : 'KS');
+  const sourceSuffix = (source?: string) => {
+    if (source === 'nordstern') return 'NS';
+    if (source === 'lifi') return 'LF';
+    if (source === 'binance') return 'BN';
+    if (source === 'bybit') return 'BY';
+    if (source === 'mexc') return 'MX';
+    return 'KS';
+  };
   const itemLabel = (item: any) => `${item.chain} [${sourceSuffix(item.dataSource || 'kyberswap')}]`;
 
   const pair = pairs[pairId];

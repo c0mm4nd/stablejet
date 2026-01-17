@@ -181,7 +181,14 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
     )
   ).sort();
 
-  const sourceSuffix = (source: string) => (source === 'nordstern' ? 'NS' : 'KS');
+  const sourceSuffix = (source: string) => {
+    if (source === 'nordstern') return 'NS';
+    if (source === 'lifi') return 'LF';
+    if (source === 'binance') return 'BN';
+    if (source === 'bybit') return 'BY';
+    if (source === 'mexc') return 'MX';
+    return 'KS';
+  };
   const splitBase = (base: string) => {
     const [chainKey, dataSource] = base.split('@');
     return { chainKey, dataSource: dataSource || 'kyberswap' };
