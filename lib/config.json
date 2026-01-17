@@ -147,6 +147,12 @@
         },
         "bybit": {
           "cexPairSymbol": "USDCUSDT"
+        },
+        "mantle": {
+          "addressA": "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
+          "addressB": "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
+          "decimalsA": 6,
+          "decimalsB": 6
         }
       }
     },
@@ -342,11 +348,15 @@
         },
         "base": {
           "addressA": "0x8210c0634AB8f273806e4b7866E9Db353773c44B",
-          "addressB": "0x102d758f688a4C1C5a80b116bD945d4455460282"
+          "addressB": "0x102d758f688a4C1C5a80b116bD945d4455460282",
+          "decimalsA": 18,
+          "decimalsB": 6
         },
         "bsc": {
           "addressA": "0xb3b02E4A9Fb2bD28CC2ff97B0aB3F6B3Ec1eE9D2",
-          "addressB": "0x55d398326f99059fF775485246999027B3197955"
+          "addressB": "0x55d398326f99059fF775485246999027B3197955",
+          "decimalsA": 18,
+          "decimalsB": 18
         }
       }
     },

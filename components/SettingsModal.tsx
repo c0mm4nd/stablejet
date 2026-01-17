@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useConfig } from '@/contexts/ConfigContext';
 import { ChainAppConfig, TradingPairConfig } from '@/lib/types';
+import { getTokenDecimals } from '@/lib/config';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -40,7 +41,25 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   useEffect(() => {
     if (isOpen) {
       setEditingChains(chains);
-      setEditingPairs(pairs);
+      const normalizedPairs: Record<string, TradingPairConfig> = {};
+      for (const [pairId, pair] of Object.entries(pairs)) {
+        const defaultA = getTokenDecimals(pair.tokenA);
+        const defaultB = getTokenDecimals(pair.tokenB);
+        const nextChains: TradingPairConfig['chains'] = {};
+        for (const [chainId, cfg] of Object.entries(pair.chains || {})) {
+          if (['binance', 'mexc', 'bybit'].includes(chainId)) {
+            nextChains[chainId] = cfg;
+            continue;
+          }
+          nextChains[chainId] = {
+            ...cfg,
+            decimalsA: cfg.decimalsA ?? defaultA,
+            decimalsB: cfg.decimalsB ?? defaultB
+          };
+        }
+        normalizedPairs[pairId] = { ...pair, chains: nextChains };
+      }
+      setEditingPairs(normalizedPairs);
       setEditingInterval(clientRefreshInterval);
     }
   }, [isOpen, chains, pairs, clientRefreshInterval]);
@@ -48,10 +67,29 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   if (!isOpen) return null;
 
   const handleSave = async () => {
+    const normalizedPairs: Record<string, TradingPairConfig> = {};
+    for (const [pairId, pair] of Object.entries(editingPairs)) {
+      const defaultA = getTokenDecimals(pair.tokenA);
+      const defaultB = getTokenDecimals(pair.tokenB);
+      const nextChains: TradingPairConfig['chains'] = {};
+      for (const [chainId, cfg] of Object.entries(pair.chains || {})) {
+        if (['binance', 'mexc', 'bybit'].includes(chainId)) {
+          nextChains[chainId] = cfg;
+          continue;
+        }
+        nextChains[chainId] = {
+          ...cfg,
+          decimalsA: cfg.decimalsA ?? defaultA,
+          decimalsB: cfg.decimalsB ?? defaultB
+        };
+      }
+      normalizedPairs[pairId] = { ...pair, chains: nextChains };
+    }
     await Promise.all([
       updateChains(editingChains),
-      updatePairs(editingPairs),
+      updatePairs(normalizedPairs),
     ]);
+    setEditingPairs(normalizedPairs);
     updateClientRefreshInterval(editingInterval);
     onClose();
   };
@@ -178,7 +216,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     });
   };
 
-  const handleUpdatePairChain = (pairId: string, chainId: string, field: 'addressA' | 'addressB' | 'cexPairSymbol' | 'disabled', value: any) => {
+  const handleUpdatePairChain = (pairId: string, chainId: string, field: 'addressA' | 'addressB' | 'cexPairSymbol' | 'decimalsA' | 'decimalsB' | 'disabled', value: any) => {
     const pair = editingPairs[pairId];
     const chainConfig = pair.chains[chainId] || { addressA: '', addressB: '' };
 
@@ -478,6 +516,42 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                                           value={config.addressB}
                                           onChange={e => handleUpdatePairChain(activePairId, chainId, 'addressB', e.target.value)}
                                           placeholder="0x..."
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-xs text-gray-500 mb-1">{editingPairs[activePairId].tokenA} Decimals</label>
+                                        <input
+                                          type="number"
+                                          min={0}
+                                          max={36}
+                                          className="w-full text-xs border rounded px-3 py-2 bg-gray-50 focus:bg-white"
+                                          value={(config as any).decimalsA ?? ''}
+                                          onChange={e => handleUpdatePairChain(
+                                            activePairId,
+                                            chainId,
+                                            'decimalsA',
+                                            e.target.value === '' ? 0 : parseInt(e.target.value, 10)
+                                          )}
+                                          placeholder="6"
+                                          required
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-xs text-gray-500 mb-1">{editingPairs[activePairId].tokenB} Decimals</label>
+                                        <input
+                                          type="number"
+                                          min={0}
+                                          max={36}
+                                          className="w-full text-xs border rounded px-3 py-2 bg-gray-50 focus:bg-white"
+                                          value={(config as any).decimalsB ?? ''}
+                                          onChange={e => handleUpdatePairChain(
+                                            activePairId,
+                                            chainId,
+                                            'decimalsB',
+                                            e.target.value === '' ? 0 : parseInt(e.target.value, 10)
+                                          )}
+                                          placeholder="6"
+                                          required
                                         />
                                       </div>
                                     </>
