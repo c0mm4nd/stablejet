@@ -1,375 +1,413 @@
 {
-    "chains": {
+  "chains": {
+    "ethereum": {
+      "name": "Ethereum",
+      "kyberCode": "ethereum",
+      "nordsternCode": "1",
+      "lifiChainId": "1"
+    },
+    "polygon": {
+      "name": "Polygon",
+      "kyberCode": "polygon",
+      "nordsternCode": "137",
+      "lifiChainId": "137"
+    },
+    "arbitrum": {
+      "name": "Arbitrum",
+      "kyberCode": "arbitrum",
+      "nordsternCode": "42161",
+      "lifiChainId": "42161"
+    },
+    "optimism": {
+      "name": "Optimism",
+      "kyberCode": "optimism",
+      "nordsternCode": "10",
+      "lifiChainId": "10"
+    },
+    "base": {
+      "name": "Base",
+      "kyberCode": "base",
+      "nordsternCode": "8453",
+      "lifiChainId": "8453"
+    },
+    "bsc": {
+      "name": "BNB Chain",
+      "kyberCode": "bsc"
+    },
+    "avalanche": {
+      "name": "Avalanche",
+      "kyberCode": "avalanche",
+      "nordsternCode": "43114",
+      "lifiChainId": "43114"
+    },
+    "fantom": {
+      "name": "Fantom",
+      "kyberCode": "fantom"
+    },
+    "gnosis": {
+      "name": "Gnosis",
+      "kyberCode": "gnosis"
+    },
+    "zksync": {
+      "name": "zkSync Era",
+      "kyberCode": "zksync"
+    },
+    "linea": {
+      "name": "Linea",
+      "kyberCode": "linea",
+      "nordsternCode": "59144",
+      "lifiChainId": "59144"
+    },
+    "scroll": {
+      "name": "Scroll",
+      "kyberCode": "scroll"
+    },
+    "sonic": {
+      "name": "Sonic",
+      "kyberCode": "sonic",
+      "nordsternCode": "146",
+      "lifiChainId": "146"
+    },
+    "unichain": {
+      "name": "Unichain",
+      "kyberCode": "unichain",
+      "nordsternCode": "130",
+      "lifiChainId": "130"
+    },
+    "berachain": {
+      "name": "Berachain",
+      "kyberCode": "berachain",
+      "nordsternCode": "80094",
+      "lifiChainId": "80094"
+    },
+    "mantle": {
+      "name": "Mantle",
+      "kyberCode": "mantle",
+      "nordsternCode": "5000",
+      "lifiChainId": "5000"
+    },
+    "binance": {
+      "name": "Binance",
+      "disable": false
+    },
+    "mexc": {
+      "name": "MEXC",
+      "disable": false
+    },
+    "bybit": {
+      "name": "Bybit",
+      "disable": false
+    }
+  },
+  "pairs": {
+    "usdc_usdt": {
+      "id": "usdc_usdt",
+      "name": "USDC/USDT",
+      "tokenA": "USDC",
+      "tokenB": "USDT",
+      "amounts": [
+        50000
+      ],
+      "chains": {
         "ethereum": {
-            "name": "Ethereum",
-            "kyberCode": "ethereum",
-            "nordsternCode": "1",
-            "lifiChainId": "1"
+          "addressA": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "decimalsA": 6,
+          "decimalsB": 6
         },
         "polygon": {
-            "name": "Polygon",
-            "kyberCode": "polygon",
-            "nordsternCode": "137",
-            "lifiChainId": "137"
+          "addressA": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+          "addressB": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+          "decimalsA": 6,
+          "decimalsB": 6
         },
         "arbitrum": {
-            "name": "Arbitrum",
-            "kyberCode": "arbitrum",
-            "nordsternCode": "42161",
-            "lifiChainId": "42161"
+          "addressA": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "decimalsA": 6,
+          "decimalsB": 6
         },
         "optimism": {
-            "name": "Optimism",
-            "kyberCode": "optimism",
-            "nordsternCode": "10",
-            "lifiChainId": "10"
-        },
-        "base": {
-            "name": "Base",
-            "kyberCode": "base",
-            "nordsternCode": "8453",
-            "lifiChainId": "8453"
-        },
-        "bsc": {
-            "name": "BNB Chain",
-            "kyberCode": "bsc"
-        },
-        "avalanche": {
-            "name": "Avalanche",
-            "kyberCode": "avalanche",
-            "nordsternCode": "43114",
-            "lifiChainId": "43114"
-        },
-        "fantom": {
-            "name": "Fantom",
-            "kyberCode": "fantom"
-        },
-        "gnosis": {
-            "name": "Gnosis",
-            "kyberCode": "gnosis"
-        },
-        "zksync": {
-            "name": "zkSync Era",
-            "kyberCode": "zksync"
-        },
-        "linea": {
-            "name": "Linea",
-            "kyberCode": "linea",
-            "nordsternCode": "59144",
-            "lifiChainId": "59144"
-        },
-        "scroll": {
-            "name": "Scroll",
-            "kyberCode": "scroll"
-        },
-        "sonic": {
-            "name": "Sonic",
-            "kyberCode": "sonic",
-            "nordsternCode": "146",
-            "lifiChainId": "146"
+          "addressA": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+          "addressB": "0x01bFF41798a0BcF287b996046Ca68b395DbC1071",
+          "decimalsA": 6,
+          "decimalsB": 6
         },
         "unichain": {
-            "name": "Unichain",
-            "kyberCode": "unichain",
-            "nordsternCode": "130",
-            "lifiChainId": "130"
-        },
-        "berachain": {
-            "name": "Berachain",
-            "kyberCode": "berachain",
-            "nordsternCode": "80094",
-            "lifiChainId": "80094"
-        },
-        "mantle": {
-            "name": "Mantle",
-            "kyberCode": "mantle",
-            "nordsternCode": "5000",
-            "lifiChainId": "5000"
+          "addressA": "0x078D782b760474a361dDA0AF3839290b0EF57AD6",
+          "addressB": "0x9151434b16b9763660705744891fA906F660EcC5",
+          "decimalsA": 6,
+          "decimalsB": 6
         },
         "binance": {
-            "name": "Binance",
-            "disable": false
+          "cexPairSymbol": "USDCUSDT"
         },
         "mexc": {
-            "name": "MEXC",
-            "disable": false
+          "cexPairSymbol": "USDCUSDT"
         },
         "bybit": {
-            "name": "Bybit",
-            "disable": false
+          "cexPairSymbol": "USDCUSDT"
         }
+      }
     },
-    "pairs": {
-        "usdc_usdt": {
-            "id": "usdc_usdt",
-            "name": "USDC/USDT",
-            "tokenA": "USDC",
-            "tokenB": "USDT",
-            "amounts": [
-                50000
-            ],
-            "chains": {
-                "ethereum": {
-                    "addressA": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-                    "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
-                    "decimalsA": 6,
-                    "decimalsB": 6
-                },
-                "polygon": {
-                    "addressA": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
-                    "addressB": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
-                    "decimalsA": 6,
-                    "decimalsB": 6
-                },
-                "arbitrum": {
-                    "addressA": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-                    "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
-                    "decimalsA": 6,
-                    "decimalsB": 6
-                },
-                "optimism": {
-                    "addressA": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
-                    "addressB": "0x01bFF41798a0BcF287b996046Ca68b395DbC1071",
-                    "decimalsA": 6,
-                    "decimalsB": 6
-                },
-                "unichain": {
-                    "addressA": "0x078D782b760474a361dDA0AF3839290b0EF57AD6",
-                    "addressB": "0x9151434b16b9763660705744891fA906F660EcC5",
-                    "decimalsA": 6,
-                    "decimalsB": 6
-                },
-                "binance": {
-                    "cexPairSymbol": "USDCUSDT"
-                },
-                "mexc": {
-                    "cexPairSymbol": "USDCUSDT"
-                },
-                "bybit": {
-                    "cexPairSymbol": "USDCUSDT"
-                }
-            }
+    "usde_usdt": {
+      "id": "usde_usdt",
+      "name": "USDe/USDT",
+      "tokenA": "USDe",
+      "tokenB": "USDT",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3",
+          "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "decimalsA": 18,
+          "decimalsB": 6
         },
-        "usde_usdt": {
-            "id": "usde_usdt",
-            "name": "USDe/USDT",
-            "tokenA": "USDe",
-            "tokenB": "USDT",
-            "amounts": [
-                10000
-            ],
-            "chains": {
-                "ethereum": {
-                    "addressA": "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3",
-                    "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "arbitrum": {
-                    "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
-                    "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "optimism": {
-                    "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
-                    "addressB": "0x01bFF41798a0BcF287b996046Ca68b395DbC1071",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "unichain": {
-                    "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
-                    "addressB": "0x9151434b16b9763660705744891fA906F660EcC5",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "berachain": {
-                    "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
-                    "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "mantle": {
-                    "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
-                    "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                }
-            }
+        "arbitrum": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "decimalsA": 18,
+          "decimalsB": 6
         },
-        "usde_usdc": {
-            "id": "usde_usdc",
-            "name": "USDe/USDC",
-            "tokenA": "USDe",
-            "tokenB": "USDC",
-            "amounts": [
-                10000
-            ],
-            "chains": {
-                "ethereum": {
-                    "addressA": "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3",
-                    "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "arbitrum": {
-                    "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
-                    "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "optimism": {
-                    "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
-                    "addressB": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "base": {
-                    "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
-                    "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "linea": {
-                    "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
-                    "addressB": "0x176211869cA2b568f2A7D4EE941E073a821EE1ff",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "unichain": {
-                    "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
-                    "addressB": "0x078D782b760474a361dDA0AF3839290b0EF57AD6",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                }
-            }
+        "optimism": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x01bFF41798a0BcF287b996046Ca68b395DbC1071",
+          "decimalsA": 18,
+          "decimalsB": 6
         },
-        "usd1_usdc": {
-            "id": "usd1_usdc",
-            "name": "USD1/USDC",
-            "tokenA": "USD1",
-            "tokenB": "USDC",
-            "amounts": [
-                10000
-            ],
-            "chains": {
-                "ethereum": {
-                    "addressA": "0x8d0D000Ee44948FC98c9B98A4FA4921476f08B0d",
-                    "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                }
-            }
+        "unichain": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x9151434b16b9763660705744891fA906F660EcC5",
+          "decimalsA": 18,
+          "decimalsB": 6
         },
-        "usd1_usdt": {
-            "id": "usd1_usdt",
-            "name": "USD1/USDT",
-            "tokenA": "USD1",
-            "tokenB": "USDT",
-            "amounts": [
-                10000
-            ],
-            "chains": {
-                "ethereum": {
-                    "addressA": "0x8d0D000Ee44948FC98c9B98A4FA4921476f08B0d",
-                    "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                }
-            }
+        "berachain": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "decimalsA": 18,
+          "decimalsB": 6
         },
-        "usdf_usdc": {
-            "id": "usdf_usdc",
-            "name": "USDf/USDC",
-            "tokenA": "USDf",
-            "tokenB": "USDC",
-            "amounts": [
-                10000
-            ],
-            "chains": {
-                "ethereum": {
-                    "addressA": "0xFa2B947eEc368f42195f24F36d2aF29f7c24CeC2",
-                    "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                }
-            }
+        "mantle": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "decimalsA": 18,
+          "decimalsB": 6
         },
-        "usdf_usdt": {
-            "id": "usdf_usdt",
-            "name": "USDf/USDT",
-            "tokenA": "USDf",
-            "tokenB": "USDT",
-            "amounts": [
-                10000
-            ],
-            "chains": {
-                "ethereum": {
-                    "addressA": "0xFa2B947eEc368f42195f24F36d2aF29f7c24CeC2",
-                    "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                }
-            }
+        "binance": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USDEUSDT"
         },
-        "usr_usdc": {
-            "id": "usr_usdc",
-            "name": "USR/USDC",
-            "tokenA": "USR",
-            "tokenB": "USDC",
-            "amounts": [
-                10000
-            ],
-            "chains": {
-                "ethereum": {
-                    "addressA": "0x66a1e37c9b0eaddca17d3662d6c05f4decf3e110",
-                    "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "arbitrum": {
-                    "addressA": "0x2492D0006411Af6C8bbb1c8afc1B0197350a79e9",
-                    "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "base": {
-                    "addressA": "0x35E5dB674D8e93a03d814FA0ADa70731efe8a4b9",
-                    "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                }
-            }
+        "mexc": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USDEUSDT"
         },
-        "usr_usdt": {
-            "id": "usr_usdt",
-            "name": "USR/USDT",
-            "tokenA": "USR",
-            "tokenB": "USDT",
-            "amounts": [
-                10000
-            ],
-            "chains": {
-                "ethereum": {
-                    "addressA": "0x66a1e37c9b0eaddca17d3662d6c05f4decf3e110",
-                    "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "arbitrum": {
-                    "addressA": "0x2492D0006411Af6C8bbb1c8afc1B0197350a79e9",
-                    "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                },
-                "berachain": {
-                    "addressA": "0x2492D0006411Af6C8bbb1c8afc1B0197350a79e9",
-                    "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
-                    "decimalsA": 18,
-                    "decimalsB": 6
-                }
-            }
+        "bybit": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USDEUSDT"
         }
+      }
     },
-    "clientRefreshInterval": 10
+    "usde_usdc": {
+      "id": "usde_usdc",
+      "name": "USDe/USDC",
+      "tokenA": "USDe",
+      "tokenB": "USDC",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3",
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "optimism": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "linea": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x176211869cA2b568f2A7D4EE941E073a821EE1ff",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "unichain": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x078D782b760474a361dDA0AF3839290b0EF57AD6",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "binance": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USDEUSDC"
+        },
+        "mexc": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USDEUSDC"
+        },
+        "bybit": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USDEUSDC"
+        }
+      }
+    },
+    "usd1_usdc": {
+      "id": "usd1_usdc",
+      "name": "USD1/USDC",
+      "tokenA": "USD1",
+      "tokenB": "USDC",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x8d0D000Ee44948FC98c9B98A4FA4921476f08B0d",
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    },
+    "usd1_usdt": {
+      "id": "usd1_usdt",
+      "name": "USD1/USDT",
+      "tokenA": "USD1",
+      "tokenB": "USDT",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x8d0D000Ee44948FC98c9B98A4FA4921476f08B0d",
+          "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    },
+    "usdf_usdc": {
+      "id": "usdf_usdc",
+      "name": "USDf/USDC",
+      "tokenA": "USDf",
+      "tokenB": "USDC",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xFa2B947eEc368f42195f24F36d2aF29f7c24CeC2",
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    },
+    "usdf_usdt": {
+      "id": "usdf_usdt",
+      "name": "USDf/USDT",
+      "tokenA": "USDf",
+      "tokenB": "USDT",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xFa2B947eEc368f42195f24F36d2aF29f7c24CeC2",
+          "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x8210c0634AB8f273806e4b7866E9Db353773c44B",
+          "addressB": "0x102d758f688a4C1C5a80b116bD945d4455460282"
+        },
+        "bsc": {
+          "addressA": "0xb3b02E4A9Fb2bD28CC2ff97B0aB3F6B3Ec1eE9D2",
+          "addressB": "0x55d398326f99059fF775485246999027B3197955"
+        }
+      }
+    },
+    "usr_usdc": {
+      "id": "usr_usdc",
+      "name": "USR/USDC",
+      "tokenA": "USR",
+      "tokenB": "USDC",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x66a1e37c9b0eaddca17d3662d6c05f4decf3e110",
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0x2492D0006411Af6C8bbb1c8afc1B0197350a79e9",
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x35E5dB674D8e93a03d814FA0ADa70731efe8a4b9",
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    },
+    "usr_usdt": {
+      "id": "usr_usdt",
+      "name": "USR/USDT",
+      "tokenA": "USR",
+      "tokenB": "USDT",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x66a1e37c9b0eaddca17d3662d6c05f4decf3e110",
+          "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0x2492D0006411Af6C8bbb1c8afc1B0197350a79e9",
+          "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "berachain": {
+          "addressA": "0x2492D0006411Af6C8bbb1c8afc1B0197350a79e9",
+          "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    }
+  },
+  "clientRefreshInterval": 10
 }

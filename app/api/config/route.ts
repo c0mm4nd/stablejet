@@ -17,10 +17,10 @@ export async function POST(request: Request) {
     try {
         const data = await request.json();
 
-        // Basic validation (can be expanded)
-        if (!data.chains || !data.tradingPairs || !data.amounts) {
-            return NextResponse.json({ error: 'Invalid config structure' }, { status: 400 });
-        }
+    // Basic validation (can be expanded)
+    if (!data.chains || !data.pairs) {
+      return NextResponse.json({ error: 'Invalid config structure' }, { status: 400 });
+    }
 
         saveConfig(data as ConfigData);
 
