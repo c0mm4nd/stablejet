@@ -95,19 +95,7 @@ class BackgroundFetcher {
           return;
         }
 
-        const activePairId = this.state.activePairId;
-        if (!activePairId) {
-          log('[BackgroundFetcher] No active pair set, skipping fetch');
-          return;
-        }
-
-        const pairIds = activePairId === 'all'
-          ? Object.keys(config.pairs)
-          : (config.pairs[activePairId] ? [activePairId] : []);
-        if (pairIds.length === 0) {
-          log(`[BackgroundFetcher] Active pair not found in config: ${activePairId}`);
-          return;
-        }
+        const pairIds = Object.keys(config.pairs);
 
         log(`[BackgroundFetcher] Fetching data for ${pairIds.length} trading pairs: ${pairIds.join(', ')}`);
 
