@@ -85,7 +85,6 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
     }).catch(() => {});
 
     setIsLoading(true);
-    setHistory([]);
     fetchData();
 
     const fetchInterval = setInterval(fetchData, clientRefreshInterval * 1000);
