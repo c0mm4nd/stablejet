@@ -178,7 +178,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     });
   };
 
-  const handleUpdatePairChain = (pairId: string, chainId: string, field: 'addressA' | 'addressB' | 'disabled', value: any) => {
+  const handleUpdatePairChain = (pairId: string, chainId: string, field: 'addressA' | 'addressB' | 'cexPairSymbol' | 'disabled', value: any) => {
     const pair = editingPairs[pairId];
     const chainConfig = pair.chains[chainId] || { addressA: '', addressB: '' };
 
@@ -432,9 +432,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     <div className="space-y-4">
                       <h3 className="text-md font-bold text-gray-800">Chain Configurations</h3>
                       <div className="grid grid-cols-1 gap-4">
-                        {Object.keys(editingChains).filter(id => !editingChains[id].disable && !['binance', 'mexc', 'bybit'].includes(id)).map(chainId => {
+                        {Object.keys(editingChains).filter(id => !editingChains[id].disable).map(chainId => {
                           const isConfigured = !!editingPairs[activePairId].chains[chainId];
                           const config = editingPairs[activePairId].chains[chainId] || { addressA: '', addressB: '' };
+                          const isCex = ['binance', 'mexc', 'bybit'].includes(chainId);
 
                           return (
                             <div key={chainId} className={`p-4 rounded-xl border transition-all ${isConfigured ? 'bg-white border-blue-200 shadow-sm' : 'bg-gray-50 border-gray-200 opacity-70 hover:opacity-100'}`}>
@@ -449,24 +450,38 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
                               {isConfigured && (
                                 <div className="grid grid-cols-2 gap-4 ml-7">
-                                  <div>
-                                    <label className="block text-xs text-gray-500 mb-1">{editingPairs[activePairId].tokenA} Address</label>
-                                    <input
-                                      className="w-full text-xs font-mono border rounded px-3 py-2 bg-gray-50 focus:bg-white"
-                                      value={config.addressA}
-                                      onChange={e => handleUpdatePairChain(activePairId, chainId, 'addressA', e.target.value)}
-                                      placeholder="0x..."
-                                    />
-                                  </div>
-                                  <div>
-                                    <label className="block text-xs text-gray-500 mb-1">{editingPairs[activePairId].tokenB} Address</label>
-                                    <input
-                                      className="w-full text-xs font-mono border rounded px-3 py-2 bg-gray-50 focus:bg-white"
-                                      value={config.addressB}
-                                      onChange={e => handleUpdatePairChain(activePairId, chainId, 'addressB', e.target.value)}
-                                      placeholder="0x..."
-                                    />
-                                  </div>
+                                  {isCex ? (
+                                    <div className="col-span-2">
+                                      <label className="block text-xs text-gray-500 mb-1">CEX Pair Symbol</label>
+                                      <input
+                                        className="w-full text-xs font-mono border rounded px-3 py-2 bg-gray-50 focus:bg-white"
+                                        value={(config as any).cexPairSymbol || ''}
+                                        onChange={e => handleUpdatePairChain(activePairId, chainId, 'cexPairSymbol', e.target.value)}
+                                        placeholder="USDCUSDT"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <div>
+                                        <label className="block text-xs text-gray-500 mb-1">{editingPairs[activePairId].tokenA} Address</label>
+                                        <input
+                                          className="w-full text-xs font-mono border rounded px-3 py-2 bg-gray-50 focus:bg-white"
+                                          value={config.addressA}
+                                          onChange={e => handleUpdatePairChain(activePairId, chainId, 'addressA', e.target.value)}
+                                          placeholder="0x..."
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-xs text-gray-500 mb-1">{editingPairs[activePairId].tokenB} Address</label>
+                                        <input
+                                          className="w-full text-xs font-mono border rounded px-3 py-2 bg-gray-50 focus:bg-white"
+                                          value={config.addressB}
+                                          onChange={e => handleUpdatePairChain(activePairId, chainId, 'addressB', e.target.value)}
+                                          placeholder="0x..."
+                                        />
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               )}
                             </div>
