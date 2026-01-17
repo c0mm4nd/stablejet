@@ -158,10 +158,7 @@ test.describe('数据源和可视化验证', () => {
     const content = await page.content();
 
     // 检查价差相关的文本或占位符
-    const hasSpreadInfo = content.includes('价差') ||
-      content.includes('USDC→USDT') ||
-      content.includes('USDT→USDC') ||
-      content.includes('USDC ⇄ USDT');
+    const hasSpreadInfo = content.includes('价差');
 
     // 如果没有数据，检查是否显示等待消息
     const hasPlaceholder = content.includes('暂无历史数据') ||
@@ -327,8 +324,8 @@ test.describe('数据源和可视化验证', () => {
         expect(firstChainData).toHaveProperty('chain');
         expect(firstChainData).toHaveProperty('chainKey');
         expect(firstChainData).toHaveProperty('amount');
-        expect(firstChainData).toHaveProperty('usdcToUsdt');
-        expect(firstChainData).toHaveProperty('usdtToUsdc');
+        expect(firstChainData).toHaveProperty('tokenAToB');
+        expect(firstChainData).toHaveProperty('tokenBToA');
       }
     } else {
       console.log('\n⚠️  暂无历史数据，这是正常的如果应用刚启动');

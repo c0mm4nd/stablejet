@@ -67,8 +67,8 @@ export default function TriangularArbitrage({ history, amount }: TriangularArbit
             if (!item.pairId) return;
             const [tA, tB] = item.pairId.split('_').map(s => s.toUpperCase());
 
-            const tokenAToB = item.tokenAToB || item.usdcToUsdt;
-            const tokenBToA = item.tokenBToA || item.usdtToUsdc;
+            const tokenAToB = item.tokenAToB;
+            const tokenBToA = item.tokenBToA;
 
             // A -> B
             if (tokenAToB?.output && tokenAToB.output > 0) {

@@ -32,8 +32,7 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
     // BUT we should probably use the Context to find the pair info.
 
     // Actually, we can fetch the pair info from Context if we expose tradingPairs.
-    // For now let's reuse the logic: "USDC/USDT" is standard.
-    // The pairId is like "usdc_usdt". 
+    // The pairId is like "tokena_tokenb". 
     const [tokenA, tokenB] = pairId.split('_').map(s => s.toUpperCase());
 
     const [sortKey, setSortKey] = useState<SortKey>('chain');
@@ -70,8 +69,8 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
             .filter(item => item.amount === amount)
             .map(item => {
                 const source = item.dataSource || 'kyberswap';
-                const tokenAToB = item.tokenAToB || item.usdcToUsdt;
-                const tokenBToA = item.tokenBToA || item.usdtToUsdc;
+                const tokenAToB = item.tokenAToB;
+                const tokenBToA = item.tokenBToA;
                 return {
                     chain: item.chain,
                     dataSource: source,

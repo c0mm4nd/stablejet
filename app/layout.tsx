@@ -17,11 +17,11 @@ export default function RootLayout({
     document.title = 'StableJet Monitor';
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'USDC/USDT 跨链兑换监控工具');
+      metaDescription.setAttribute('content', '跨链兑换监控工具');
     } else {
       const meta = document.createElement('meta');
       meta.name = 'description';
-      meta.content = 'USDC/USDT 跨链兑换监控工具';
+    meta.content = '跨链兑换监控工具';
       document.head.appendChild(meta);
     }
   }, []);

@@ -34,25 +34,25 @@ test.describe('数据源状态详细检查', () => {
       if (!dataSourceStats[source as keyof typeof dataSourceStats]) continue;
       
       const stats = dataSourceStats[source as keyof typeof dataSourceStats];
-      stats.total += 2; // USDC→USDT + USDT→USDC
+      stats.total += 2; // tokenA→tokenB + tokenB→tokenA
       
       // 检查 USDC→USDT
-      if (chainData.usdcToUsdt.output !== null && chainData.usdcToUsdt.output > 0) {
+      if (chainData.tokenAToB?.output !== null && chainData.tokenAToB?.output > 0) {
         stats.success++;
       } else {
         stats.failed++;
-        if (chainData.usdcToUsdt.error) {
-          stats.errors.push(`${chainData.chain} USDC→USDT: ${chainData.usdcToUsdt.error}`);
+        if (chainData.tokenAToB?.error) {
+          stats.errors.push(`${chainData.chain} A→B: ${chainData.tokenAToB.error}`);
         }
       }
       
       // 检查 USDT→USDC
-      if (chainData.usdtToUsdc.output !== null && chainData.usdtToUsdc.output > 0) {
+      if (chainData.tokenBToA?.output !== null && chainData.tokenBToA?.output > 0) {
         stats.success++;
       } else {
         stats.failed++;
-        if (chainData.usdtToUsdc.error) {
-          stats.errors.push(`${chainData.chain} USDT→USDC: ${chainData.usdtToUsdc.error}`);
+        if (chainData.tokenBToA?.error) {
+          stats.errors.push(`${chainData.chain} B→A: ${chainData.tokenBToA.error}`);
         }
       }
     }
@@ -138,8 +138,8 @@ test.describe('数据源状态详细检查', () => {
     const chainStats: Record<string, { source: string; success: boolean }> = {};
     
     for (const chainData of latestData.data) {
-      const hasSuccess = (chainData.usdcToUsdt.output !== null && chainData.usdcToUsdt.output > 0) ||
-                        (chainData.usdtToUsdc.output !== null && chainData.usdtToUsdc.output > 0);
+      const hasSuccess = (chainData.tokenAToB?.output !== null && chainData.tokenAToB?.output > 0) ||
+                        (chainData.tokenBToA?.output !== null && chainData.tokenBToA?.output > 0);
       
       chainStats[chainData.chain] = {
         source: chainData.dataSource || 'kyberswap',

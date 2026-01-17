@@ -52,8 +52,7 @@ const GLOBAL_RATE_LIMITER_KEY = Symbol.for('stablejet.bybit.ratelimiter');
 const rateLimiter = (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] || new BybitRateLimiter();
 if (process.env.NODE_ENV !== 'production') (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] = rateLimiter;
 
-async function getBybitUsdcUsdtDepth(limit: number = 500, symbol: string = 'USDCUSDT'): Promise<{ bids: Array<[string, string]>; asks: Array<[string, string]> }> {
-  // Bybit API v5: https://api.bybit.com/v5/market/orderbook?category=spot&symbol=USDCUSDT&limit=500
+async function getBybitDepth(limit: number, symbol: string): Promise<{ bids: Array<[string, string]>; asks: Array<[string, string]> }> {
   const url = `https://api.bybit.com/v5/market/orderbook?category=spot&symbol=${symbol}&limit=${limit}`;
 
   try {
@@ -73,8 +72,8 @@ async function getBybitUsdcUsdtDepth(limit: number = 500, symbol: string = 'USDC
     const asks = data.result.a;
 
     if (!Array.isArray(bids) || !Array.isArray(asks) || bids.length === 0 || asks.length === 0) {
-      error('[Bybit] Empty orderbook for USDCUSDT');
-      throw new Error('Bybit returned empty orderbook for USDCUSDT');
+      error(`[Bybit] Empty orderbook for ${symbol}`);
+      throw new Error(`Bybit returned empty orderbook for ${symbol}`);
     }
 
     log(`[Bybit] ✓ Success - bids: ${bids.length}, asks: ${asks.length}, best bid: ${bids[0][0]}`);
@@ -127,48 +126,34 @@ function simulateBuyBaseWithQuote(quoteAmount: number, asks: Array<[string, stri
   return { baseOut, fullyFilled: remainingQuote <= 1e-8 };
 }
 
-export async function getBybitSwapData(amounts: number[], symbol: string = 'USDCUSDT'): Promise<ChainSwapData[]> {
+export async function getBybitSwapData(amounts: number[], symbol: string): Promise<ChainSwapData[]> {
   try {
-    const depth = await getBybitUsdcUsdtDepth(500, symbol);
+    const depth = await getBybitDepth(500, symbol);
 
     return amounts.map(amount => {
-      const usdcToUsdtSim = simulateSellBaseForQuote(amount, depth.bids);
-      const usdtToUsdcSim = simulateBuyBaseWithQuote(amount, depth.asks);
+      const aToBSim = simulateSellBaseForQuote(amount, depth.bids);
+      const bToASim = simulateBuyBaseWithQuote(amount, depth.asks);
 
-      const usdcToUsdtOut = usdcToUsdtSim.fullyFilled ? usdcToUsdtSim.quoteOut : null;
-      const usdtToUsdcOut = usdtToUsdcSim.fullyFilled ? usdtToUsdcSim.baseOut : null;
+      const aToBOut = aToBSim.fullyFilled ? aToBSim.quoteOut : null;
+      const bToAOut = bToASim.fullyFilled ? bToASim.baseOut : null;
 
       return {
         chain: 'Bybit',
         chainKey: 'bybit',
         amount,
         dataSource: 'bybit' as any,
-        usdcToUsdt: {
-          input: amount,
-          output: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
-          outputUsd: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
-          ...(usdcToUsdtSim.fullyFilled ? {} : { error: 'Insufficient Bybit bid liquidity to fill market sell' }),
-          route: { type: 'cex', note: 'Orderbook depth simulation' }
-        },
-        usdtToUsdc: {
-          input: amount,
-          output: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
-          outputUsd: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
-          ...(usdtToUsdcSim.fullyFilled ? {} : { error: 'Insufficient Bybit ask liquidity to fill market buy' }),
-          route: { type: 'cex', note: 'Orderbook depth simulation' }
-        },
         tokenAToB: {
           input: amount,
-          output: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
-          outputUsd: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
-          ...(usdcToUsdtSim.fullyFilled ? {} : { error: 'Insufficient Bybit bid liquidity to fill market sell' }),
+          output: aToBOut !== null && Number.isFinite(aToBOut) ? aToBOut : null,
+          outputUsd: aToBOut !== null && Number.isFinite(aToBOut) ? aToBOut : null,
+          ...(aToBSim.fullyFilled ? {} : { error: 'Insufficient Bybit bid liquidity to fill market sell' }),
           route: { type: 'cex', note: 'Orderbook depth simulation' }
         },
         tokenBToA: {
           input: amount,
-          output: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
-          outputUsd: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
-          ...(usdtToUsdcSim.fullyFilled ? {} : { error: 'Insufficient Bybit ask liquidity to fill market buy' }),
+          output: bToAOut !== null && Number.isFinite(bToAOut) ? bToAOut : null,
+          outputUsd: bToAOut !== null && Number.isFinite(bToAOut) ? bToAOut : null,
+          ...(bToASim.fullyFilled ? {} : { error: 'Insufficient Bybit ask liquidity to fill market buy' }),
           route: { type: 'cex', note: 'Orderbook depth simulation' }
         },
       };
@@ -182,20 +167,6 @@ export async function getBybitSwapData(amounts: number[], symbol: string = 'USDC
       chainKey: 'bybit',
       amount,
       dataSource: 'bybit' as any,
-      usdcToUsdt: {
-        input: amount,
-        output: null,
-        outputUsd: null,
-        error: message,
-        route: { type: 'cex', note: 'Orderbook depth simulation' }
-      },
-      usdtToUsdc: {
-        input: amount,
-        output: null,
-        outputUsd: null,
-        error: message,
-        route: { type: 'cex', note: 'Orderbook depth simulation' }
-      },
       tokenAToB: {
         input: amount,
         output: null,

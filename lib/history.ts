@@ -21,7 +21,7 @@ function safelyParseRoute(value: string) {
 initDatabase();
 
 // 保存新的数据点
-export function saveDataPoint(data: ChainSwapData[], pairId: string = 'usdc_usdt') {
+export function saveDataPoint(data: ChainSwapData[], pairId: string) {
   const db = getDatabase();
   const timestamp = new Date().toISOString();
 
@@ -32,14 +32,12 @@ export function saveDataPoint(data: ChainSwapData[], pairId: string = 'usdc_usdt
       VALUES (?)
     `);
 
-    const insertChainData = db.prepare(`
-      INSERT INTO chain_data (
+    const insertChainSwap = db.prepare(`
+      INSERT INTO chain_swaps (
         history_point_id, chain, chain_key, data_source, pair_id, amount,
-        usdc_to_usdt_input, usdc_to_usdt_output, usdc_to_usdt_output_usd, usdc_to_usdt_error, usdc_to_usdt_route,
-        usdt_to_usdc_input, usdt_to_usdc_output, usdt_to_usdc_output_usd, usdt_to_usdc_error, usdt_to_usdc_route,
         token_a_to_b_input, token_a_to_b_output, token_a_to_b_output_usd, token_a_to_b_error, token_a_to_b_route,
         token_b_to_a_input, token_b_to_a_output, token_b_to_a_output_usd, token_b_to_a_error, token_b_to_a_route
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const transaction = db.transaction((data: ChainSwapData[], pairId: string) => {
@@ -49,23 +47,13 @@ export function saveDataPoint(data: ChainSwapData[], pairId: string = 'usdc_usdt
 
       // 插入每条链的数据
       for (const item of data) {
-        insertChainData.run(
+        insertChainSwap.run(
           historyPointId,
           item.chain,
           item.chainKey,
           item.dataSource || 'kyberswap',
           item.pairId || pairId,
           item.amount,
-          item.usdcToUsdt.input,
-          item.usdcToUsdt.output,
-          item.usdcToUsdt.outputUsd,
-          item.usdcToUsdt.error || null,
-          item.usdcToUsdt.route ? JSON.stringify(item.usdcToUsdt.route) : null,
-          item.usdtToUsdc.input,
-          item.usdtToUsdc.output,
-          item.usdtToUsdc.outputUsd,
-          item.usdtToUsdc.error || null,
-          item.usdtToUsdc.route ? JSON.stringify(item.usdtToUsdc.route) : null,
           item.tokenAToB?.input || null,
           item.tokenAToB?.output || null,
           item.tokenAToB?.outputUsd || null,
@@ -124,8 +112,8 @@ export function getHistoryInRange(hours: number = 24, pairId?: string): HistoryD
 
     // 为每个数据点获取链数据
     const getChainDataQuery = pairId
-      ? `SELECT * FROM chain_data WHERE history_point_id = ? AND pair_id = ?`
-      : `SELECT * FROM chain_data WHERE history_point_id = ?`;
+      ? `SELECT * FROM chain_swaps WHERE history_point_id = ? AND pair_id = ?`
+      : `SELECT * FROM chain_swaps WHERE history_point_id = ?`;
 
     const getChainData = db.prepare(getChainDataQuery);
 
@@ -138,22 +126,8 @@ export function getHistoryInRange(hours: number = 24, pairId?: string): HistoryD
         chain: row.chain,
         chainKey: row.chain_key,
         dataSource: (row.data_source || 'kyberswap'),
-        pairId: row.pair_id || 'usdc_usdt',
+        pairId: row.pair_id || undefined,
         amount: row.amount,
-        usdcToUsdt: {
-          input: row.usdc_to_usdt_input,
-          output: row.usdc_to_usdt_output,
-          outputUsd: row.usdc_to_usdt_output_usd,
-          error: row.usdc_to_usdt_error || undefined,
-          route: row.usdc_to_usdt_route ? safelyParseRoute(row.usdc_to_usdt_route) : undefined
-        },
-        usdtToUsdc: {
-          input: row.usdt_to_usdc_input,
-          output: row.usdt_to_usdc_output,
-          outputUsd: row.usdt_to_usdc_output_usd,
-          error: row.usdt_to_usdc_error || undefined,
-          route: row.usdt_to_usdc_route ? safelyParseRoute(row.usdt_to_usdc_route) : undefined
-        },
         tokenAToB: row.token_a_to_b_input ? {
           input: row.token_a_to_b_input,
           output: row.token_a_to_b_output,

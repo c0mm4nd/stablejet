@@ -45,8 +45,7 @@ const GLOBAL_RATE_LIMITER_KEY = Symbol.for('stablejet.mexc.ratelimiter');
 const rateLimiter = (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] || new MexcRateLimiter();
 if (process.env.NODE_ENV !== 'production') (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] = rateLimiter;
 
-async function getMexcUsdcUsdtDepth(limit: number = 200, symbol: string = 'USDCUSDT'): Promise<MexcDepthResponse> {
-  // MEXC API v3: https://api.mexc.com/api/v3/depth?symbol=USDCUSDT&limit=200
+async function getMexcDepth(limit: number, symbol: string): Promise<MexcDepthResponse> {
   const url = `https://api.mexc.com/api/v3/depth?symbol=${symbol}&limit=${limit}`;
 
   try {
@@ -58,8 +57,8 @@ async function getMexcUsdcUsdtDepth(limit: number = 200, symbol: string = 'USDCU
     const data = response.data;
 
     if (!Array.isArray(data.bids) || !Array.isArray(data.asks) || data.bids.length === 0 || data.asks.length === 0) {
-      error('[MEXC] Empty orderbook for USDCUSDT');
-      throw new Error('MEXC returned empty orderbook for USDCUSDT');
+      error(`[MEXC] Empty orderbook for ${symbol}`);
+      throw new Error(`MEXC returned empty orderbook for ${symbol}`);
     }
 
     log(`[MEXC] ✓ Success - bids: ${data.bids.length}, asks: ${data.asks.length}, best bid: ${data.bids[0][0]}`);
@@ -112,48 +111,34 @@ function simulateBuyBaseWithQuote(quoteAmount: number, asks: Array<[string, stri
   return { baseOut, fullyFilled: remainingQuote <= 1e-8 };
 }
 
-export async function getMexcSwapData(amounts: number[], symbol: string = 'USDCUSDT'): Promise<ChainSwapData[]> {
+export async function getMexcSwapData(amounts: number[], symbol: string): Promise<ChainSwapData[]> {
   try {
-    const depth = await getMexcUsdcUsdtDepth(200, symbol);
+    const depth = await getMexcDepth(200, symbol);
 
     return amounts.map(amount => {
-      const usdcToUsdtSim = simulateSellBaseForQuote(amount, depth.bids);
-      const usdtToUsdcSim = simulateBuyBaseWithQuote(amount, depth.asks);
+      const aToBSim = simulateSellBaseForQuote(amount, depth.bids);
+      const bToASim = simulateBuyBaseWithQuote(amount, depth.asks);
 
-      const usdcToUsdtOut = usdcToUsdtSim.fullyFilled ? usdcToUsdtSim.quoteOut : null;
-      const usdtToUsdcOut = usdtToUsdcSim.fullyFilled ? usdtToUsdcSim.baseOut : null;
+      const aToBOut = aToBSim.fullyFilled ? aToBSim.quoteOut : null;
+      const bToAOut = bToASim.fullyFilled ? bToASim.baseOut : null;
 
       return {
         chain: 'MEXC',
         chainKey: 'mexc',
         amount,
         dataSource: 'mexc' as any,
-        usdcToUsdt: {
-          input: amount,
-          output: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
-          outputUsd: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
-          ...(usdcToUsdtSim.fullyFilled ? {} : { error: 'Insufficient MEXC bid liquidity to fill market sell' }),
-          route: { type: 'cex', note: 'Orderbook depth simulation' }
-        },
-        usdtToUsdc: {
-          input: amount,
-          output: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
-          outputUsd: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
-          ...(usdtToUsdcSim.fullyFilled ? {} : { error: 'Insufficient MEXC ask liquidity to fill market buy' }),
-          route: { type: 'cex', note: 'Orderbook depth simulation' }
-        },
         tokenAToB: {
           input: amount,
-          output: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
-          outputUsd: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
-          ...(usdcToUsdtSim.fullyFilled ? {} : { error: 'Insufficient MEXC bid liquidity to fill market sell' }),
+          output: aToBOut !== null && Number.isFinite(aToBOut) ? aToBOut : null,
+          outputUsd: aToBOut !== null && Number.isFinite(aToBOut) ? aToBOut : null,
+          ...(aToBSim.fullyFilled ? {} : { error: 'Insufficient MEXC bid liquidity to fill market sell' }),
           route: { type: 'cex', note: 'Orderbook depth simulation' }
         },
         tokenBToA: {
           input: amount,
-          output: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
-          outputUsd: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
-          ...(usdtToUsdcSim.fullyFilled ? {} : { error: 'Insufficient MEXC ask liquidity to fill market buy' }),
+          output: bToAOut !== null && Number.isFinite(bToAOut) ? bToAOut : null,
+          outputUsd: bToAOut !== null && Number.isFinite(bToAOut) ? bToAOut : null,
+          ...(bToASim.fullyFilled ? {} : { error: 'Insufficient MEXC ask liquidity to fill market buy' }),
           route: { type: 'cex', note: 'Orderbook depth simulation' }
         },
       };
@@ -167,20 +152,6 @@ export async function getMexcSwapData(amounts: number[], symbol: string = 'USDCU
       chainKey: 'mexc',
       amount,
       dataSource: 'mexc' as any,
-      usdcToUsdt: {
-        input: amount,
-        output: null,
-        outputUsd: null,
-        error: message,
-        route: { type: 'cex', note: 'Orderbook depth simulation' }
-      },
-      usdtToUsdc: {
-        input: amount,
-        output: null,
-        outputUsd: null,
-        error: message,
-        route: { type: 'cex', note: 'Orderbook depth simulation' }
-      },
       tokenAToB: {
         input: amount,
         output: null,

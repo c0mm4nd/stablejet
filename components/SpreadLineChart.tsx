@@ -24,8 +24,8 @@ const CHAIN_DISPLAY_NAMES: Record<string, string> = {
   'monad': 'Monad',
   'sonic': 'Sonic',
   'etherlink': 'Etherlink',
-  'mantle': 'Mantle (USDC/USDT)',
-  'mantle_0': 'Mantle (USDC/USDT0)',
+  'mantle': 'Mantle',
+  'mantle_0': 'Mantle',
   'unichain': 'UniChain',
   'berachain': 'Berachain',
   'binance': 'Binance (CEX)',
@@ -33,8 +33,8 @@ const CHAIN_DISPLAY_NAMES: Record<string, string> = {
   'bybit': 'Bybit (CEX)',
 };
 
-// USDC → USDT 使用蓝色系（冷色调）
-const USDC_TO_USDT_COLORS: Record<string, string> = {
+// TokenA → TokenB 使用蓝色系（冷色调）
+const A_TO_B_COLORS: Record<string, string> = {
   'ethereum': '#3B82F6',      // 蓝色
   'polygon': '#8B5CF6',       // 紫色
   'arbitrum': '#06B6D4',      // 青色
@@ -54,8 +54,8 @@ const USDC_TO_USDT_COLORS: Record<string, string> = {
   'bybit': '#F7A600',         // Bybit 橙色
 };
 
-// USDT → USDC 使用橙/红色系（暖色调）
-const USDT_TO_USDC_COLORS: Record<string, string> = {
+// TokenB → TokenA 使用橙/红色系（暖色调）
+const B_TO_A_COLORS: Record<string, string> = {
   'ethereum': '#F59E0B',      // 琥珀色
   'polygon': '#EF4444',       // 红色
   'arbitrum': '#F97316',      // 橙色
@@ -155,14 +155,14 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
     const amountItems = point.data.filter(item => item.amount === amount);
     const ratesAToB = amountItems
       .map(item => {
-        const quote = item.tokenAToB || item.usdcToUsdt;
-        return calculateImpliedRate(quote.input, quote.output);
+        const quote = item.tokenAToB;
+        return quote ? calculateImpliedRate(quote.input, quote.output) : null;
       })
       .filter((r): r is number => r !== null);
     const ratesBToA = amountItems
       .map(item => {
-        const quote = item.tokenBToA || item.usdtToUsdc;
-        return calculateImpliedRate(quote.input, quote.output);
+        const quote = item.tokenBToA;
+        return quote ? calculateImpliedRate(quote.input, quote.output) : null;
       })
       .filter((r): r is number => r !== null);
 
@@ -207,12 +207,12 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
       .filter(item => item.amount === amount)
       .forEach(item => {
         const base = `${item.chainKey}@${item.dataSource || 'kyberswap'}`;
-        const tokenAToB = item.tokenAToB || item.usdcToUsdt;
-        const tokenBToA = item.tokenBToA || item.usdtToUsdc;
+        const tokenAToB = item.tokenAToB;
+        const tokenBToA = item.tokenBToA;
 
         const baseline = baselineByTimestamp[point.timestamp] || { aToB: null, bToA: null };
-        const tokenAToBRate = calculateImpliedRate(tokenAToB.input, tokenAToB.output);
-        const tokenBToARate = calculateImpliedRate(tokenBToA.input, tokenBToA.output);
+        const tokenAToBRate = tokenAToB ? calculateImpliedRate(tokenAToB.input, tokenAToB.output) : null;
+        const tokenBToARate = tokenBToA ? calculateImpliedRate(tokenBToA.input, tokenBToA.output) : null;
         const tokenAToBSpread = calculateRateDeviationBps(tokenAToBRate, baseline.aToB);
         const tokenBToASpread = calculateRateDeviationBps(tokenBToARate, baseline.bToA);
 
@@ -245,14 +245,13 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
       .forEach(item => {
         const base = `${item.chainKey}@${item.dataSource || 'kyberswap'}`;
 
-        // 使用通用字段或回退到 USDC/USDT 字段
-        const tokenAToB = item.tokenAToB || item.usdcToUsdt;
-        const tokenBToA = item.tokenBToA || item.usdtToUsdc;
+        const tokenAToB = item.tokenAToB;
+        const tokenBToA = item.tokenBToA;
 
         const baseline = baselineByTimestamp[point.timestamp] || { aToB: null, bToA: null };
 
         // TokenA → TokenB
-        const tokenAToBRate = calculateImpliedRate(tokenAToB.input, tokenAToB.output);
+        const tokenAToBRate = tokenAToB ? calculateImpliedRate(tokenAToB.input, tokenAToB.output) : null;
         const tokenAToBSpread = calculateRateDeviationBps(tokenAToBRate, baseline.aToB);
         const filteredTokenAToB = filterOutliers(
           tokenAToBSpread !== null ? parseFloat(tokenAToBSpread.toFixed(2)) : null,
@@ -262,7 +261,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
         dataPoint[`${base} (${tokenAShort}→${tokenBShort})`] = filteredTokenAToB;
 
         // TokenB → TokenA
-        const tokenBToARate = calculateImpliedRate(tokenBToA.input, tokenBToA.output);
+        const tokenBToARate = tokenBToA ? calculateImpliedRate(tokenBToA.input, tokenBToA.output) : null;
         const tokenBToASpread = calculateRateDeviationBps(tokenBToARate, baseline.bToA);
         const filteredTokenBToA = filterOutliers(
           tokenBToASpread !== null ? parseFloat(tokenBToASpread.toFixed(2)) : null,
@@ -279,7 +278,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">
-        {amount.toLocaleString()} {tokenAShort} - 双向报价偏差 (bps) ({pair?.name || 'USDC/USDT'})
+        {amount.toLocaleString()} {tokenAShort} - 双向报价偏差 (bps) ({pair?.name || '交易对'})
       </h2>
 
       <ResponsiveContainer width="100%" height={450}>
@@ -304,8 +303,8 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
           {/* TokenA → TokenB 线条（蓝色系） */}
           {seriesBases.map(base => {
             const { chainKey, dataSource } = splitBase(base);
-            const palette = Object.values(USDC_TO_USDT_COLORS);
-            const stroke = USDC_TO_USDT_COLORS[chainKey] || palette[Math.abs(chainKey.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % palette.length];
+            const palette = Object.values(A_TO_B_COLORS);
+            const stroke = A_TO_B_COLORS[chainKey] || palette[Math.abs(chainKey.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % palette.length];
 
             return (
               <Line
@@ -325,8 +324,8 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
           {/* TokenB → TokenA 线条（橙/红色系） */}
           {seriesBases.map(base => {
             const { chainKey, dataSource } = splitBase(base);
-            const palette = Object.values(USDT_TO_USDC_COLORS);
-            const stroke = USDT_TO_USDC_COLORS[chainKey] || palette[Math.abs(chainKey.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % palette.length];
+            const palette = Object.values(B_TO_A_COLORS);
+            const stroke = B_TO_A_COLORS[chainKey] || palette[Math.abs(chainKey.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % palette.length];
 
             return (
               <Line

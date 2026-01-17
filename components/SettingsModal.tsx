@@ -31,9 +31,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
   // Pair
   const [newPairId, setNewPairId] = useState('');
-  const [newPairName, setNewPairName] = useState(''); // e.g. "USDC/USDT"
-  const [newPairTokenA, setNewPairTokenA] = useState(''); // "USDC"
-  const [newPairTokenB, setNewPairTokenB] = useState(''); // "USDT"
+  const [newPairName, setNewPairName] = useState(''); // e.g. "TokenA/TokenB"
+  const [newPairTokenA, setNewPairTokenA] = useState(''); // "TokenA"
+  const [newPairTokenB, setNewPairTokenB] = useState(''); // "TokenB"
 
   // Pair Amount
   const [newAmount, setNewAmount] = useState('');
@@ -308,11 +308,11 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               </div>
               {/* Add Pair Form if needed, or just modal? Let's put inputs here for simplicity */}
               <div className="mb-4 space-y-2 bg-white p-2 rounded border border-gray-200 shadow-sm">
-                <input placeholder="ID (usdc_usdt)" value={newPairId} onChange={e => setNewPairId(e.target.value)} className="w-full text-xs border rounded px-2 py-1" />
-                <input placeholder="Name (USDC/USDT)" value={newPairName} onChange={e => setNewPairName(e.target.value)} className="w-full text-xs border rounded px-2 py-1" />
+                <input placeholder="ID (e.g. pair_a_b)" value={newPairId} onChange={e => setNewPairId(e.target.value)} className="w-full text-xs border rounded px-2 py-1" />
+                <input placeholder="Name (e.g. TokenA/TokenB)" value={newPairName} onChange={e => setNewPairName(e.target.value)} className="w-full text-xs border rounded px-2 py-1" />
                 <div className="flex gap-1">
-                  <input placeholder="A (USDC)" value={newPairTokenA} onChange={e => setNewPairTokenA(e.target.value)} className="w-1/2 text-xs border rounded px-2 py-1" />
-                  <input placeholder="B (USDT)" value={newPairTokenB} onChange={e => setNewPairTokenB(e.target.value)} className="w-1/2 text-xs border rounded px-2 py-1" />
+                <input placeholder="A (TokenA)" value={newPairTokenA} onChange={e => setNewPairTokenA(e.target.value)} className="w-1/2 text-xs border rounded px-2 py-1" />
+                <input placeholder="B (TokenB)" value={newPairTokenB} onChange={e => setNewPairTokenB(e.target.value)} className="w-1/2 text-xs border rounded px-2 py-1" />
                 </div>
                 <button onClick={handleAddPair} className="w-full bg-blue-600 text-white text-xs rounded py-1 font-semibold">Add</button>
               </div>
@@ -495,7 +495,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                                         className="w-full text-xs font-mono border rounded px-3 py-2 bg-gray-50 focus:bg-white"
                                         value={(config as any).cexPairSymbol || ''}
                                         onChange={e => handleUpdatePairChain(activePairId, chainId, 'cexPairSymbol', e.target.value)}
-                                        placeholder="USDCUSDT"
+                                        placeholder="PAIRSYMBOL"
                                       />
                                     </div>
                                   ) : (

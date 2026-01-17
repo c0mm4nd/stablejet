@@ -1,7 +1,7 @@
 {
   "name": "stablejet",
   "version": "2.0.0",
-  "description": "Monitor USDC/USDT swap rates across multiple chains using KyberSwap API",
+  "description": "Monitor multi-chain swap rates across configurable pairs and sources",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

@@ -192,7 +192,7 @@ export async function getSwapDataForPair(
 
     // CEX Logic: Fetch if configured in the pair's chain map
     if (['binance', 'mexc', 'bybit'].includes(chainKey)) {
-      const symbol = chainPairData.cexPairSymbol || pairId === 'usdc_usdt' ? 'USDCUSDT' : undefined;
+      const symbol = chainPairData.cexPairSymbol;
       if (!symbol) continue; // Skip if no symbol and not default pair
 
       try {

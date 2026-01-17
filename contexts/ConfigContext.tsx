@@ -24,7 +24,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
   const [chains, setChains] = useState<Record<string, ChainAppConfig>>({});
   const [pairs, setPairs] = useState<Record<string, TradingPairConfig>>({});
   const [clientRefreshInterval, setClientRefreshInterval] = useState<number>(DEFAULT_CLIENT_REFRESH_INTERVAL);
-  const [selectedPair, setSelectedPair] = useState<string>('usdc_usdt');
+  const [selectedPair, setSelectedPair] = useState<string>('');
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoadingConfig, setIsLoadingConfig] = useState(true);
@@ -38,6 +38,15 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
         const data: ConfigData = await res.json();
         setChains(data.chains);
         setPairs(data.pairs);
+        if (!selectedPair) {
+          const firstPairId = Object.keys(data.pairs || {})[0];
+          if (firstPairId) {
+            setSelectedPair(firstPairId);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('stablejet_selected_pair', firstPairId);
+            }
+          }
+        }
       } else {
         console.error('Failed to fetch config');
       }

@@ -88,8 +88,8 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
       .filter(item => item.amount === amount)
       .map(item => {
         const source = item.dataSource || 'kyberswap';
-        const tokenAToB = item.tokenAToB || item.usdcToUsdt;
-        const tokenBToA = item.tokenBToA || item.usdtToUsdc;
+        const tokenAToB = item.tokenAToB;
+        const tokenBToA = item.tokenBToA;
 
         const rateAtoB = calculateImpliedRate(tokenAToB.input, tokenAToB.output);
         const rateBtoA = calculateImpliedRate(tokenBToA.input, tokenBToA.output);
@@ -97,14 +97,14 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
         return {
           chain: item.chain,
           dataSource: source,
-          outputAtoB: tokenAToB.output,
-          outputBtoA: tokenBToA.output,
+          outputAtoB: tokenAToB?.output ?? null,
+          outputBtoA: tokenBToA?.output ?? null,
           // 往返收益 bps：rateAtoB * rateBtoA - 1
           arbitrageSpace: calculateRoundTripBps(rateAtoB, rateBtoA),
           rateAtoB,
           rateBtoA,
-          routeAtoB: tokenAToB.route,
-          routeBtoA: tokenBToA.route
+          routeAtoB: tokenAToB?.route,
+          routeBtoA: tokenBToA?.route
         };
       });
 

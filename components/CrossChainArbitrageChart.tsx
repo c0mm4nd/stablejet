@@ -155,14 +155,14 @@ export default function CrossChainArbitrageChart({ history, amount, pairId }: Cr
 
     const ratesAtoB = amountData
       .map(item => {
-        const tokenAToB = item.tokenAToB || item.usdcToUsdt;
-        return calculateImpliedRate(tokenAToB.input, tokenAToB.output);
+        const tokenAToB = item.tokenAToB;
+        return tokenAToB ? calculateImpliedRate(tokenAToB.input, tokenAToB.output) : null;
       })
       .filter((r): r is number => r !== null);
     const ratesBtoA = amountData
       .map(item => {
-        const tokenBToA = item.tokenBToA || item.usdtToUsdc;
-        return calculateImpliedRate(tokenBToA.input, tokenBToA.output);
+        const tokenBToA = item.tokenBToA;
+        return tokenBToA ? calculateImpliedRate(tokenBToA.input, tokenBToA.output) : null;
       })
       .filter((r): r is number => r !== null);
 
@@ -186,15 +186,15 @@ export default function CrossChainArbitrageChart({ history, amount, pairId }: Cr
           chainPairs[pairKey] = [];
         }
 
-        const buyAtoB = buyChain.tokenAToB || buyChain.usdcToUsdt;
-        const buyBtoA = buyChain.tokenBToA || buyChain.usdtToUsdc;
-        const sellAtoB = sellChain.tokenAToB || sellChain.usdcToUsdt;
-        const sellBtoA = sellChain.tokenBToA || sellChain.usdtToUsdc;
+        const buyAtoB = buyChain.tokenAToB;
+        const buyBtoA = buyChain.tokenBToA;
+        const sellAtoB = sellChain.tokenAToB;
+        const sellBtoA = sellChain.tokenBToA;
 
-        const buyRateAtoB = calculateImpliedRate(buyAtoB.input, buyAtoB.output);
-        const buyRateBtoA = calculateImpliedRate(buyBtoA.input, buyBtoA.output);
-        const sellRateAtoB = calculateImpliedRate(sellAtoB.input, sellAtoB.output);
-        const sellRateBtoA = calculateImpliedRate(sellBtoA.input, sellBtoA.output);
+        const buyRateAtoB = buyAtoB ? calculateImpliedRate(buyAtoB.input, buyAtoB.output) : null;
+        const buyRateBtoA = buyBtoA ? calculateImpliedRate(buyBtoA.input, buyBtoA.output) : null;
+        const sellRateAtoB = sellAtoB ? calculateImpliedRate(sellAtoB.input, sellAtoB.output) : null;
+        const sellRateBtoA = sellBtoA ? calculateImpliedRate(sellBtoA.input, sellBtoA.output) : null;
 
         // 方向1: buyChain 做 A→B，然后 sellChain 做 B→A
         const direction1_profit = calculateRoundTripBps(buyRateAtoB, sellRateBtoA);

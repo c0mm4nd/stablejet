@@ -49,9 +49,7 @@ const GLOBAL_RATE_LIMITER_KEY = Symbol.for('stablejet.binance.ratelimiter');
 const rateLimiter = (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] || new BinanceRateLimiter();
 if (process.env.NODE_ENV !== 'production') (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] = rateLimiter;
 
-async function getBinanceUsdcUsdtDepth(limit: number = 1000, symbol: string = 'USDCUSDT'): Promise<BinanceDepthResponse> {
-  // 后台任务直接调用 Binance API（服务端）
-  // axios 自动使用系统代理环境变量
+async function getBinanceDepth(limit: number, symbol: string): Promise<BinanceDepthResponse> {
   const url = `https://api.binance.com/api/v3/depth?symbol=${symbol}&limit=${limit}`;
 
   try {
@@ -64,8 +62,8 @@ async function getBinanceUsdcUsdtDepth(limit: number = 1000, symbol: string = 'U
     const data = response.data;
 
     if (!Array.isArray(data.bids) || !Array.isArray(data.asks) || data.bids.length === 0 || data.asks.length === 0) {
-      error('[Binance] Empty orderbook for USDCUSDT');
-      throw new Error('Binance returned empty orderbook for USDCUSDT');
+      error(`[Binance] Empty orderbook for ${symbol}`);
+      throw new Error(`Binance returned empty orderbook for ${symbol}`);
     }
 
     log(`[Binance] ✓ Success - bids: ${data.bids.length}, asks: ${data.asks.length}, best bid: ${data.bids[0][0]}`);
@@ -120,49 +118,35 @@ function simulateBuyBaseWithQuote(quoteAmount: number, asks: Array<[string, stri
   return { baseOut, fullyFilled: remainingQuote <= 1e-8 };
 }
 
-export async function getBinanceSwapData(amounts: number[], symbol: string = 'USDCUSDT'): Promise<ChainSwapData[]> {
+export async function getBinanceSwapData(amounts: number[], symbol: string): Promise<ChainSwapData[]> {
   try {
     // Use depth to approximate market-order execution (assume you eat the book).
-    const depth = await getBinanceUsdcUsdtDepth(1000, symbol);
+    const depth = await getBinanceDepth(1000, symbol);
 
     return amounts.map(amount => {
-      const usdcToUsdtSim = simulateSellBaseForQuote(amount, depth.bids);
-      const usdtToUsdcSim = simulateBuyBaseWithQuote(amount, depth.asks);
+      const aToBSim = simulateSellBaseForQuote(amount, depth.bids);
+      const bToASim = simulateBuyBaseWithQuote(amount, depth.asks);
 
-      const usdcToUsdtOut = usdcToUsdtSim.fullyFilled ? usdcToUsdtSim.quoteOut : null;
-      const usdtToUsdcOut = usdtToUsdcSim.fullyFilled ? usdtToUsdcSim.baseOut : null;
+      const aToBOut = aToBSim.fullyFilled ? aToBSim.quoteOut : null;
+      const bToAOut = bToASim.fullyFilled ? bToASim.baseOut : null;
 
       return {
         chain: 'Binance',
         chainKey: 'binance',
         amount,
         dataSource: 'binance',
-        usdcToUsdt: {
-          input: amount,
-          output: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
-          outputUsd: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
-          ...(usdcToUsdtSim.fullyFilled ? {} : { error: 'Insufficient Binance bid liquidity to fill market sell' }),
-          route: { type: 'cex', note: 'Orderbook depth simulation' }
-        },
-        usdtToUsdc: {
-          input: amount,
-          output: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
-          outputUsd: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
-          ...(usdtToUsdcSim.fullyFilled ? {} : { error: 'Insufficient Binance ask liquidity to fill market buy' }),
-          route: { type: 'cex', note: 'Orderbook depth simulation' }
-        },
         tokenAToB: {
           input: amount,
-          output: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
-          outputUsd: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
-          ...(usdcToUsdtSim.fullyFilled ? {} : { error: 'Insufficient Binance bid liquidity to fill market sell' }),
+          output: aToBOut !== null && Number.isFinite(aToBOut) ? aToBOut : null,
+          outputUsd: aToBOut !== null && Number.isFinite(aToBOut) ? aToBOut : null,
+          ...(aToBSim.fullyFilled ? {} : { error: 'Insufficient Binance bid liquidity to fill market sell' }),
           route: { type: 'cex', note: 'Orderbook depth simulation' }
         },
         tokenBToA: {
           input: amount,
-          output: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
-          outputUsd: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
-          ...(usdtToUsdcSim.fullyFilled ? {} : { error: 'Insufficient Binance ask liquidity to fill market buy' }),
+          output: bToAOut !== null && Number.isFinite(bToAOut) ? bToAOut : null,
+          outputUsd: bToAOut !== null && Number.isFinite(bToAOut) ? bToAOut : null,
+          ...(bToASim.fullyFilled ? {} : { error: 'Insufficient Binance ask liquidity to fill market buy' }),
           route: { type: 'cex', note: 'Orderbook depth simulation' }
         },
       };
@@ -176,20 +160,6 @@ export async function getBinanceSwapData(amounts: number[], symbol: string = 'US
       chainKey: 'binance',
       amount,
       dataSource: 'binance',
-      usdcToUsdt: {
-        input: amount,
-        output: null,
-        outputUsd: null,
-        error: message,
-        route: { type: 'cex', note: 'Orderbook depth simulation' }
-      },
-      usdtToUsdc: {
-        input: amount,
-        output: null,
-        outputUsd: null,
-        error: message,
-        route: { type: 'cex', note: 'Orderbook depth simulation' }
-      },
       tokenAToB: {
         input: amount,
         output: null,

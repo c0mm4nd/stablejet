@@ -66,44 +66,31 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
 
   sources.push(...fetched);
 
-  const isUsdcUsdt = pairId === 'usdc_usdt';
   const results: ChainSwapData[] = [];
 
   for (const { source, aToB, bToA } of sources) {
+    const tokenAToB = {
+      input: amount,
+      output: aToB.success && aToB.amountOut ? fromWei(aToB.amountOut, tokenBDecimals) : null,
+      outputUsd: aToB.success && aToB.amountOutUsd ? parseFloat(aToB.amountOutUsd) : null,
+      error: aToB.error,
+      route: aToB.route
+    };
+    const tokenBToA = {
+      input: amount,
+      output: bToA.success && bToA.amountOut ? fromWei(bToA.amountOut, tokenADecimals) : null,
+      outputUsd: bToA.success && bToA.amountOutUsd ? parseFloat(bToA.amountOutUsd) : null,
+      error: bToA.error,
+      route: bToA.route
+    };
     results.push({
       chain: chainName,
       chainKey,
       amount,
       pairId,
       dataSource: source,
-      usdcToUsdt: isUsdcUsdt ? {
-        input: amount,
-        output: aToB.success && aToB.amountOut ? fromWei(aToB.amountOut, tokenBDecimals) : null,
-        outputUsd: aToB.success && aToB.amountOutUsd ? parseFloat(aToB.amountOutUsd) : null,
-        error: aToB.error,
-        route: aToB.route
-      } : { input: amount, output: null, outputUsd: null },
-      usdtToUsdc: isUsdcUsdt ? {
-        input: amount,
-        output: bToA.success && bToA.amountOut ? fromWei(bToA.amountOut, tokenADecimals) : null,
-        outputUsd: bToA.success && bToA.amountOutUsd ? parseFloat(bToA.amountOutUsd) : null,
-        error: bToA.error,
-        route: bToA.route
-      } : { input: amount, output: null, outputUsd: null },
-      tokenAToB: {
-        input: amount,
-        output: aToB.success && aToB.amountOut ? fromWei(aToB.amountOut, tokenBDecimals) : null,
-        outputUsd: aToB.success && aToB.amountOutUsd ? parseFloat(aToB.amountOutUsd) : null,
-        error: aToB.error,
-        route: aToB.route
-      },
-      tokenBToA: {
-        input: amount,
-        output: bToA.success && bToA.amountOut ? fromWei(bToA.amountOut, tokenADecimals) : null,
-        outputUsd: bToA.success && bToA.amountOutUsd ? parseFloat(bToA.amountOutUsd) : null,
-        error: bToA.error,
-        route: bToA.route
-      }
+      tokenAToB,
+      tokenBToA
     });
   }
 

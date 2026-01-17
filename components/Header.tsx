@@ -128,7 +128,7 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <p>未找到匹配的交易对</p>
-                      <p className="text-xs mt-1">试试输入 "USDC" 或 "USDe"</p>
+                      <p className="text-xs mt-1">试试输入代币符号</p>
                     </div>
                   )}
                 </div>

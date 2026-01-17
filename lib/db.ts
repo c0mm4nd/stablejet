@@ -54,7 +54,7 @@ export function initDatabase() {
       chain TEXT NOT NULL,
       chain_key TEXT NOT NULL,
       data_source TEXT NOT NULL DEFAULT 'kyberswap',
-      pair_id TEXT NOT NULL DEFAULT 'usdc_usdt',
+      pair_id TEXT NOT NULL DEFAULT '',
       amount INTEGER NOT NULL,
 
       usdc_to_usdt_input REAL NOT NULL,
@@ -89,6 +89,38 @@ export function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_pair_chain_amount ON chain_data(pair_id, chain, amount);
   `);
 
+  // 新版：通用链数据表（仅保留 tokenA/tokenB 字段）
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS chain_swaps (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      history_point_id INTEGER NOT NULL,
+      chain TEXT NOT NULL,
+      chain_key TEXT NOT NULL,
+      data_source TEXT NOT NULL DEFAULT 'kyberswap',
+      pair_id TEXT NOT NULL DEFAULT '',
+      amount INTEGER NOT NULL,
+
+      token_a_to_b_input REAL,
+      token_a_to_b_output REAL,
+      token_a_to_b_output_usd REAL,
+      token_a_to_b_error TEXT,
+      token_a_to_b_route TEXT,
+
+      token_b_to_a_input REAL,
+      token_b_to_a_output REAL,
+      token_b_to_a_output_usd REAL,
+      token_b_to_a_error TEXT,
+      token_b_to_a_route TEXT,
+
+      FOREIGN KEY (history_point_id) REFERENCES history_points(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_swap_history_point ON chain_swaps(history_point_id);
+    CREATE INDEX IF NOT EXISTS idx_swap_chain_amount ON chain_swaps(chain, amount);
+    CREATE INDEX IF NOT EXISTS idx_swap_pair_chain_amount ON chain_swaps(pair_id, chain, amount);
+    CREATE INDEX IF NOT EXISTS idx_swap_source_chain_amount ON chain_swaps(data_source, chain, amount);
+  `);
+
   // 轻量迁移：如果旧表缺少 data_source 列，则补齐
   try {
     const cols = db.prepare(`PRAGMA table_info(chain_data)`).all() as Array<{ name: string }>;
@@ -104,7 +136,7 @@ export function initDatabase() {
     }
 
     if (!hasPairId) {
-      db.exec(`ALTER TABLE chain_data ADD COLUMN pair_id TEXT NOT NULL DEFAULT 'usdc_usdt'`);
+      db.exec(`ALTER TABLE chain_data ADD COLUMN pair_id TEXT NOT NULL DEFAULT ''`);
       db.exec(`CREATE INDEX IF NOT EXISTS idx_pair_chain_amount ON chain_data(pair_id, chain, amount)`);
       log('Database migrated: added chain_data.pair_id');
     }
