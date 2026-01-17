@@ -126,7 +126,15 @@ export async function getNordsternQuoteByChainKey(
         amountOut: data.toAmount,
         route: {
           type: 'nordstern',
-          note: 'Route info not provided by Nordstern'
+          swaps: Array.isArray(data.swaps) ? data.swaps : undefined,
+          tx: data.tx,
+          raw: {
+            src: data.src,
+            dst: data.dst,
+            fromAmount: data.fromAmount,
+            toAmount: data.toAmount
+          },
+          note: Array.isArray(data.swaps) && data.swaps.length > 0 ? undefined : 'No swaps returned'
         }
       };
     }

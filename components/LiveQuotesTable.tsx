@@ -42,6 +42,12 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
   const { pairs } = useConfig();
   const [sortKey, setSortKey] = useState<SortKey>('arbitrageSpace');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [activeRoute, setActiveRoute] = useState<{
+    chain: string;
+    source: string;
+    routeAtoB?: any;
+    routeBtoA?: any;
+  } | null>(null);
 
   if (history.length === 0) {
     return null;
@@ -119,56 +125,63 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
     }));
   }, [latestData, amount]);
 
-  const shortAddr = (addr?: string) => {
-    if (!addr || typeof addr !== 'string') return '';
-    if (!addr.startsWith('0x') || addr.length < 12) return addr;
-    return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
-  };
-
-  const formatRouteLines = (route: any): string[] => {
+  const formatRouteBlocks = (route: any): string[] => {
     if (!route) return [];
-    if (typeof route === 'string') return [route];
     if (route.note) return [route.note];
     if (Array.isArray(route.paths)) {
       const lines: string[] = [];
       route.paths.forEach((path: any[], idx: number) => {
         lines.push(`Path ${idx + 1}`);
         path.forEach((hop: any, hopIdx: number) => {
-          const from = shortAddr(hop.tokenIn);
-          const to = shortAddr(hop.tokenOut);
+          const from = hop.tokenIn || '';
+          const to = hop.tokenOut || '';
           const pool = hop.pool ? ` (${hop.pool})` : '';
-          lines.push(`${hopIdx + 1}. ${from} → ${to}${pool}`);
+          lines.push(`${hopIdx + 1}. ${from} -> ${to}${pool}`);
         });
       });
       return lines;
     }
-    return ['Route info unavailable'];
+    if (Array.isArray(route.swaps)) {
+      return [JSON.stringify(route.swaps, null, 2)];
+    }
+    if (route.raw || route.tx) {
+      return [JSON.stringify({ raw: route.raw, tx: route.tx }, null, 2)];
+    }
+    return [JSON.stringify(route, null, 2)];
   };
 
-  const renderRouteTooltip = (routeA: any, routeB: any) => {
-    const aLines = formatRouteLines(routeA);
-    const bLines = formatRouteLines(routeB);
-    if (aLines.length === 0 && bLines.length === 0) return null;
-
+  const renderRouteModal = () => {
+    if (!activeRoute) return null;
+    const aLines = formatRouteBlocks(activeRoute.routeAtoB);
+    const bLines = formatRouteBlocks(activeRoute.routeBtoA);
     return (
-      <div className="absolute left-1/2 top-full z-20 mt-2 w-[320px] -translate-x-1/2 rounded-lg border border-gray-200 bg-white p-3 text-xs text-gray-700 shadow-xl hidden group-hover:block">
-        <div className="font-semibold text-gray-900 mb-1">Route Info</div>
-        {aLines.length > 0 && (
-          <div className="mb-2">
-            <div className="font-medium text-gray-600 mb-1">A → B</div>
-            {aLines.map((line, idx) => (
-              <div key={`a-${idx}`} className="whitespace-pre-wrap">{line}</div>
-            ))}
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setActiveRoute(null)}>
+        <div className="w-full max-w-2xl rounded-xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-between border-b px-5 py-4">
+            <div>
+              <div className="text-sm text-gray-500">Route Details</div>
+              <div className="text-lg font-semibold text-gray-900">{activeRoute.chain} · {activeRoute.source}</div>
+            </div>
+            <button onClick={() => setActiveRoute(null)} className="text-gray-400 hover:text-gray-700 text-2xl leading-none">×</button>
           </div>
-        )}
-        {bLines.length > 0 && (
-          <div>
-            <div className="font-medium text-gray-600 mb-1">B → A</div>
-            {bLines.map((line, idx) => (
-              <div key={`b-${idx}`} className="whitespace-pre-wrap">{line}</div>
-            ))}
+          <div className="max-h-[70vh] overflow-y-auto px-5 py-4 text-sm text-gray-700">
+            {aLines.length > 0 && (
+              <div className="mb-6">
+                <div className="font-semibold text-gray-800 mb-2">A → B</div>
+                <pre className="whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-700">{aLines.join('\n')}</pre>
+              </div>
+            )}
+            {bLines.length > 0 && (
+              <div>
+                <div className="font-semibold text-gray-800 mb-2">B → A</div>
+                <pre className="whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-700">{bLines.join('\n')}</pre>
+              </div>
+            )}
+            {aLines.length === 0 && bLines.length === 0 && (
+              <div className="text-gray-500">No route info available.</div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     );
   };
@@ -218,6 +231,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+      {renderRouteModal()}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800">
           输入数量: {amount.toLocaleString()} - 实时报价数据 (共 {sortedData.length} 个链)
@@ -306,12 +320,16 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                     {row.chain}
                   </td>
                   <td className="px-4 py-3">
-                    <span className="relative group inline-flex">
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1"
+                      onClick={() => setActiveRoute({ chain: row.chain, source: sourceDisplayInfo.name, routeAtoB: row.routeAtoB, routeBtoA: row.routeBtoA })}
+                    >
                       <span className={`font-semibold ${sourceDisplayInfo.color}`}>
                         {sourceDisplayInfo.name}
                       </span>
-                      {renderRouteTooltip(row.routeAtoB, row.routeBtoA)}
-                    </span>
+                      <span className="text-xs text-gray-400">ⓘ</span>
+                    </button>
                   </td>
                   <td className="px-4 py-3 text-right">
                     {row.outputAtoB !== null ? (

@@ -35,6 +35,9 @@ export interface RouteHop {
 export interface RouteInfo {
   type: 'kyberswap' | 'nordstern' | 'cex' | 'unknown';
   paths?: RouteHop[][];
+  swaps?: any[];
+  tx?: any;
+  raw?: any;
   note?: string;
 }
 
@@ -82,6 +85,7 @@ export interface QuoteResult {
   amountOut?: string;
   amountOutUsd?: string;
   error?: string;
+  route?: RouteInfo;
 }
 
 export interface NordsternQuoteResponse {
@@ -89,6 +93,7 @@ export interface NordsternQuoteResponse {
   dst: string;
   fromAmount: string;
   toAmount: string;
+  swaps?: any[];
   tx?: {
     data: string;
     from: string;
