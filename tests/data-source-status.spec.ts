@@ -24,7 +24,7 @@ test.describe('数据源状态详细检查', () => {
     // 统计各数据源的状态
     const dataSourceStats = {
       kyberswap: { total: 0, success: 0, failed: 0, errors: [] as string[] },
-      openocean: { total: 0, success: 0, failed: 0, errors: [] as string[] },
+      nordstern: { total: 0, success: 0, failed: 0, errors: [] as string[] },
       binance: { total: 0, success: 0, failed: 0, errors: [] as string[] },
     };
     
@@ -100,10 +100,10 @@ test.describe('数据源状态详细检查', () => {
     console.log(`   失败: ${totalFailed} (${((totalFailed / totalRequests) * 100).toFixed(1)}%)`);
     console.log('');
     
-    // 检查 OpenOcean 是否有 429 错误
-    const has429Error = dataSourceStats.openocean.errors.some(e => e.includes('429'));
+    // 检查 Nordstern 是否有 429 错误
+    const has429Error = dataSourceStats.nordstern.errors.some(e => e.includes('429'));
     if (has429Error) {
-      console.log('⚠️  OpenOcean 遇到速率限制 (HTTP 429)');
+      console.log('⚠️  Nordstern 遇到速率限制 (HTTP 429)');
       console.log('   建议: 增加请求间隔或使用 API key\n');
     }
     
@@ -153,7 +153,7 @@ test.describe('数据源状态详细检查', () => {
     
     const groupedBySource: Record<string, string[]> = {
       kyberswap: [],
-      openocean: [],
+      nordstern: [],
       binance: []
     };
     

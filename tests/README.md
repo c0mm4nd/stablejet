@@ -8,7 +8,7 @@
 
 ### 数据源验证
 - ✅ 19个区块链网络（Ethereum, Polygon, Arbitrum, Optimism, Base, BSC, Avalanche, HyperEVM, Monad, Sonic, Etherlink, Mantle, UniChain, Berachain, Fantom, Gnosis, zkSync Era, Linea, Scroll）
-- ✅ 3种数据源（KyberSwap, OpenOcean, Binance）
+- ✅ 3种数据源（KyberSwap, Nordstern, Binance）
 - ✅ 4个金额档位（$5,000, $10,000, $30,000, $50,000）
 
 ### 可视化验证

@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, calculateRoundTripBps } from '@/lib/utils';
-import { TRADING_PAIRS } from '@/lib/config';
+import { useConfig } from '@/contexts/ConfigContext';
 
 interface LiveQuotesTableProps {
   history: HistoryDataPoint[];
@@ -22,6 +22,8 @@ interface TableRow {
   spreadAtoB: number | null;
   spreadBtoA: number | null;
   arbitrageSpace: number | null;
+  routeAtoB?: any;
+  routeBtoA?: any;
 }
 
 interface RawRow {
@@ -32,9 +34,12 @@ interface RawRow {
   arbitrageSpace: number | null;
   rateAtoB: number | null;
   rateBtoA: number | null;
+  routeAtoB?: any;
+  routeBtoA?: any;
 }
 
 export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesTableProps) {
+  const { pairs } = useConfig();
   const [sortKey, setSortKey] = useState<SortKey>('arbitrageSpace');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
@@ -42,7 +47,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
     return null;
   }
 
-  const pair = TRADING_PAIRS[pairId];
+  const pair = pairs[pairId];
   if (!pair) {
     return null;
   }
@@ -56,15 +61,15 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
   });
 
   // 获取最新的数据点
-  const latestData = recentHistory.length > 0 
-    ? recentHistory[recentHistory.length - 1] 
+  const latestData = recentHistory.length > 0
+    ? recentHistory[recentHistory.length - 1]
     : history[history.length - 1];
   const timestamp = new Date(latestData.timestamp).toLocaleString('zh-CN');
 
   // 数据源显示名称和颜色
   const sourceInfo: Record<string, { name: string; color: string }> = {
     kyberswap: { name: 'KyberSwap', color: 'text-blue-600' },
-    openocean: { name: 'OpenOcean', color: 'text-purple-600' },
+    nordstern: { name: 'Nordstern', color: 'text-cyan-600' },
     binance: { name: 'Binance', color: 'text-yellow-600' },
     bybit: { name: 'Bybit', color: 'text-orange-600' },
     mexc: { name: 'MEXC', color: 'text-green-600' }
@@ -91,6 +96,8 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
           arbitrageSpace: calculateRoundTripBps(rateAtoB, rateBtoA),
           rateAtoB,
           rateBtoA,
+          routeAtoB: tokenAToB.route,
+          routeBtoA: tokenBToA.route
         };
       });
 
@@ -107,8 +114,64 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
       spreadAtoB: calculateRateDeviationBps(r.rateAtoB, baselineAtoB),
       spreadBtoA: calculateRateDeviationBps(r.rateBtoA, baselineBtoA),
       arbitrageSpace: r.arbitrageSpace,
+      routeAtoB: r.routeAtoB,
+      routeBtoA: r.routeBtoA
     }));
   }, [latestData, amount]);
+
+  const shortAddr = (addr?: string) => {
+    if (!addr || typeof addr !== 'string') return '';
+    if (!addr.startsWith('0x') || addr.length < 12) return addr;
+    return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
+  };
+
+  const formatRouteLines = (route: any): string[] => {
+    if (!route) return [];
+    if (typeof route === 'string') return [route];
+    if (route.note) return [route.note];
+    if (Array.isArray(route.paths)) {
+      const lines: string[] = [];
+      route.paths.forEach((path: any[], idx: number) => {
+        lines.push(`Path ${idx + 1}`);
+        path.forEach((hop: any, hopIdx: number) => {
+          const from = shortAddr(hop.tokenIn);
+          const to = shortAddr(hop.tokenOut);
+          const pool = hop.pool ? ` (${hop.pool})` : '';
+          lines.push(`${hopIdx + 1}. ${from} → ${to}${pool}`);
+        });
+      });
+      return lines;
+    }
+    return ['Route info unavailable'];
+  };
+
+  const renderRouteTooltip = (routeA: any, routeB: any) => {
+    const aLines = formatRouteLines(routeA);
+    const bLines = formatRouteLines(routeB);
+    if (aLines.length === 0 && bLines.length === 0) return null;
+
+    return (
+      <div className="absolute left-1/2 top-full z-20 mt-2 w-[320px] -translate-x-1/2 rounded-lg border border-gray-200 bg-white p-3 text-xs text-gray-700 shadow-xl hidden group-hover:block">
+        <div className="font-semibold text-gray-900 mb-1">Route Info</div>
+        {aLines.length > 0 && (
+          <div className="mb-2">
+            <div className="font-medium text-gray-600 mb-1">A → B</div>
+            {aLines.map((line, idx) => (
+              <div key={`a-${idx}`} className="whitespace-pre-wrap">{line}</div>
+            ))}
+          </div>
+        )}
+        {bLines.length > 0 && (
+          <div>
+            <div className="font-medium text-gray-600 mb-1">B → A</div>
+            {bLines.map((line, idx) => (
+              <div key={`b-${idx}`} className="whitespace-pre-wrap">{line}</div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // 排序数据
   const sortedData = useMemo(() => {
@@ -124,7 +187,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
 
       // 字符串比较
       if (typeof aVal === 'string' && typeof bVal === 'string') {
-        return sortDirection === 'asc' 
+        return sortDirection === 'asc'
           ? aVal.localeCompare(bVal)
           : bVal.localeCompare(aVal);
       }
@@ -168,7 +231,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th 
+              <th
                 className="px-4 py-3 text-left font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort('chain')}
               >
@@ -177,7 +240,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                   <SortIcon columnKey="chain" />
                 </div>
               </th>
-              <th 
+              <th
                 className="px-4 py-3 text-left font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort('dataSource')}
               >
@@ -186,7 +249,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                   <SortIcon columnKey="dataSource" />
                 </div>
               </th>
-              <th 
+              <th
                 className="px-4 py-3 text-right font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort('outputAtoB')}
               >
@@ -195,7 +258,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                   <SortIcon columnKey="outputAtoB" />
                 </div>
               </th>
-              <th 
+              <th
                 className="px-4 py-3 text-right font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort('spreadAtoB')}
               >
@@ -204,7 +267,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                   <SortIcon columnKey="spreadAtoB" />
                 </div>
               </th>
-              <th 
+              <th
                 className="px-4 py-3 text-right font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort('outputBtoA')}
               >
@@ -213,7 +276,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                   <SortIcon columnKey="outputBtoA" />
                 </div>
               </th>
-              <th 
+              <th
                 className="px-4 py-3 text-right font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort('spreadBtoA')}
               >
@@ -222,7 +285,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                   <SortIcon columnKey="spreadBtoA" />
                 </div>
               </th>
-              <th 
+              <th
                 className="px-4 py-3 text-right font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort('arbitrageSpace')}
               >
@@ -236,15 +299,18 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
           <tbody className="divide-y divide-gray-100">
             {sortedData.map((row, idx) => {
               const sourceDisplayInfo = sourceInfo[row.dataSource] || { name: row.dataSource, color: 'text-gray-600' };
-              
+
               return (
                 <tr key={idx} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 font-medium text-gray-900">
                     {row.chain}
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`font-semibold ${sourceDisplayInfo.color}`}>
-                      {sourceDisplayInfo.name}
+                    <span className="relative group inline-flex">
+                      <span className={`font-semibold ${sourceDisplayInfo.color}`}>
+                        {sourceDisplayInfo.name}
+                      </span>
+                      {renderRouteTooltip(row.routeAtoB, row.routeBtoA)}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -300,7 +366,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
       </div>
 
       <div className="mt-4 text-xs text-gray-500 text-center">
-        价差 (bps) = 相对“全体中位数汇率”的偏差 | 
+        价差 (bps) = 相对“全体中位数汇率”的偏差 |
         套利空间 (bps) = ({pair.tokenA}→{pair.tokenB} 汇率 × {pair.tokenB}→{pair.tokenA} 汇率 - 1) × 10000 |
         点击列标题可排序
       </div>

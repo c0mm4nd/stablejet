@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { TRADING_PAIRS } from '@/lib/config';
+import { useConfig } from '@/contexts/ConfigContext';
 
 interface HeaderProps {
   countdown: number;
@@ -11,7 +11,8 @@ interface HeaderProps {
 }
 
 export default function Header({ countdown, selectedPair, onPairChange, onSettingsClick }: HeaderProps) {
-  const pairs = Object.values(TRADING_PAIRS);
+  const { pairs: pairsConfig } = useConfig();
+  const pairs = Object.values(pairsConfig);
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -100,14 +101,12 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
                         <button
                           key={pair.id}
                           onClick={() => handlePairSelect(pair.id)}
-                          className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between group ${
-                            selectedPair === pair.id ? 'bg-blue-50' : ''
-                          }`}
+                          className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between group ${selectedPair === pair.id ? 'bg-blue-50' : ''
+                            }`}
                         >
                           <div className="flex items-center gap-3">
-                            <div className={`w-2 h-2 rounded-full ${
-                              selectedPair === pair.id ? 'bg-blue-600' : 'bg-gray-300'
-                            }`}></div>
+                            <div className={`w-2 h-2 rounded-full ${selectedPair === pair.id ? 'bg-blue-600' : 'bg-gray-300'
+                              }`}></div>
                             <div>
                               <div className="font-medium text-gray-800">{pair.name}</div>
                               <div className="text-xs text-gray-500">

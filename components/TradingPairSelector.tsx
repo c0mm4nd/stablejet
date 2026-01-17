@@ -1,6 +1,6 @@
 'use client';
 
-import { TRADING_PAIRS } from '@/lib/config';
+import { useConfig } from '@/contexts/ConfigContext';
 
 interface TradingPairSelectorProps {
   selectedPair: string;
@@ -8,7 +8,8 @@ interface TradingPairSelectorProps {
 }
 
 export default function TradingPairSelector({ selectedPair, onPairChange }: TradingPairSelectorProps) {
-  const pairs = Object.values(TRADING_PAIRS);
+  const { pairs: pairsConfig } = useConfig();
+  const pairs = Object.values(pairsConfig);
 
   return (
     <div className="flex items-center justify-center gap-2 mb-8">
@@ -16,11 +17,10 @@ export default function TradingPairSelector({ selectedPair, onPairChange }: Trad
         <button
           key={pair.id}
           onClick={() => onPairChange(pair.id)}
-          className={`relative px-8 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
-            selectedPair === pair.id
+          className={`relative px-8 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${selectedPair === pair.id
               ? 'bg-white text-blue-600 shadow-xl shadow-blue-500/20 scale-105'
               : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
-          }`}
+            }`}
         >
           <span className="relative z-10">{pair.name}</span>
           {selectedPair === pair.id && (

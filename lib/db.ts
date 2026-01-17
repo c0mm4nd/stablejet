@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import { log, warn } from './logger';
 import path from 'path';
 import fs from 'fs';
 
@@ -60,21 +61,25 @@ export function initDatabase() {
       usdc_to_usdt_output REAL,
       usdc_to_usdt_output_usd REAL,
       usdc_to_usdt_error TEXT,
+      usdc_to_usdt_route TEXT,
 
       usdt_to_usdc_input REAL NOT NULL,
       usdt_to_usdc_output REAL,
       usdt_to_usdc_output_usd REAL,
       usdt_to_usdc_error TEXT,
+      usdt_to_usdc_route TEXT,
 
       token_a_to_b_input REAL,
       token_a_to_b_output REAL,
       token_a_to_b_output_usd REAL,
       token_a_to_b_error TEXT,
+      token_a_to_b_route TEXT,
 
       token_b_to_a_input REAL,
       token_b_to_a_output REAL,
       token_b_to_a_output_usd REAL,
       token_b_to_a_error TEXT,
+      token_b_to_a_route TEXT,
 
       FOREIGN KEY (history_point_id) REFERENCES history_points(id) ON DELETE CASCADE
     );
@@ -90,19 +95,20 @@ export function initDatabase() {
     const hasDataSource = cols.some(c => c.name === 'data_source');
     const hasPairId = cols.some(c => c.name === 'pair_id');
     const hasTokenAToB = cols.some(c => c.name === 'token_a_to_b_input');
-    
+    const hasRouteColumns = cols.some(c => c.name === 'token_a_to_b_route');
+
     if (!hasDataSource) {
       db.exec(`ALTER TABLE chain_data ADD COLUMN data_source TEXT`);
       db.exec(`UPDATE chain_data SET data_source = 'kyberswap' WHERE data_source IS NULL`);
-      console.log('Database migrated: added chain_data.data_source');
+      log('Database migrated: added chain_data.data_source');
     }
-    
+
     if (!hasPairId) {
       db.exec(`ALTER TABLE chain_data ADD COLUMN pair_id TEXT NOT NULL DEFAULT 'usdc_usdt'`);
       db.exec(`CREATE INDEX IF NOT EXISTS idx_pair_chain_amount ON chain_data(pair_id, chain, amount)`);
-      console.log('Database migrated: added chain_data.pair_id');
+      log('Database migrated: added chain_data.pair_id');
     }
-    
+
     if (!hasTokenAToB) {
       db.exec(`
         ALTER TABLE chain_data ADD COLUMN token_a_to_b_input REAL;
@@ -114,17 +120,27 @@ export function initDatabase() {
         ALTER TABLE chain_data ADD COLUMN token_b_to_a_output_usd REAL;
         ALTER TABLE chain_data ADD COLUMN token_b_to_a_error TEXT;
       `);
-      console.log('Database migrated: added generic token swap columns');
+      log('Database migrated: added generic token swap columns');
     }
-    
-    if (!hasDataSource || !hasPairId || !hasTokenAToB) {
+
+    if (!hasRouteColumns) {
+      db.exec(`
+        ALTER TABLE chain_data ADD COLUMN usdc_to_usdt_route TEXT;
+        ALTER TABLE chain_data ADD COLUMN usdt_to_usdc_route TEXT;
+        ALTER TABLE chain_data ADD COLUMN token_a_to_b_route TEXT;
+        ALTER TABLE chain_data ADD COLUMN token_b_to_a_route TEXT;
+      `);
+      log('Database migrated: added route columns');
+    }
+
+    if (!hasDataSource || !hasPairId || !hasTokenAToB || !hasRouteColumns) {
       db.exec(`CREATE INDEX IF NOT EXISTS idx_source_chain_amount ON chain_data(data_source, chain, amount)`);
     }
-  } catch (error) {
-    console.warn('Database migration check failed:', error);
+  } catch (err) {
+    warn('Database migration check failed:', err);
   }
 
-  console.log('Database initialized successfully');
+  log('Database initialized successfully');
 }
 
 // 关闭数据库连接

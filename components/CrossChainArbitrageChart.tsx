@@ -2,7 +2,7 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { HistoryDataPoint } from '@/lib/history';
-import { TRADING_PAIRS } from '@/lib/config';
+import { useConfig } from '@/contexts/ConfigContext';
 import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, calculateRoundTripBps, filterOutliers } from '@/lib/utils';
 
 interface CrossChainArbitrageChartProps {
@@ -127,11 +127,13 @@ interface ArbitrageDetail {
   step2Bps: number;
 }
 
+
 export default function CrossChainArbitrageChart({ history, amount, pairId }: CrossChainArbitrageChartProps) {
-  const sourceSuffix = (source?: string) => (source === 'openocean' ? 'OO' : 'KS');
+  const { pairs } = useConfig();
+  const sourceSuffix = (source?: string) => (source === 'nordstern' ? 'NS' : 'KS');
   const itemLabel = (item: any) => `${item.chain} [${sourceSuffix(item.dataSource || 'kyberswap')}]`;
 
-  const pair = TRADING_PAIRS[pairId];
+  const pair = pairs[pairId];
   if (!pair) {
     return null;
   }

@@ -22,6 +22,20 @@ export interface SwapResult {
   output: number | null;
   outputUsd: number | null;
   error?: string;
+  route?: RouteInfo;
+}
+
+export interface RouteHop {
+  pool?: string;
+  tokenIn: string;
+  tokenOut: string;
+  swapAmount?: string;
+}
+
+export interface RouteInfo {
+  type: 'kyberswap' | 'nordstern' | 'cex' | 'unknown';
+  paths?: RouteHop[][];
+  note?: string;
 }
 
 export interface ChainSwapData {
@@ -29,7 +43,7 @@ export interface ChainSwapData {
   chainKey: string;
   amount: number;
   pairId?: string; // Trading pair identifier
-  dataSource?: 'kyberswap' | 'openocean' | 'binance' | 'mexc' | 'bybit'; // 数据来源
+  dataSource?: 'kyberswap' | 'nordstern' | 'binance' | 'mexc' | 'bybit'; // 数据来源
   usdcToUsdt: SwapResult;
   usdtToUsdc: SwapResult;
   // Generic swap results for any pair
@@ -70,25 +84,49 @@ export interface QuoteResult {
   error?: string;
 }
 
-export interface OpenOceanQuoteResponse {
-  code: number;
-  data?: {
-    inToken: {
-      symbol: string;
-      name: string;
-      address: string;
-      decimals: number;
-    };
-    outToken: {
-      symbol: string;
-      name: string;
-      address: string;
-      decimals: number;
-    };
-    inAmount: string;
-    outAmount: string;
-    estimatedGas: string;
-    path?: any;
+export interface NordsternQuoteResponse {
+  src: string;
+  dst: string;
+  fromAmount: string;
+  toAmount: string;
+  tx?: {
+    data: string;
+    from: string;
+    to: string;
+    value: string;
   };
-  error?: string;
+}
+
+// --- Config V2 Types ---
+
+export interface ChainAppConfig {
+  name: string;
+  // API identifiers for aggregators
+  kyberCode?: string;     // e.g. "ethereum"
+  nordsternCode?: string; // e.g. "8118"
+  disable?: boolean;
+}
+
+export interface ChainPairConfig {
+  addressA?: string;
+  addressB?: string;
+  decimalsA?: number;
+  decimalsB?: number;
+  cexPairSymbol?: string; // e.g. "USDCUSDT" for CEX
+  disabled?: boolean;
+}
+
+export interface TradingPairConfig {
+  id: string;          // e.g. "usdc_usdt"
+  name: string;        // e.g. "USDC/USDT"
+  tokenA: string;      // Symbol A (e.g. "USDC")
+  tokenB: string;      // Symbol B (e.g. "USDT")
+  amounts: number[];   // e.g. [10000, 50000, 100000]
+  chains: Record<string, ChainPairConfig>; // chainId -> { addressA, addressB }
+}
+
+export interface ConfigData {
+  chains: Record<string, ChainAppConfig>; // chainId -> Config
+  pairs: Record<string, TradingPairConfig>; // pairId -> Config
+  clientRefreshInterval: number;
 }

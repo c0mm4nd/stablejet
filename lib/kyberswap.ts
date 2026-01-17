@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { QuoteResult, KyberSwapQuoteResponse, ChainSwapData, TradingPair } from './types';
-import { USDT_USDC_CHAINS, AMOUNTS, toWei, fromWei, getAllUnstableTokens, OPENOCEAN_ONLY_CHAINS, TRADING_PAIRS, getTokenDecimals } from './config';
-import { getOpenOceanQuoteByChainKey } from './openocean';
+import { error } from './logger';
+import { QuoteResult, KyberSwapQuoteResponse, ChainSwapData, TradingPairConfig, ChainAppConfig } from './types';
+import { toWei, fromWei, getAllUnstableTokens, getTokenDecimals } from './config';
+import { getNordsternQuoteByChainKey } from './nordstern';
 import { getBinanceSwapData } from './binance';
 import { getMexcSwapData } from './mexc';
 import { getBybitSwapData } from './bybit';
@@ -28,20 +29,20 @@ class KyberSwapRateLimiter {
 
   async waitForSlot(): Promise<void> {
     const now = Date.now();
-    
+
     // 清理超过时间窗口的请求记录
     this.requestTimes = this.requestTimes.filter(time => now - time < this.windowMs);
-    
+
     // 如果达到限制，等待直到有空位
     while (this.requestTimes.length >= this.maxRequests) {
       const oldestRequest = this.requestTimes[0];
       const waitTime = this.windowMs - (now - oldestRequest) + 100;
       await delay(waitTime);
-      
+
       const newNow = Date.now();
       this.requestTimes = this.requestTimes.filter(time => newNow - time < this.windowMs);
     }
-    
+
     // 确保最小间隔
     if (this.requestTimes.length > 0) {
       const lastRequest = this.requestTimes[this.requestTimes.length - 1];
@@ -51,11 +52,11 @@ class KyberSwapRateLimiter {
         await delay(waitTime);
       }
     }
-    
+
     // 记录这次请求
     this.requestTimes.push(Date.now());
   }
-  
+
   getStatus(): { current: number; max: number; rate: string } {
     const now = Date.now();
     this.requestTimes = this.requestTimes.filter(time => now - time < this.windowMs);
@@ -67,7 +68,10 @@ class KyberSwapRateLimiter {
   }
 }
 
-const rateLimiter = new KyberSwapRateLimiter();
+const GLOBAL_RATE_LIMITER_KEY = Symbol.for('stablejet.kyberswap.ratelimiter');
+
+const rateLimiter = (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] || new KyberSwapRateLimiter();
+if (process.env.NODE_ENV !== 'production') (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] = rateLimiter;
 
 // 检查路由路径是否包含不稳定代币
 function hasUnstableTokenInRoute(route: Array<Array<{
@@ -82,8 +86,8 @@ function hasUnstableTokenInRoute(route: Array<Array<{
     for (const hop of path) {
       // 检查路径中的每个代币是否在不稳定代币列表中
       if (unstableTokens.has(hop.tokenIn.toLowerCase()) ||
-          unstableTokens.has(hop.tokenOut.toLowerCase())) {
-        
+        unstableTokens.has(hop.tokenOut.toLowerCase())) {
+
         return true;
       }
     }
@@ -103,54 +107,50 @@ export async function getQuote(
   const chainClean = chain.split('_')[0];
 
   const url = `https://aggregator-api.kyberswap.com/${chainClean}/api/v1/routes`;
-  const params = new URLSearchParams({
+  const params = {
     tokenIn,
     tokenOut,
     amountIn,
     gasInclude: 'true'
-  });
+  };
 
   try {
     // 等待速率限制器允许
     await rateLimiter.waitForSlot();
-    
-    const response = await axiosInstance.get<KyberSwapQuoteResponse>(`${url}?${params}`);
+
+    const response = await axiosInstance.get<KyberSwapQuoteResponse>(url, { params });
     const data = response.data;
 
     if (data.code === 0 && data.data?.routeSummary) {
-      // 检查路由路径是否包含不稳定代币
-      // if (data.data.routeSummary.route && hasUnstableTokenInRoute(data.data.routeSummary.route)) {
-      //   return {
-      //     success: false,
-      //     error: 'Route contains unstable tokens (ETH/WETH/WBTC)'
-      //   };
-      // }
-
       return {
         success: true,
         amountOut: data.data.routeSummary.amountOut,
-        amountOutUsd: data.data.routeSummary.amountOutUsd
+        amountOutUsd: data.data.routeSummary.amountOutUsd,
+        route: {
+          type: 'kyberswap',
+          paths: data.data.routeSummary.route
+        }
       };
     } else {
-      console.error(`[KyberSwap] No route found for ${chainClean}: ${data.message || 'Unknown'}`);
+      error(`[KyberSwap] No route found for ${chainClean}: ${data.message || 'Unknown'}`);
       return {
         success: false,
         error: data.message || 'No route found'
       };
     }
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const statusText = error.response?.statusText || '';
-      const message = `${error.message} (status: ${error.response?.status || 'N/A'}${statusText ? ', ' + statusText : ''})`;
-      console.error(`[KyberSwap] Error for ${chainClean}:`, message);
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const statusText = err.response?.statusText || '';
+      const message = `${err.message} (status: ${err.response?.status || 'N/A'}${statusText ? ', ' + statusText : ''})`;
+      error(`[KyberSwap] Error for ${chainClean}:`, message);
       return {
         success: false,
         error: message
       };
     }
-    
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    console.error(`[KyberSwap] Error for ${chainClean}:`, message);
+
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    error(`[KyberSwap] Error for ${chainClean}:`, message);
     return {
       success: false,
       error: message
@@ -163,126 +163,134 @@ export function getKyberSwapRateLimiterStatus() {
   return rateLimiter.getStatus();
 }
 
-// 获取所有链的兑换数据
-export async function getAllSwapData(): Promise<ChainSwapData[]> {
-  // 默认获取 USDC/USDT
-  return getSwapDataForPair('usdc_usdt');
-}
-
 // 获取指定交易对的兑换数据
-export async function getSwapDataForPair(pairId: string = 'usdc_usdt'): Promise<ChainSwapData[]> {
+export async function getSwapDataForPair(
+  pairConfig: TradingPairConfig,
+  chainsConfig: Record<string, ChainAppConfig>
+): Promise<ChainSwapData[]> {
   const results: ChainSwapData[] = [];
-  
-  // 获取交易对配置
-  const pair = TRADING_PAIRS[pairId];
-  if (!pair) {
-    console.error(`[SwapData] Unknown trading pair: ${pairId}`);
-    return results;
-  }
+  const pairId = pairConfig.id;
+  const amounts = pairConfig.amounts;
 
-  const tokenADecimals = getTokenDecimals(pair.tokenA);
-  const tokenBDecimals = getTokenDecimals(pair.tokenB);
+  const defaultTokenADecimals = getTokenDecimals(pairConfig.tokenA);
+  const defaultTokenBDecimals = getTokenDecimals(pairConfig.tokenB);
 
-  console.log(`[SwapData] Fetching data for pair: ${pair.name} (${pairId})`);
-  
-  // 只有 USDC/USDT 支持 CEX
-  const isCexSupported = pairId === 'usdc_usdt';
-  
-  // 并发启动所有 CEX 数据获取（仅 USDC/USDT）
-  const cexPromises = isCexSupported ? [
-    getBinanceSwapData(AMOUNTS),
-    getMexcSwapData(AMOUNTS),
-    getBybitSwapData(AMOUNTS)
-  ] : [];
+  // console.log(`[SwapData] Fetching data for pair: ${pairConfig.name} (${pairId})`);
 
-  for (const [chainKey, chainConfig] of Object.entries(USDT_USDC_CHAINS)) {
-    // 跳过 CEX，它们单独处理
-    if (chainKey === 'binance' || chainKey === 'mexc' || chainKey === 'bybit') {
+  for (const [chainKey, chainPairData] of Object.entries(pairConfig.chains)) {
+    // Check if chain is globally enabled
+    const appChainConfig = chainsConfig[chainKey];
+    if (!appChainConfig || appChainConfig.disable) continue;
+
+    // Check if pair is enabled on this chain
+    // (Our new type doesn't have disable on chainPairData yet, but good to check if we added it)
+    if (chainPairData.disabled) continue;
+
+    // Determine effective decimals for this chain
+    const tokenADecimals = chainPairData.decimalsA ?? defaultTokenADecimals;
+    const tokenBDecimals = chainPairData.decimalsB ?? defaultTokenBDecimals;
+
+    // CEX Logic: Fetch if configured in the pair's chain map
+    if (['binance', 'mexc', 'bybit'].includes(chainKey)) {
+      const symbol = chainPairData.cexPairSymbol || pairId === 'usdc_usdt' ? 'USDCUSDT' : undefined;
+      if (!symbol) continue; // Skip if no symbol and not default pair
+
+      try {
+        let cexData: ChainSwapData[] = [];
+        if (chainKey === 'binance') {
+          cexData = await getBinanceSwapData(amounts, symbol);
+        } else if (chainKey === 'mexc') {
+          cexData = await getMexcSwapData(amounts, symbol);
+        } else if (chainKey === 'bybit') {
+          cexData = await getBybitSwapData(amounts, symbol);
+        }
+
+        results.push(...cexData.map(d => ({ ...d, pairId })));
+      } catch (err) {
+        error(`[CEX] Error fetching ${chainKey} data:`, err);
+      }
       continue;
     }
 
-    // 获取该链上的代币地址
-    const tokenAAddress = pair.getAddressA(chainConfig);
-    const tokenBAddress = pair.getAddressB(chainConfig);
+    const tokenAAddress = chainPairData.addressA;
+    const tokenBAddress = chainPairData.addressB;
 
-    // 如果该链不支持这个交易对，跳过
-    if (!tokenAAddress || !tokenBAddress) {
-      console.log(`[SwapData] Skipping ${chainKey} - ${pair.name} not available`);
-      continue;
-    }
+    if (!tokenAAddress || !tokenBAddress) continue;
 
-    for (const amount of AMOUNTS) {
+    const useNordstern = !!appChainConfig.nordsternCode;
+
+    const kyberChainParam = appChainConfig.kyberCode || chainKey;
+    const nordsternChainParam = appChainConfig.nordsternCode || chainKey;
+
+    for (const amount of amounts) {
       // amountIn 需要按“输入 token” 的 decimals 来编码
       const amountInAToB = toWei(amount, tokenADecimals);
       const amountInBToA = toWei(amount, tokenBDecimals);
 
-      const chainCleanKey = chainKey.split('_')[0];
-      const useOpenOcean = OPENOCEAN_ONLY_CHAINS.has(chainKey) || OPENOCEAN_ONLY_CHAINS.has(chainCleanKey);
+      const sources: Array<{ source: 'kyberswap' | 'nordstern'; aToB: QuoteResult; bToA: QuoteResult }> = [];
 
-      // TokenA -> TokenB
-      const tokenAToB = useOpenOcean
-        ? await getOpenOceanQuoteByChainKey(chainKey, tokenAAddress, tokenBAddress, amountInAToB)
-        : await getQuote(chainKey, tokenAAddress, tokenBAddress, amountInAToB);
+      const kyberPromise = getQuote(kyberChainParam, tokenAAddress, tokenBAddress, amountInAToB)
+        .then(aToB => getQuote(kyberChainParam, tokenBAddress, tokenAAddress, amountInBToA)
+          .then(bToA => ({ source: 'kyberswap' as const, aToB, bToA })));
 
-      // TokenB -> TokenA
-      const tokenBToA = useOpenOcean
-        ? await getOpenOceanQuoteByChainKey(chainKey, tokenBAddress, tokenAAddress, amountInBToA)
-        : await getQuote(chainKey, tokenBAddress, tokenAAddress, amountInBToA);
+      const nordsternPromise = useNordstern
+        ? getNordsternQuoteByChainKey(nordsternChainParam, tokenAAddress, tokenBAddress, amountInAToB)
+          .then(aToB => getNordsternQuoteByChainKey(nordsternChainParam, tokenBAddress, tokenAAddress, amountInBToA)
+            .then(bToA => ({ source: 'nordstern' as const, aToB, bToA })))
+        : null;
 
-      const dataSource: 'kyberswap' | 'openocean' = useOpenOcean ? 'openocean' : 'kyberswap';
+      const fetched = await Promise.all([
+        kyberPromise,
+        ...(nordsternPromise ? [nordsternPromise] : [])
+      ]);
+
+      sources.push(...fetched);
 
       // 为了向后兼容，USDC/USDT 数据放在 usdcToUsdt/usdtToUsdc 字段
-      // 其他交易对放在 tokenAToB/tokenBToA 字段
       const isUsdcUsdt = pairId === 'usdc_usdt';
 
-      results.push({
-        chain: chainConfig.name,
-        chainKey,
-        amount,
-        pairId,
-        dataSource,
-        // 向后兼容字段（USDC/USDT）
-        usdcToUsdt: isUsdcUsdt ? {
-          input: amount,
-          output: tokenAToB.success && tokenAToB.amountOut ? fromWei(tokenAToB.amountOut, tokenBDecimals) : null,
-          outputUsd: tokenAToB.success && tokenAToB.amountOutUsd ? parseFloat(tokenAToB.amountOutUsd) : null,
-          error: tokenAToB.error
-        } : { input: amount, output: null, outputUsd: null },
-        usdtToUsdc: isUsdcUsdt ? {
-          input: amount,
-          output: tokenBToA.success && tokenBToA.amountOut ? fromWei(tokenBToA.amountOut, tokenADecimals) : null,
-          outputUsd: tokenBToA.success && tokenBToA.amountOutUsd ? parseFloat(tokenBToA.amountOutUsd) : null,
-          error: tokenBToA.error
-        } : { input: amount, output: null, outputUsd: null },
-        // 通用字段（所有交易对）
-        tokenAToB: {
-          input: amount,
-          output: tokenAToB.success && tokenAToB.amountOut ? fromWei(tokenAToB.amountOut, tokenBDecimals) : null,
-          outputUsd: tokenAToB.success && tokenAToB.amountOutUsd ? parseFloat(tokenAToB.amountOutUsd) : null,
-          error: tokenAToB.error
-        },
-        tokenBToA: {
-          input: amount,
-          output: tokenBToA.success && tokenBToA.amountOut ? fromWei(tokenBToA.amountOut, tokenADecimals) : null,
-          outputUsd: tokenBToA.success && tokenBToA.amountOutUsd ? parseFloat(tokenBToA.amountOutUsd) : null,
-          error: tokenBToA.error
-        }
-      });
-    }
-  }
-
-  // 等待所有 CEX 数据（仅 USDC/USDT）
-  if (isCexSupported && cexPromises.length > 0) {
-    try {
-      const cexResults = await Promise.all(cexPromises);
-      for (const cexData of cexResults) {
-        results.push(...cexData.map(d => ({ ...d, pairId })));
+      for (const { source, aToB, bToA } of sources) {
+        results.push({
+          chain: appChainConfig.name,
+          chainKey,
+          amount,
+          pairId,
+          dataSource: source,
+          // 向后兼容字段（USDC/USDT）
+          usdcToUsdt: isUsdcUsdt ? {
+            input: amount,
+            output: aToB.success && aToB.amountOut ? fromWei(aToB.amountOut, tokenBDecimals) : null,
+            outputUsd: aToB.success && aToB.amountOutUsd ? parseFloat(aToB.amountOutUsd) : null,
+            error: aToB.error,
+            route: aToB.route
+          } : { input: amount, output: null, outputUsd: null },
+          usdtToUsdc: isUsdcUsdt ? {
+            input: amount,
+            output: bToA.success && bToA.amountOut ? fromWei(bToA.amountOut, tokenADecimals) : null,
+            outputUsd: bToA.success && bToA.amountOutUsd ? parseFloat(bToA.amountOutUsd) : null,
+            error: bToA.error,
+            route: bToA.route
+          } : { input: amount, output: null, outputUsd: null },
+          // 通用字段（所有交易对）
+          tokenAToB: {
+            input: amount,
+            output: aToB.success && aToB.amountOut ? fromWei(aToB.amountOut, tokenBDecimals) : null,
+            outputUsd: aToB.success && aToB.amountOutUsd ? parseFloat(aToB.amountOutUsd) : null,
+            error: aToB.error,
+            route: aToB.route
+          },
+          tokenBToA: {
+            input: amount,
+            output: bToA.success && bToA.amountOut ? fromWei(bToA.amountOut, tokenADecimals) : null,
+            outputUsd: bToA.success && bToA.amountOutUsd ? parseFloat(bToA.amountOutUsd) : null,
+            error: bToA.error,
+            route: bToA.route
+          }
+        });
       }
-    } catch (error) {
-      console.error('[CEX] Error fetching CEX data:', error);
     }
   }
 
-  console.log(`[SwapData] Fetched ${results.length} data points for ${pair.name}`);
+  // console.log(`[SwapData] Fetched ${results.length} data points for ${pair.name}`);
   return results;
 }

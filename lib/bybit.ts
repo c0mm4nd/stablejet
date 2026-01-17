@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { log, error } from './logger';
 import { ChainSwapData } from './types';
 
 interface BybitDepthResponse {
@@ -30,15 +31,15 @@ class BybitRateLimiter {
   async waitForSlot(): Promise<void> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     if (timeSinceLastRequest < this.minInterval) {
       const waitTime = this.minInterval - timeSinceLastRequest;
       await delay(waitTime);
     }
-    
+
     this.lastRequestTime = Date.now();
   }
-  
+
   getStatus(): { rate: string } {
     return {
       rate: '1 req/1s (single request per cycle)'
@@ -46,43 +47,46 @@ class BybitRateLimiter {
   }
 }
 
-const rateLimiter = new BybitRateLimiter();
+const GLOBAL_RATE_LIMITER_KEY = Symbol.for('stablejet.bybit.ratelimiter');
 
-async function getBybitUsdcUsdtDepth(limit: number = 500): Promise<{ bids: Array<[string, string]>; asks: Array<[string, string]> }> {
+const rateLimiter = (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] || new BybitRateLimiter();
+if (process.env.NODE_ENV !== 'production') (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] = rateLimiter;
+
+async function getBybitUsdcUsdtDepth(limit: number = 500, symbol: string = 'USDCUSDT'): Promise<{ bids: Array<[string, string]>; asks: Array<[string, string]> }> {
   // Bybit API v5: https://api.bybit.com/v5/market/orderbook?category=spot&symbol=USDCUSDT&limit=500
-  const url = `https://api.bybit.com/v5/market/orderbook?category=spot&symbol=USDCUSDT&limit=${limit}`;
+  const url = `https://api.bybit.com/v5/market/orderbook?category=spot&symbol=${symbol}&limit=${limit}`;
 
   try {
-    console.log('[Bybit] Fetching depth data from api.bybit.com...');
-    
+    log('[Bybit] Fetching depth data from api.bybit.com...');
+
     await rateLimiter.waitForSlot();
-    
+
     const response = await axiosInstance.get<BybitDepthResponse>(url);
     const data = response.data;
-    
+
     if (data.retCode !== 0) {
-      console.error(`[Bybit] API error: ${data.retMsg}`);
+      error(`[Bybit] API error: ${data.retMsg}`);
       throw new Error(`Bybit API error: ${data.retMsg}`);
     }
 
     const bids = data.result.b;
     const asks = data.result.a;
-    
+
     if (!Array.isArray(bids) || !Array.isArray(asks) || bids.length === 0 || asks.length === 0) {
-      console.error('[Bybit] Empty orderbook for USDCUSDT');
+      error('[Bybit] Empty orderbook for USDCUSDT');
       throw new Error('Bybit returned empty orderbook for USDCUSDT');
     }
 
-    console.log(`[Bybit] ✓ Success - bids: ${bids.length}, asks: ${asks.length}, best bid: ${bids[0][0]}`);
+    log(`[Bybit] ✓ Success - bids: ${bids.length}, asks: ${asks.length}, best bid: ${bids[0][0]}`);
     return { bids, asks };
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const message = error.response?.data || error.message;
-      console.error(`[Bybit] Axios error: ${error.code || 'UNKNOWN'}, status: ${error.response?.status || 'N/A'}, message:`, message);
-      throw new Error(`Bybit error: ${error.message}`);
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const message = err.response?.data || err.message;
+      error(`[Bybit] Axios error: ${err.code || 'UNKNOWN'}, status: ${err.response?.status || 'N/A'}, message:`, message);
+      throw new Error(`Bybit error: ${err.message}`);
     }
-    console.error('[Bybit] Unexpected error:', error instanceof Error ? error.message : 'Unknown error');
-    throw error;
+    error('[Bybit] Unexpected error:', err instanceof Error ? err.message : 'Unknown error');
+    throw err;
   }
 }
 
@@ -123,9 +127,9 @@ function simulateBuyBaseWithQuote(quoteAmount: number, asks: Array<[string, stri
   return { baseOut, fullyFilled: remainingQuote <= 1e-8 };
 }
 
-export async function getBybitSwapData(amounts: number[]): Promise<ChainSwapData[]> {
+export async function getBybitSwapData(amounts: number[], symbol: string = 'USDCUSDT'): Promise<ChainSwapData[]> {
   try {
-    const depth = await getBybitUsdcUsdtDepth(500);
+    const depth = await getBybitUsdcUsdtDepth(500, symbol);
 
     return amounts.map(amount => {
       const usdcToUsdtSim = simulateSellBaseForQuote(amount, depth.bids);
@@ -144,18 +148,34 @@ export async function getBybitSwapData(amounts: number[]): Promise<ChainSwapData
           output: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
           outputUsd: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
           ...(usdcToUsdtSim.fullyFilled ? {} : { error: 'Insufficient Bybit bid liquidity to fill market sell' }),
+          route: { type: 'cex', note: 'Orderbook depth simulation' }
         },
         usdtToUsdc: {
           input: amount,
           output: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
           outputUsd: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
           ...(usdtToUsdcSim.fullyFilled ? {} : { error: 'Insufficient Bybit ask liquidity to fill market buy' }),
+          route: { type: 'cex', note: 'Orderbook depth simulation' }
+        },
+        tokenAToB: {
+          input: amount,
+          output: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
+          outputUsd: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
+          ...(usdcToUsdtSim.fullyFilled ? {} : { error: 'Insufficient Bybit bid liquidity to fill market sell' }),
+          route: { type: 'cex', note: 'Orderbook depth simulation' }
+        },
+        tokenBToA: {
+          input: amount,
+          output: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
+          outputUsd: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
+          ...(usdtToUsdcSim.fullyFilled ? {} : { error: 'Insufficient Bybit ask liquidity to fill market buy' }),
+          route: { type: 'cex', note: 'Orderbook depth simulation' }
         },
       };
     });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown Bybit error';
-    console.error('[Bybit] Error fetching swap data:', message);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown Bybit error';
+    error('[Bybit] Error fetching swap data:', message);
 
     return amounts.map(amount => ({
       chain: 'Bybit',
@@ -167,12 +187,28 @@ export async function getBybitSwapData(amounts: number[]): Promise<ChainSwapData
         output: null,
         outputUsd: null,
         error: message,
+        route: { type: 'cex', note: 'Orderbook depth simulation' }
       },
       usdtToUsdc: {
         input: amount,
         output: null,
         outputUsd: null,
         error: message,
+        route: { type: 'cex', note: 'Orderbook depth simulation' }
+      },
+      tokenAToB: {
+        input: amount,
+        output: null,
+        outputUsd: null,
+        error: message,
+        route: { type: 'cex', note: 'Orderbook depth simulation' }
+      },
+      tokenBToA: {
+        input: amount,
+        output: null,
+        outputUsd: null,
+        error: message,
+        route: { type: 'cex', note: 'Orderbook depth simulation' }
       },
     }));
   }

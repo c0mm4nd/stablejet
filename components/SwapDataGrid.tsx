@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { SwapDataResponse } from '@/lib/types';
-import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
+import { HistoryDataPoint } from '@/lib/history';
 import Header from './Header';
-import HistoryChartsView from './HistoryChartsView';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
 import SettingsModal from './SettingsModal';
+import QuotesTable from './QuotesTable';
+import ArbitrageDashboard from './ArbitrageDashboard';
 
 interface HistoryResponse {
   success: boolean;
@@ -22,7 +22,7 @@ interface SwapDataGridProps {
 }
 
 export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
-  const { clientRefreshInterval, updateSelectedPair } = useConfig();
+  const { clientRefreshInterval, updateSelectedPair, pairs, isLoadingConfig } = useConfig();
   const [history, setHistory] = useState<HistoryDataPoint[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [timestamp, setTimestamp] = useState<string | null>(null);
@@ -30,8 +30,13 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
+  const [activeTab, setActiveTab] = useState<'quotes' | 'arbitrage'>('quotes');
+  const [arbitrageMode, setArbitrageMode] = useState<'roundtrip' | 'triangular'>('roundtrip');
+
+  const currentPairConfig = pairs[pairId];
+  const amounts = currentPairConfig?.amounts || [];
+
   const buildApiUrl = (path: string, query?: Record<string, string | number | boolean | undefined>) => {
-    // Always use a no-trailing-slash form for API routes
     const cleanPath = path.endsWith('/') ? path.slice(0, -1) : path;
     const params = new URLSearchParams();
     if (query) {
@@ -46,36 +51,41 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
 
   const fetchData = useCallback(async () => {
     try {
-      // 只获取历史数据（数据由服务器后台任务定期更新）
+      const includeAllPairs = activeTab === 'arbitrage' && arbitrageMode === 'triangular';
       const historyResponse = await fetch(
-        buildApiUrl('/api/history', { hours: 24, pair: pairId, _ts: Date.now() }),
+        buildApiUrl('/api/history', { hours: 24, pair: includeAllPairs ? undefined : pairId, _ts: Date.now() }),
         { cache: 'no-store' }
       );
       const historyResult: HistoryResponse = await historyResponse.json();
 
       if (historyResult.success && historyResult.data.length > 0) {
         setHistory(historyResult.data);
-        // 使用最新数据点的时间戳
         setTimestamp(historyResult.data[historyResult.data.length - 1].timestamp);
         setError(null);
       } else {
-        // 如果没有数据，清空历史数据
         setHistory([]);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : '未知错误');
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setIsLoading(false);
       setCountdown(clientRefreshInterval);
     }
-  }, [clientRefreshInterval, pairId]);
+  }, [clientRefreshInterval, pairId, activeTab, arbitrageMode]);
 
-  // 客户端定期刷新显示的数据
   useEffect(() => {
-    // Reset loading state when pair changes
+    const nextActivePair = activeTab === 'arbitrage' && arbitrageMode === 'triangular'
+      ? 'all'
+      : pairId;
+
+    fetch('/api/background/active-pair', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pairId: nextActivePair })
+    }).catch(() => {});
+
     setIsLoading(true);
     setHistory([]);
-    
     fetchData();
 
     const fetchInterval = setInterval(fetchData, clientRefreshInterval * 1000);
@@ -87,48 +97,105 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
       clearInterval(fetchInterval);
       clearInterval(countdownInterval);
     };
-  }, [clientRefreshInterval, fetchData, pairId]);
+  }, [clientRefreshInterval, fetchData, pairId, activeTab, arbitrageMode]);
+
+  if (isLoadingConfig) {
+    return <div className="min-h-screen flex items-center justify-center"><LoadingSpinner /></div>;
+  }
+
+  if (!currentPairConfig) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
+        <div className="text-xl font-semibold text-gray-700">Trading Pair Not Found</div>
+        <button onClick={() => setIsSettingsOpen(true)} className="text-blue-600 hover:underline">Open Settings</button>
+        <SettingsModal
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header 固定在顶部 */}
-      <Header 
+    <div className="min-h-screen bg-gray-50/50">
+      <Header
         countdown={countdown}
         selectedPair={pairId}
         onPairChange={updateSelectedPair}
         onSettingsClick={() => setIsSettingsOpen(true)}
       />
 
-      {/* 主内容区域 */}
       <main className="max-w-[1920px] mx-auto px-6 py-8">
+        {/* Tabs */}
+        <div className="flex justify-center mb-8">
+          <div className="bg-white p-1 rounded-xl shadow-sm border border-gray-200 inline-flex">
+            <button
+              onClick={() => setActiveTab('quotes')}
+              className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'quotes'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+                }`}
+            >
+              Quotes
+            </button>
+            <button
+              onClick={() => setActiveTab('arbitrage')}
+              className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'arbitrage'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+                }`}
+            >
+              Arbitrage
+            </button>
+          </div>
+        </div>
+
         {isLoading && history.length === 0 ? (
           <LoadingSpinner />
         ) : error ? (
           <ErrorMessage message={error} />
         ) : history.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm p-12 text-center border border-gray-100">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <p className="text-gray-700 text-lg font-medium mb-2">等待数据收集</p>
-            <p className="text-gray-500">当前交易对暂无历史数据，数据每 10 秒更新一次</p>
+          <div className="text-center py-12 text-gray-500 bg-white rounded-2xl shadow-sm border border-gray-100">
+            Waiting for data...
           </div>
         ) : (
-          <>
-            <HistoryChartsView history={history} pairId={pairId} />
+          <div className="space-y-12">
+            {amounts.map((amount) => (
+              <div key={amount} className="space-y-4">
+                {/* Amount Header if multiple amounts exist, or just clear separation */}
+                {amounts.length > 0 && (
+                  <div className="flex items-center gap-4">
+                    <hr className="flex-1 border-gray-200" />
+                    <span className="text-sm font-bold text-gray-400 uppercase tracking-wider">
+                      Amount: {amount.toLocaleString()}
+                    </span>
+                    <hr className="flex-1 border-gray-200" />
+                  </div>
+                )}
+
+                {activeTab === 'quotes' && (
+                  <QuotesTable history={history} amount={amount} pairId={pairId} />
+                )}
+                {activeTab === 'arbitrage' && (
+                  <ArbitrageDashboard
+                    history={history}
+                    amount={amount}
+                    pairId={pairId}
+                    onModeChange={setArbitrageMode}
+                  />
+                )}
+              </div>
+            ))}
 
             {timestamp && (
               <div className="text-center text-gray-400 mt-8 text-sm">
-                最后更新: {new Date(timestamp).toLocaleString('zh-CN')} | 数据点: {history.length}
+                Last Update: {new Date(timestamp).toLocaleString()} | Data Points: {history.length}
               </div>
             )}
-          </>
+          </div>
         )}
       </main>
 
-      {/* 设置模态框 */}
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}

@@ -3,7 +3,7 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { HistoryDataPoint } from '@/lib/history';
 import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, filterOutliers } from '@/lib/utils';
-import { DEFAULT_TRADING_PAIR, TRADING_PAIRS } from '@/lib/config';
+import { useConfig } from '@/contexts/ConfigContext';
 
 interface SpreadLineChartProps {
   history: HistoryDataPoint[];
@@ -138,8 +138,14 @@ const CustomTooltip = ({ active, payload, label, pairConfig }: any) => {
   );
 };
 
-export default function SpreadLineChart({ history, amount, pairId = DEFAULT_TRADING_PAIR }: SpreadLineChartProps) {
-  const pair = TRADING_PAIRS[pairId] || TRADING_PAIRS[DEFAULT_TRADING_PAIR];
+// ... (existing constants)
+
+export default function SpreadLineChart({ history, amount, pairId }: SpreadLineChartProps) {
+  const { pairs } = useConfig();
+  const pair = pairId ? pairs[pairId] : undefined;
+
+  if (!pair) return null;
+
   const tokenAShort = pair.tokenA;
   const tokenBShort = pair.tokenB;
 
@@ -175,7 +181,7 @@ export default function SpreadLineChart({ history, amount, pairId = DEFAULT_TRAD
     )
   ).sort();
 
-  const sourceSuffix = (source: string) => (source === 'openocean' ? 'OO' : 'KS');
+  const sourceSuffix = (source: string) => (source === 'nordstern' ? 'NS' : 'KS');
   const splitBase = (base: string) => {
     const [chainKey, dataSource] = base.split('@');
     return { chainKey, dataSource: dataSource || 'kyberswap' };
@@ -231,13 +237,13 @@ export default function SpreadLineChart({ history, amount, pairId = DEFAULT_TRAD
       .filter(item => item.amount === amount)
       .forEach(item => {
         const base = `${item.chainKey}@${item.dataSource || 'kyberswap'}`;
-        
+
         // 使用通用字段或回退到 USDC/USDT 字段
         const tokenAToB = item.tokenAToB || item.usdcToUsdt;
         const tokenBToA = item.tokenBToA || item.usdtToUsdc;
 
         const baseline = baselineByTimestamp[point.timestamp] || { aToB: null, bToA: null };
-        
+
         // TokenA → TokenB
         const tokenAToBRate = calculateImpliedRate(tokenAToB.input, tokenAToB.output);
         const tokenAToBSpread = calculateRateDeviationBps(tokenAToBRate, baseline.aToB);

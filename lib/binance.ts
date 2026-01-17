@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { log, error } from './logger';
 import { ChainSwapData } from './types';
 
 interface BinanceDepthResponse {
@@ -27,15 +28,15 @@ class BinanceRateLimiter {
   async waitForSlot(): Promise<void> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     if (timeSinceLastRequest < this.minInterval) {
       const waitTime = this.minInterval - timeSinceLastRequest;
       await delay(waitTime);
     }
-    
+
     this.lastRequestTime = Date.now();
   }
-  
+
   getStatus(): { rate: string } {
     return {
       rate: '1 req/1s (single request per cycle)'
@@ -43,37 +44,40 @@ class BinanceRateLimiter {
   }
 }
 
-const rateLimiter = new BinanceRateLimiter();
+const GLOBAL_RATE_LIMITER_KEY = Symbol.for('stablejet.binance.ratelimiter');
 
-async function getBinanceUsdcUsdtDepth(limit: number = 1000): Promise<BinanceDepthResponse> {
+const rateLimiter = (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] || new BinanceRateLimiter();
+if (process.env.NODE_ENV !== 'production') (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] = rateLimiter;
+
+async function getBinanceUsdcUsdtDepth(limit: number = 1000, symbol: string = 'USDCUSDT'): Promise<BinanceDepthResponse> {
   // 后台任务直接调用 Binance API（服务端）
   // axios 自动使用系统代理环境变量
-  const url = `https://api.binance.com/api/v3/depth?symbol=USDCUSDT&limit=${limit}`;
+  const url = `https://api.binance.com/api/v3/depth?symbol=${symbol}&limit=${limit}`;
 
   try {
-    console.log('[Binance] Fetching depth data from api.binance.com...');
-    
+    log(`[Binance] Fetching depth data for ${symbol} from api.binance.com...`);
+
     // 等待速率限制器允许
     await rateLimiter.waitForSlot();
-    
+
     const response = await axiosInstance.get<BinanceDepthResponse>(url);
     const data = response.data;
-    
+
     if (!Array.isArray(data.bids) || !Array.isArray(data.asks) || data.bids.length === 0 || data.asks.length === 0) {
-      console.error('[Binance] Empty orderbook for USDCUSDT');
+      error('[Binance] Empty orderbook for USDCUSDT');
       throw new Error('Binance returned empty orderbook for USDCUSDT');
     }
 
-    console.log(`[Binance] ✓ Success - bids: ${data.bids.length}, asks: ${data.asks.length}, best bid: ${data.bids[0][0]}`);
+    log(`[Binance] ✓ Success - bids: ${data.bids.length}, asks: ${data.asks.length}, best bid: ${data.bids[0][0]}`);
     return data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const message = error.response?.data || error.message;
-      console.error(`[Binance] Axios error: ${error.code || 'UNKNOWN'}, status: ${error.response?.status || 'N/A'}, message:`, message);
-      throw new Error(`Binance error: ${error.message}`);
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const message = err.response?.data || err.message;
+      error(`[Binance] Axios error: ${err.code || 'UNKNOWN'}, status: ${err.response?.status || 'N/A'}, message:`, message);
+      throw new Error(`Binance error: ${err.message}`);
     }
-    console.error('[Binance] Unexpected error:', error instanceof Error ? error.message : 'Unknown error');
-    throw error;
+    error('[Binance] Unexpected error:', err instanceof Error ? err.message : 'Unknown error');
+    throw err;
   }
 }
 
@@ -116,10 +120,10 @@ function simulateBuyBaseWithQuote(quoteAmount: number, asks: Array<[string, stri
   return { baseOut, fullyFilled: remainingQuote <= 1e-8 };
 }
 
-export async function getBinanceSwapData(amounts: number[]): Promise<ChainSwapData[]> {
+export async function getBinanceSwapData(amounts: number[], symbol: string = 'USDCUSDT'): Promise<ChainSwapData[]> {
   try {
     // Use depth to approximate market-order execution (assume you eat the book).
-    const depth = await getBinanceUsdcUsdtDepth(1000);
+    const depth = await getBinanceUsdcUsdtDepth(1000, symbol);
 
     return amounts.map(amount => {
       const usdcToUsdtSim = simulateSellBaseForQuote(amount, depth.bids);
@@ -138,18 +142,34 @@ export async function getBinanceSwapData(amounts: number[]): Promise<ChainSwapDa
           output: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
           outputUsd: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
           ...(usdcToUsdtSim.fullyFilled ? {} : { error: 'Insufficient Binance bid liquidity to fill market sell' }),
+          route: { type: 'cex', note: 'Orderbook depth simulation' }
         },
         usdtToUsdc: {
           input: amount,
           output: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
           outputUsd: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
           ...(usdtToUsdcSim.fullyFilled ? {} : { error: 'Insufficient Binance ask liquidity to fill market buy' }),
+          route: { type: 'cex', note: 'Orderbook depth simulation' }
+        },
+        tokenAToB: {
+          input: amount,
+          output: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
+          outputUsd: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
+          ...(usdcToUsdtSim.fullyFilled ? {} : { error: 'Insufficient Binance bid liquidity to fill market sell' }),
+          route: { type: 'cex', note: 'Orderbook depth simulation' }
+        },
+        tokenBToA: {
+          input: amount,
+          output: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
+          outputUsd: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
+          ...(usdtToUsdcSim.fullyFilled ? {} : { error: 'Insufficient Binance ask liquidity to fill market buy' }),
+          route: { type: 'cex', note: 'Orderbook depth simulation' }
         },
       };
     });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown Binance error';
-    console.error('[Binance] Error fetching swap data:', message);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown Binance error';
+    error('[Binance] Error fetching swap data:', message);
 
     return amounts.map(amount => ({
       chain: 'Binance',
@@ -161,12 +181,28 @@ export async function getBinanceSwapData(amounts: number[]): Promise<ChainSwapDa
         output: null,
         outputUsd: null,
         error: message,
+        route: { type: 'cex', note: 'Orderbook depth simulation' }
       },
       usdtToUsdc: {
         input: amount,
         output: null,
         outputUsd: null,
         error: message,
+        route: { type: 'cex', note: 'Orderbook depth simulation' }
+      },
+      tokenAToB: {
+        input: amount,
+        output: null,
+        outputUsd: null,
+        error: message,
+        route: { type: 'cex', note: 'Orderbook depth simulation' }
+      },
+      tokenBToA: {
+        input: amount,
+        output: null,
+        outputUsd: null,
+        error: message,
+        route: { type: 'cex', note: 'Orderbook depth simulation' }
       },
     }));
   }

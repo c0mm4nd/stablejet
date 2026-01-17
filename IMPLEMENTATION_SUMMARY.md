@@ -10,7 +10,7 @@ StableJet 是一个实时监控 USDC/USDT 跨链套利机会的应用，支持�
 
 ### 1. 多数据源支持
 - ✅ **KyberSwap** - 主要 DEX 聚合器（14个链）
-- ✅ **OpenOcean** - 备用聚合器（5个链）
+- ✅ **Nordstern** - 备用聚合器（按需配置）
 - ✅ **Binance** - CEX 价格参考
 
 ### 2. 支持的区块链（19个）
@@ -37,7 +37,7 @@ StableJet 是一个实时监控 USDC/USDT 跨链套利机会的应用，支持�
 
 **修改的文件**：
 - `lib/binance.ts`
-- `lib/openocean.ts`
+- `lib/nordstern.ts`
 - `lib/kyberswap.ts`
 - `app/api/binance/route.ts`
 
@@ -46,7 +46,7 @@ StableJet 是一个实时监控 USDC/USDT 跨链套利机会的应用，支持�
 | 数据源 | 速率限制 | 算法 |
 |--------|---------|------|
 | KyberSwap | 10 RPS (100 req/10s) | 滑动窗口 |
-| OpenOcean | 2 RPS (20 req/10s) | 滑动窗口 |
+| Nordstern | 0.5 RPS (5 req/10s) | 滑动窗口 |
 | Binance | 1 req/cycle | 固定间隔 |
 
 **特点**：
@@ -76,7 +76,7 @@ stablejet/
 │   └── page.tsx
 ├── lib/
 │   ├── binance.ts               # Binance 数据源（速率限制）
-│   ├── openocean.ts             # OpenOcean 数据源（速率限制）
+│   ├── nordstern.ts             # Nordstern 数据源（速率限制）
 │   ├── kyberswap.ts             # KyberSwap 数据源（速率限制）
 │   ├── background-fetcher.ts    # 后台数据获取（每10秒）
 │   ├── config.ts                # 链和代币配置
@@ -158,8 +158,8 @@ tail -f /tmp/stablejet-ratelimit.log | grep "completed" -A 15
 [Binance] Fetching depth data from api.binance.com...
 [Binance] ✓ Success - bids: 496, asks: 374, best bid: 1.00020000
 
-[OpenOcean] Requesting quote for fantom (rate: 3/20 @ 2 RPS)
-[OpenOcean] ✓ Success for fantom: 13957737200 out
+[Nordstern] Requesting quote for 8118 (rate: 3/5 @ 0.5 RPS)
+[Nordstern] ✓ Success for 8118: 13957737200 out
 
 [BackgroundFetcher] ✓ Data fetch completed
   Total requests: 168
@@ -168,12 +168,12 @@ tail -f /tmp/stablejet-ratelimit.log | grep "completed" -A 15
 
   By data source:
     kyberswap: 112/120 (93.3%)
-    openocean: 30/40 (75.0%)
+    nordstern: 30/40 (75.0%)
     binance: 8/8 (100%)
 
   Rate limiters:
     KyberSwap: 87/100 @ 10 RPS (100 req/10s)
-    OpenOcean: 18/20 @ 2 RPS (20 req/10s)
+    Nordstern: 2/5 @ 0.5 RPS (5 req/10s)
     Binance: 1 req/1s (single request per cycle)
 ======================================================================
 ```
@@ -184,12 +184,12 @@ tail -f /tmp/stablejet-ratelimit.log | grep "completed" -A 15
 
 ### 修改速率限制
 
-**OpenOcean** (`lib/openocean.ts`):
+**Nordstern** (`lib/nordstern.ts`):
 ```typescript
-class OpenOceanRateLimiter {
-  private readonly maxRequests = 20;      // 10秒内最多请求数
+class NordsternRateLimiter {
+  private readonly maxRequests = 5;       // 10秒内最多请求数
   private readonly windowMs = 10000;      // 时间窗口
-  private readonly minInterval = 500;     // 最小间隔 (2 RPS)
+  private readonly minInterval = 2000;    // 最小间隔 (0.5 RPS)
 }
 ```
 
@@ -306,7 +306,7 @@ npm run test:report
 
 ## 🐛 故障排除
 
-### OpenOcean 429 错误
+### Nordstern 429 错误
 - 原因：超过速率限制（2 RPS）
 - 解决：等待1小时或增加请求间隔
 

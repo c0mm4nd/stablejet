@@ -1,73 +1,121 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { ChainConfig } from '@/lib/types';
-import { USDT_USDC_CHAINS as DEFAULT_CHAINS, AMOUNTS as DEFAULT_AMOUNTS, DEFAULT_TRADING_PAIR } from '@/lib/config';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { ChainAppConfig, TradingPairConfig, ConfigData } from '@/lib/types';
 
 const DEFAULT_CLIENT_REFRESH_INTERVAL = 10; // 默认客户端刷新间隔10秒
 
 interface ConfigContextType {
-  chains: Record<string, ChainConfig>;
-  amounts: number[];
+  chains: Record<string, ChainAppConfig>;
+  pairs: Record<string, TradingPairConfig>;
   clientRefreshInterval: number; // 客户端刷新显示的间隔（秒）
   selectedPair: string; // 当前选中的交易对
-  updateChains: (chains: Record<string, ChainConfig>) => void;
-  updateAmounts: (amounts: number[]) => void;
+  updateChains: (chains: Record<string, ChainAppConfig>) => Promise<void>;
+  updatePairs: (pairs: Record<string, TradingPairConfig>) => Promise<void>;
   updateClientRefreshInterval: (interval: number) => void;
   updateSelectedPair: (pairId: string) => void;
   resetToDefaults: () => void;
+  isLoadingConfig: boolean;
 }
 
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 
 export function ConfigProvider({ children }: { children: ReactNode }) {
-  const [chains, setChains] = useState<Record<string, ChainConfig>>(DEFAULT_CHAINS);
-  const [amounts, setAmounts] = useState<number[]>(DEFAULT_AMOUNTS);
+  const [chains, setChains] = useState<Record<string, ChainAppConfig>>({});
+  const [pairs, setPairs] = useState<Record<string, TradingPairConfig>>({});
   const [clientRefreshInterval, setClientRefreshInterval] = useState<number>(DEFAULT_CLIENT_REFRESH_INTERVAL);
-  const [selectedPair, setSelectedPair] = useState<string>(DEFAULT_TRADING_PAIR);
+  const [selectedPair, setSelectedPair] = useState<string>('usdc_usdt');
+
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoadingConfig, setIsLoadingConfig] = useState(true);
 
-  // 从 localStorage 加载配置
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const savedChains = localStorage.getItem('stablejet_chains');
-        const savedAmounts = localStorage.getItem('stablejet_amounts');
-        const savedClientRefreshInterval = localStorage.getItem('stablejet_client_refresh_interval');
-        const savedSelectedPair = localStorage.getItem('stablejet_selected_pair');
-
-        if (savedChains) {
-          setChains(JSON.parse(savedChains));
-        }
-        if (savedAmounts) {
-          setAmounts(JSON.parse(savedAmounts));
-        }
-        if (savedClientRefreshInterval) {
-          setClientRefreshInterval(JSON.parse(savedClientRefreshInterval));
-        }
-        if (savedSelectedPair) {
-          setSelectedPair(savedSelectedPair);
-        }
-      } catch (error) {
-        console.error('Failed to load config from localStorage:', error);
-      } finally {
-        setIsLoaded(true);
+  // Fetch Config from API
+  const fetchConfig = useCallback(async () => {
+    try {
+      setIsLoadingConfig(true);
+      const res = await fetch('/api/config');
+      if (res.ok) {
+        const data: ConfigData = await res.json();
+        setChains(data.chains);
+        setPairs(data.pairs);
+      } else {
+        console.error('Failed to fetch config');
       }
+    } catch (err) {
+      console.error('Error fetching config:', err);
+    } finally {
+      setIsLoadingConfig(false);
     }
   }, []);
 
-  // 保存配置到 localStorage
-  const updateChains = (newChains: Record<string, ChainConfig>) => {
-    setChains(newChains);
+  // Initial Load
+  useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('stablejet_chains', JSON.stringify(newChains));
+      const loadLocalSettings = () => {
+        try {
+          const savedClientRefreshInterval = localStorage.getItem('stablejet_client_refresh_interval');
+          const savedSelectedPair = localStorage.getItem('stablejet_selected_pair');
+
+          if (savedClientRefreshInterval) {
+            setClientRefreshInterval(JSON.parse(savedClientRefreshInterval));
+          }
+          if (savedSelectedPair) {
+            setSelectedPair(savedSelectedPair);
+            // Best-effort sync for server-side background fetcher
+            fetch('/api/background/active-pair', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ pairId: savedSelectedPair })
+            }).catch(() => {});
+          }
+        } catch (error) {
+          console.error('Failed to load local settings:', error);
+        }
+      };
+
+      loadLocalSettings();
+      fetchConfig().then(() => setIsLoaded(true));
+    }
+  }, [fetchConfig]);
+
+  // Update Chains (Persist to Server)
+  const updateChains = async (newChains: Record<string, ChainAppConfig>) => {
+    setChains(newChains);
+    try {
+      const res = await fetch('/api/config');
+      const currentConfig: ConfigData = await res.json();
+
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...currentConfig,
+          chains: newChains
+        })
+      });
+    } catch (err) {
+      console.error('Failed to save chains:', err);
+      fetchConfig();
     }
   };
 
-  const updateAmounts = (newAmounts: number[]) => {
-    setAmounts(newAmounts);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('stablejet_amounts', JSON.stringify(newAmounts));
+  const updatePairs = async (newPairs: Record<string, TradingPairConfig>) => {
+    setPairs(newPairs);
+    try {
+      const res = await fetch('/api/config');
+      const currentConfig: ConfigData = await res.json();
+
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...currentConfig,
+          pairs: newPairs
+        })
+      });
+    } catch (err) {
+      console.error('Failed to save pairs:', err);
+      fetchConfig();
     }
   };
 
@@ -83,38 +131,32 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     if (typeof window !== 'undefined') {
       localStorage.setItem('stablejet_selected_pair', pairId);
     }
+    fetch('/api/background/active-pair', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pairId })
+    }).catch(() => {});
   };
 
   const resetToDefaults = () => {
-    setChains(DEFAULT_CHAINS);
-    setAmounts(DEFAULT_AMOUNTS);
-    setClientRefreshInterval(DEFAULT_CLIENT_REFRESH_INTERVAL);
-    setSelectedPair(DEFAULT_TRADING_PAIR);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('stablejet_chains');
-      localStorage.removeItem('stablejet_amounts');
-      localStorage.removeItem('stablejet_client_refresh_interval');
-      localStorage.removeItem('stablejet_selected_pair');
-    }
+    alert("Reset feature is disabled in dynamic mode.");
   };
 
-  // 等待加载完成后再渲染子组件，避免闪烁
-  if (!isLoaded) {
-    return null;
-  }
+  if (!isLoaded) return null;
 
   return (
     <ConfigContext.Provider
       value={{
         chains,
-        amounts,
+        pairs,
         clientRefreshInterval,
         selectedPair,
         updateChains,
-        updateAmounts,
+        updatePairs,
         updateClientRefreshInterval,
         updateSelectedPair,
         resetToDefaults,
+        isLoadingConfig,
       }}
     >
       {children}

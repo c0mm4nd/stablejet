@@ -1,177 +1,247 @@
-import { getAllSwapData, getSwapDataForPair } from './kyberswap';
+import { log, error } from './logger';
+import { getSwapDataForPair, getKyberSwapRateLimiterStatus } from './kyberswap';
 import { saveDataPoint } from './history';
-import { getKyberSwapRateLimiterStatus } from './kyberswap';
-import { getOpenOceanRateLimiterStatus } from './openocean';
+import { getNordsternRateLimiterStatus } from './nordstern';
 import { getBinanceRateLimiterStatus } from './binance';
-import { TRADING_PAIRS } from './config';
+import { getConfig } from './server-config';
+
+type FetcherState = {
+  intervalId: NodeJS.Timeout | null;
+  fetchInterval: number;
+  isFetching: boolean;
+  lastFetchTime: number;
+  fetchPromise: Promise<void> | null;
+  startInProgress: boolean;
+  activePairId: string | null;
+};
 
 class BackgroundFetcher {
-  private intervalId: NodeJS.Timeout | null = null;
-  private fetchInterval: number = 10000; // 默认10秒
-  private isFetching: boolean = false;
-  private lastFetchTime: number = 0;
+  constructor(private state: FetcherState) {}
 
   start(intervalSeconds: number = 10) {
-    if (this.intervalId) {
-      console.log('Background fetcher is already running');
+    if (this.state.intervalId || this.state.startInProgress) {
+      log('Background fetcher is already running');
       return;
     }
 
-    this.fetchInterval = intervalSeconds * 1000;
-    console.log(`Starting background fetcher with interval: ${intervalSeconds}s`);
+    this.state.startInProgress = true;
+
+    this.state.fetchInterval = intervalSeconds * 1000;
+    log(`Starting background fetcher with interval: ${intervalSeconds}s`);
 
     // 立即执行一次
     this.fetchData();
 
     // 然后定期执行
-    this.intervalId = setInterval(() => {
+    this.state.intervalId = setInterval(() => {
       this.fetchData();
-    }, this.fetchInterval);
+    }, this.state.fetchInterval);
+
+    this.state.startInProgress = false;
   }
 
   stop() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-      console.log('Background fetcher stopped');
+    if (this.state.intervalId) {
+      clearInterval(this.state.intervalId);
+      this.state.intervalId = null;
+      log('Background fetcher stopped');
     }
   }
 
   updateInterval(intervalSeconds: number) {
-    console.log(`Updating background fetcher interval to: ${intervalSeconds}s`);
-    this.fetchInterval = intervalSeconds * 1000;
+    log(`Updating background fetcher interval to: ${intervalSeconds}s`);
+    this.state.fetchInterval = intervalSeconds * 1000;
 
     // 重启定时器
     this.stop();
     this.start(intervalSeconds);
   }
 
+  setActivePair(pairId: string | null) {
+    if (pairId === this.state.activePairId) return;
+    this.state.activePairId = pairId;
+    log(`[BackgroundFetcher] Active pair set to: ${pairId || 'none'}`);
+  }
+
+  getActivePair() {
+    return this.state.activePairId;
+  }
+
   async fetchData() {
-    // 防止重复请求
-    if (this.isFetching) {
-      console.log('[BackgroundFetcher] Already fetching data, skipping...');
-      return;
+    if (this.state.fetchPromise) {
+      return this.state.fetchPromise;
     }
 
     // 防抖：如果距离上次请求不到1秒，跳过
     const now = Date.now();
-    if (now - this.lastFetchTime < 1000) {
-      console.log('[BackgroundFetcher] Fetched too recently, skipping...');
+    if (now - this.state.lastFetchTime < 1000) {
+      // log('[BackgroundFetcher] Fetched too recently, skipping...');
       return;
     }
 
-    this.isFetching = true;
-    this.lastFetchTime = now;
+    this.state.isFetching = true;
+    this.state.lastFetchTime = now;
+
+    const fetchPromise = (async () => {
+      try {
+        log(`${'='.repeat(70)}`);
+        log(`[BackgroundFetcher] Starting data fetch...`);
+        log(`${'='.repeat(70)}`);
+
+        // 读取最新配置
+        const config = getConfig();
+        if (!config) {
+          error('[BackgroundFetcher] Failed to load config');
+          return;
+        }
+
+        const activePairId = this.state.activePairId;
+        if (!activePairId) {
+          log('[BackgroundFetcher] No active pair set, skipping fetch');
+          return;
+        }
+
+        const pairIds = activePairId === 'all'
+          ? Object.keys(config.pairs)
+          : (config.pairs[activePairId] ? [activePairId] : []);
+        if (pairIds.length === 0) {
+          log(`[BackgroundFetcher] Active pair not found in config: ${activePairId}`);
+          return;
+        }
+
+        log(`[BackgroundFetcher] Fetching data for ${pairIds.length} trading pairs: ${pairIds.join(', ')}`);
+
+        for (const pairId of pairIds) {
+          try {
+            log(`[BackgroundFetcher] === Fetching ${pairId} ===`);
+            const pairConfig = config.pairs[pairId];
+
+            // Pass full config to usage logic, or pass relevant parts
+            // getSwapDataForPair will now need to accept TradingPairConfig and the Global Chain Config map
+            const data = await getSwapDataForPair(pairConfig, config.chains);
+
+            // 统计成功和失败
+            let successCount = 0;
+            let failureCount = 0;
+            const dataSourceStats: Record<string, { success: number; failed: number }> = {};
+
+            for (const item of data) {
+              const source = item.dataSource || 'kyberswap';
+              if (!dataSourceStats[source]) {
+                dataSourceStats[source] = { success: 0, failed: 0 };
+              }
+
+              // 检查通用字段
+              const hasTokenASuccess = item.tokenAToB?.output && item.tokenAToB.output > 0;
+              const hasTokenBSuccess = item.tokenBToA?.output && item.tokenBToA.output > 0;
+
+              if (hasTokenASuccess) {
+                dataSourceStats[source].success++;
+                successCount++;
+              } else {
+                dataSourceStats[source].failed++;
+                failureCount++;
+              }
+
+              if (hasTokenBSuccess) {
+                dataSourceStats[source].success++;
+                successCount++;
+              } else {
+                dataSourceStats[source].failed++;
+                failureCount++;
+              }
+            }
+
+            // 保存数据到历史记录
+            if (data.length > 0) {
+              saveDataPoint(data, pairId);
+              log(`[BackgroundFetcher] ✓ ${pairId}: Saved ${data.length} data points`);
+            }
+
+            // 打印统计信息
+            log(`[BackgroundFetcher] ${pairId} Statistics:`);
+            log(`  Total: ${successCount + failureCount} swap directions`);
+            log(`  Success: ${successCount}`);
+            log(`  Failed: ${failureCount}`);
+            log(`  By source:`);
+            for (const [source, stats] of Object.entries(dataSourceStats)) {
+              log(`    - ${source}: ${stats.success} success, ${stats.failed} failed`);
+            }
+          } catch (err) {
+            error(`[BackgroundFetcher] Error fetching ${pairId}:`, err);
+          }
+        }
+
+        log(`${'='.repeat(70)}`);
+        log(`[BackgroundFetcher] Data fetch completed for all pairs`);
+        log(`${'='.repeat(70)}\n`);
+
+        // 显示速率限制器状态
+        log('\n[BackgroundFetcher] Rate limiters:');
+        try {
+          const kyberStatus = getKyberSwapRateLimiterStatus();
+          log(`  KyberSwap: ${kyberStatus.current}/${kyberStatus.max} @ ${kyberStatus.rate}`);
+        } catch (e) { /* ignore */ }
+
+        try {
+          const nordsternStatus = getNordsternRateLimiterStatus();
+          log(`  Nordstern: ${nordsternStatus.current}/${nordsternStatus.max} @ ${nordsternStatus.rate}`);
+        } catch (e) { /* ignore */ }
+
+        try {
+          const binanceStatus = getBinanceRateLimiterStatus();
+          log(`  Binance: ${binanceStatus.rate}`);
+        } catch (e) { /* ignore */ }
+
+      } catch (err) {
+        error('\n[BackgroundFetcher] ✗ Error fetching data:', err instanceof Error ? err.message : 'Unknown error');
+      }
+    })();
+
+    this.state.fetchPromise = fetchPromise;
 
     try {
-      console.log(`\n${'='.repeat(70)}`);
-      console.log(`[BackgroundFetcher] [${new Date().toISOString()}] Starting data fetch...`);
-      console.log(`${'='.repeat(70)}`);
-      
-      // 获取所有交易对的数据
-      const allPairs = Object.keys(TRADING_PAIRS);
-      console.log(`[BackgroundFetcher] Fetching data for ${allPairs.length} trading pairs: ${allPairs.join(', ')}`);
-      
-      for (const pairId of allPairs) {
-        try {
-          console.log(`\n[BackgroundFetcher] === Fetching ${pairId} ===`);
-          const data = await getSwapDataForPair(pairId);
-          
-          // 统计成功和失败
-          let successCount = 0;
-          let failureCount = 0;
-          const dataSourceStats: Record<string, { success: number; failed: number }> = {};
-          
-          for (const item of data) {
-            const source = item.dataSource || 'kyberswap';
-            if (!dataSourceStats[source]) {
-              dataSourceStats[source] = { success: 0, failed: 0 };
-            }
-            
-            // 检查通用字段
-            const hasTokenASuccess = item.tokenAToB?.output !== null && item.tokenAToB?.output && item.tokenAToB.output > 0;
-            const hasTokenBSuccess = item.tokenBToA?.output !== null && item.tokenBToA?.output && item.tokenBToA.output > 0;
-            
-            if (hasTokenASuccess) {
-              dataSourceStats[source].success++;
-              successCount++;
-            } else {
-              dataSourceStats[source].failed++;
-              failureCount++;
-            }
-            
-            if (hasTokenBSuccess) {
-              dataSourceStats[source].success++;
-              successCount++;
-            } else {
-              dataSourceStats[source].failed++;
-              failureCount++;
-            }
-          }
-          
-          // 保存数据到历史记录
-          if (data.length > 0) {
-            saveDataPoint(data, pairId);
-            console.log(`[BackgroundFetcher] ✓ ${pairId}: Saved ${data.length} data points`);
-          }
-          
-          // 打印统计信息
-          console.log(`[BackgroundFetcher] ${pairId} Statistics:`);
-          console.log(`  Total: ${successCount + failureCount} swap directions`);
-          console.log(`  Success: ${successCount}`);
-          console.log(`  Failed: ${failureCount}`);
-          console.log(`  By source:`);
-          for (const [source, stats] of Object.entries(dataSourceStats)) {
-            console.log(`    - ${source}: ${stats.success} success, ${stats.failed} failed`);
-          }
-        } catch (error) {
-          console.error(`[BackgroundFetcher] Error fetching ${pairId}:`, error);
-        }
-      }
-      
-      console.log(`\n${'='.repeat(70)}`);
-      console.log(`[BackgroundFetcher] Data fetch completed for all pairs`);
-      console.log(`${'='.repeat(70)}\n`);
-      
-      // 显示速率限制器状态
-      console.log('\n[BackgroundFetcher] Rate limiters:');
-      try {
-        const kyberStatus = getKyberSwapRateLimiterStatus();
-        console.log(`  KyberSwap: ${kyberStatus.current}/${kyberStatus.max} @ ${kyberStatus.rate}`);
-      } catch (e) { /* ignore */ }
-      
-      try {
-        const openoceanStatus = getOpenOceanRateLimiterStatus();
-        console.log(`  OpenOcean: ${openoceanStatus.current}/${openoceanStatus.max} @ ${openoceanStatus.rate}`);
-      } catch (e) { /* ignore */ }
-      
-      try {
-        const binanceStatus = getBinanceRateLimiterStatus();
-        console.log(`  Binance: ${binanceStatus.rate}`);
-      } catch (e) { /* ignore */ }
-      
-    } catch (error) {
-      console.error('\n[BackgroundFetcher] ✗ Error fetching data:', error instanceof Error ? error.message : 'Unknown error');
+      await fetchPromise;
     } finally {
-      this.isFetching = false;
+      this.state.fetchPromise = null;
+      this.state.isFetching = false;
     }
   }
 
   getStatus() {
     return {
-      isRunning: this.intervalId !== null,
-      isFetching: this.isFetching,
-      intervalSeconds: this.fetchInterval / 1000,
-      lastFetchTime: this.lastFetchTime ? new Date(this.lastFetchTime).toISOString() : null
+      isRunning: this.state.intervalId !== null,
+      isFetching: this.state.isFetching,
+      intervalSeconds: this.state.fetchInterval / 1000,
+      lastFetchTime: this.state.lastFetchTime ? new Date(this.state.lastFetchTime).toISOString() : null,
+      activePairId: this.state.activePairId
     };
   }
 }
 
 // 单例模式
-const backgroundFetcher = new BackgroundFetcher();
+const GLOBAL_FETCHER_KEY = Symbol.for('stablejet.backgroundFetcher');
+const GLOBAL_STATE_KEY = Symbol.for('stablejet.backgroundFetcher.state');
+
+const globalState: FetcherState = (globalThis as any)[GLOBAL_STATE_KEY] || {
+  intervalId: null,
+  fetchInterval: 10000,
+  isFetching: false,
+  lastFetchTime: 0,
+  fetchPromise: null,
+  startInProgress: false,
+  activePairId: null
+};
+
+const backgroundFetcher = (globalThis as any)[GLOBAL_FETCHER_KEY] || new BackgroundFetcher(globalState);
+
+(globalThis as any)[GLOBAL_FETCHER_KEY] = backgroundFetcher;
+(globalThis as any)[GLOBAL_STATE_KEY] = globalState;
 
 // 在开发环境中自动启动
 if (process.env.NODE_ENV === 'development' && process.env.DISABLE_BACKGROUND_FETCHER !== '1') {
+  // Use a small delay to allow initial server startup (and prevent race conditions if hot reloading frequently)
+  // or just start directly. The check inside start() prevents duplicates.
   backgroundFetcher.start(10);
 }
 

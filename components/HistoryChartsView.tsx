@@ -13,7 +13,9 @@ interface HistoryChartsViewProps {
 }
 
 export default function HistoryChartsView({ history, pairId }: HistoryChartsViewProps) {
-  const { amounts, chains } = useConfig();
+  const { pairs, chains } = useConfig();
+  const pair = pairs[pairId];
+  const amounts = pair ? pair.amounts : [];
   // 全局时间窗口状态（单位：分钟）
   const [timeWindow, setTimeWindow] = useState(10);
 
@@ -56,11 +58,10 @@ export default function HistoryChartsView({ history, pairId }: HistoryChartsView
             <button
               key={minutes}
               onClick={() => setTimeWindow(minutes)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                timeWindow === minutes
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${timeWindow === minutes
                   ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
                   : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-              }`}
+                }`}
             >
               {minutes < 60 ? `${minutes}分钟` : '1小时'}
             </button>

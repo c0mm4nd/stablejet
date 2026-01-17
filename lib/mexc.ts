@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { log, error } from './logger';
 import { ChainSwapData } from './types';
 
 interface MexcDepthResponse {
@@ -23,15 +24,15 @@ class MexcRateLimiter {
   async waitForSlot(): Promise<void> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     if (timeSinceLastRequest < this.minInterval) {
       const waitTime = this.minInterval - timeSinceLastRequest;
       await delay(waitTime);
     }
-    
+
     this.lastRequestTime = Date.now();
   }
-  
+
   getStatus(): { rate: string } {
     return {
       rate: '1 req/1s (single request per cycle)'
@@ -39,35 +40,38 @@ class MexcRateLimiter {
   }
 }
 
-const rateLimiter = new MexcRateLimiter();
+const GLOBAL_RATE_LIMITER_KEY = Symbol.for('stablejet.mexc.ratelimiter');
 
-async function getMexcUsdcUsdtDepth(limit: number = 200): Promise<MexcDepthResponse> {
+const rateLimiter = (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] || new MexcRateLimiter();
+if (process.env.NODE_ENV !== 'production') (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] = rateLimiter;
+
+async function getMexcUsdcUsdtDepth(limit: number = 200, symbol: string = 'USDCUSDT'): Promise<MexcDepthResponse> {
   // MEXC API v3: https://api.mexc.com/api/v3/depth?symbol=USDCUSDT&limit=200
-  const url = `https://api.mexc.com/api/v3/depth?symbol=USDCUSDT&limit=${limit}`;
+  const url = `https://api.mexc.com/api/v3/depth?symbol=${symbol}&limit=${limit}`;
 
   try {
-    console.log('[MEXC] Fetching depth data from api.mexc.com...');
-    
+    log('[MEXC] Fetching depth data from api.mexc.com...');
+
     await rateLimiter.waitForSlot();
-    
+
     const response = await axiosInstance.get<MexcDepthResponse>(url);
     const data = response.data;
-    
+
     if (!Array.isArray(data.bids) || !Array.isArray(data.asks) || data.bids.length === 0 || data.asks.length === 0) {
-      console.error('[MEXC] Empty orderbook for USDCUSDT');
+      error('[MEXC] Empty orderbook for USDCUSDT');
       throw new Error('MEXC returned empty orderbook for USDCUSDT');
     }
 
-    console.log(`[MEXC] ✓ Success - bids: ${data.bids.length}, asks: ${data.asks.length}, best bid: ${data.bids[0][0]}`);
+    log(`[MEXC] ✓ Success - bids: ${data.bids.length}, asks: ${data.asks.length}, best bid: ${data.bids[0][0]}`);
     return data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const message = error.response?.data || error.message;
-      console.error(`[MEXC] Axios error: ${error.code || 'UNKNOWN'}, status: ${error.response?.status || 'N/A'}, message:`, message);
-      throw new Error(`MEXC error: ${error.message}`);
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const message = err.response?.data || err.message;
+      error(`[MEXC] Axios error: ${err.code || 'UNKNOWN'}, status: ${err.response?.status || 'N/A'}, message:`, message);
+      throw new Error(`MEXC error: ${err.message}`);
     }
-    console.error('[MEXC] Unexpected error:', error instanceof Error ? error.message : 'Unknown error');
-    throw error;
+    error('[MEXC] Unexpected error:', err instanceof Error ? err.message : 'Unknown error');
+    throw err;
   }
 }
 
@@ -108,9 +112,9 @@ function simulateBuyBaseWithQuote(quoteAmount: number, asks: Array<[string, stri
   return { baseOut, fullyFilled: remainingQuote <= 1e-8 };
 }
 
-export async function getMexcSwapData(amounts: number[]): Promise<ChainSwapData[]> {
+export async function getMexcSwapData(amounts: number[], symbol: string = 'USDCUSDT'): Promise<ChainSwapData[]> {
   try {
-    const depth = await getMexcUsdcUsdtDepth(200);
+    const depth = await getMexcUsdcUsdtDepth(200, symbol);
 
     return amounts.map(amount => {
       const usdcToUsdtSim = simulateSellBaseForQuote(amount, depth.bids);
@@ -129,18 +133,34 @@ export async function getMexcSwapData(amounts: number[]): Promise<ChainSwapData[
           output: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
           outputUsd: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
           ...(usdcToUsdtSim.fullyFilled ? {} : { error: 'Insufficient MEXC bid liquidity to fill market sell' }),
+          route: { type: 'cex', note: 'Orderbook depth simulation' }
         },
         usdtToUsdc: {
           input: amount,
           output: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
           outputUsd: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
           ...(usdtToUsdcSim.fullyFilled ? {} : { error: 'Insufficient MEXC ask liquidity to fill market buy' }),
+          route: { type: 'cex', note: 'Orderbook depth simulation' }
+        },
+        tokenAToB: {
+          input: amount,
+          output: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
+          outputUsd: usdcToUsdtOut !== null && Number.isFinite(usdcToUsdtOut) ? usdcToUsdtOut : null,
+          ...(usdcToUsdtSim.fullyFilled ? {} : { error: 'Insufficient MEXC bid liquidity to fill market sell' }),
+          route: { type: 'cex', note: 'Orderbook depth simulation' }
+        },
+        tokenBToA: {
+          input: amount,
+          output: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
+          outputUsd: usdtToUsdcOut !== null && Number.isFinite(usdtToUsdcOut) ? usdtToUsdcOut : null,
+          ...(usdtToUsdcSim.fullyFilled ? {} : { error: 'Insufficient MEXC ask liquidity to fill market buy' }),
+          route: { type: 'cex', note: 'Orderbook depth simulation' }
         },
       };
     });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown MEXC error';
-    console.error('[MEXC] Error fetching swap data:', message);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown MEXC error';
+    error('[MEXC] Error fetching swap data:', message);
 
     return amounts.map(amount => ({
       chain: 'MEXC',
@@ -152,12 +172,28 @@ export async function getMexcSwapData(amounts: number[]): Promise<ChainSwapData[
         output: null,
         outputUsd: null,
         error: message,
+        route: { type: 'cex', note: 'Orderbook depth simulation' }
       },
       usdtToUsdc: {
         input: amount,
         output: null,
         outputUsd: null,
         error: message,
+        route: { type: 'cex', note: 'Orderbook depth simulation' }
+      },
+      tokenAToB: {
+        input: amount,
+        output: null,
+        outputUsd: null,
+        error: message,
+        route: { type: 'cex', note: 'Orderbook depth simulation' }
+      },
+      tokenBToA: {
+        input: amount,
+        output: null,
+        outputUsd: null,
+        error: message,
+        route: { type: 'cex', note: 'Orderbook depth simulation' }
       },
     }));
   }
