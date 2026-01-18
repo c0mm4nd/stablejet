@@ -28,6 +28,13 @@ interface TriangularOpp {
 
 export default function TriangularArbitrage({ history, amount }: TriangularArbitrageProps) {
     const { pairs } = useConfig();
+    const pairsByLower = useMemo(() => {
+        const map = new Map<string, { tokenA: string; tokenB: string }>();
+        Object.entries(pairs).forEach(([id, pair]) => {
+            map.set(id.toLowerCase(), { tokenA: pair.tokenA, tokenB: pair.tokenB });
+        });
+        return map;
+    }, [pairs]);
     // We process the Latest snapshot across ALL pairs.
     // Assumption: `history` contains data for multiple pairs if we changed the fetcher.
     // If `history` only has 1 pair, this returns empty.
@@ -39,13 +46,13 @@ export default function TriangularArbitrage({ history, amount }: TriangularArbit
         // History is time-series. We want the latest "State of the World".
         // 1. Group latest data by PairId.
         const latestTime = history[history.length - 1].timestamp;
-        const timeThreshold = new Date(latestTime).getTime() - 60000; // Within 1 minute of latest
+        const timeThreshold = new Date(latestTime).getTime() - 5 * 60 * 1000; // Within 5 minutes of latest
 
         // Flatten all recent data points
         const recentData = history
             .filter(h => new Date(h.timestamp).getTime() > timeThreshold)
             .flatMap(h => h.data)
-            .filter(d => d.amount === amount);
+            .filter(d => d.tokenAToB || d.tokenBToA);
 
         // Build a Graph: Token -> Token -> List of Quotes (Edges)
         // Edge: { chain, source, rate }
@@ -67,7 +74,7 @@ export default function TriangularArbitrage({ history, amount }: TriangularArbit
             // Need Token Names from pairId? 
             // item.pairId is required. If missing, we can't link.
             if (!item.pairId) return;
-            const pair = pairs[item.pairId];
+            const pair = pairs[item.pairId] || pairsByLower.get(item.pairId.toLowerCase());
             const [fallbackA, fallbackB] = item.pairId.split('_');
             const tA = pair?.tokenA || fallbackA || 'TokenA';
             const tB = pair?.tokenB || fallbackB || 'TokenB';
