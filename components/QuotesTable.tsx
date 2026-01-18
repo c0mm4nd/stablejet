@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
-import { useConfig } from '@/contexts/ConfigContext'; // To get chain names if needed, though history has chain name
+import { useConfig } from '@/contexts/ConfigContext';
 // import { hydrateTradingPairs } from '@/lib/config'; // If we need to lookup token names from context
 
 interface QuotesTableProps {
@@ -24,16 +24,11 @@ interface TableRow {
 }
 
 export default function QuotesTable({ history, amount, pairId }: QuotesTableProps) {
-    // We need to know Token Names for the header
-    // Currently we can't easily get Token Names from `pairId` without the `TradingPair` config.
-    // The history item has `tokenAToB` but doesn't explicitly say "USDC". 
-    // However, `SwapDataGrid` or parent usually knows.
-    // We can try to infer or just use "Token A" / "Token B" if config is missing, 
-    // BUT we should probably use the Context to find the pair info.
-
-    // Actually, we can fetch the pair info from Context if we expose tradingPairs.
-    // The pairId is like "tokena_tokenb". 
-    const [tokenA, tokenB] = pairId.split('_').map(s => s.toUpperCase());
+    const { pairs } = useConfig();
+    const pair = pairs[pairId];
+    const [fallbackA, fallbackB] = pairId.split('_');
+    const tokenA = pair?.tokenA || fallbackA || 'TokenA';
+    const tokenB = pair?.tokenB || fallbackB || 'TokenB';
 
     const [sortKey, setSortKey] = useState<SortKey>('chain');
     const [sortDirection, setSortDirection] = useState<SortDirection>('asc');

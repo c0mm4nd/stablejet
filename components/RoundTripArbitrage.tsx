@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
+import { useConfig } from '@/contexts/ConfigContext';
 
 interface RoundTripArbitrageProps {
     history: HistoryDataPoint[];
@@ -21,7 +22,11 @@ interface ArbOpportunity {
 }
 
 export default function RoundTripArbitrage({ history, amount, pairId }: RoundTripArbitrageProps) {
-    const [tokenA, tokenB] = pairId.split('_').map(s => s.toUpperCase());
+    const { pairs } = useConfig();
+    const configPair = pairs[pairId];
+    const [fallbackA, fallbackB] = pairId.split('_');
+    const tokenA = configPair?.tokenA || fallbackA || 'TokenA';
+    const tokenB = configPair?.tokenB || fallbackB || 'TokenB';
 
     if (history.length === 0) return null;
 

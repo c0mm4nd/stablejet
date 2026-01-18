@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
+import { useConfig } from '@/contexts/ConfigContext';
 
 interface TriangularArbitrageProps {
     history: HistoryDataPoint[];
@@ -26,6 +27,7 @@ interface TriangularOpp {
 }
 
 export default function TriangularArbitrage({ history, amount }: TriangularArbitrageProps) {
+    const { pairs } = useConfig();
     // We process the Latest snapshot across ALL pairs.
     // Assumption: `history` contains data for multiple pairs if we changed the fetcher.
     // If `history` only has 1 pair, this returns empty.
@@ -65,7 +67,10 @@ export default function TriangularArbitrage({ history, amount }: TriangularArbit
             // Need Token Names from pairId? 
             // item.pairId is required. If missing, we can't link.
             if (!item.pairId) return;
-            const [tA, tB] = item.pairId.split('_').map(s => s.toUpperCase());
+            const pair = pairs[item.pairId];
+            const [fallbackA, fallbackB] = item.pairId.split('_');
+            const tA = pair?.tokenA || fallbackA || 'TokenA';
+            const tB = pair?.tokenB || fallbackB || 'TokenB';
 
             const tokenAToB = item.tokenAToB;
             const tokenBToA = item.tokenBToA;
