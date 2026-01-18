@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { error } from './logger';
-import { QuoteResult, KyberSwapQuoteResponse, ChainSwapData, TradingPairConfig, ChainAppConfig } from './types';
+import { QuoteResult, KyberSwapQuoteResponse, ChainSwapData, TradingPairConfig, ChainAppConfig, ConfigData } from './types';
 import { getAllUnstableTokens, getTokenDecimals } from './config';
 import { getOnchainSwapDataForAmount } from './onchain-sources';
 import { getBinanceSwapData } from './binance';
@@ -166,7 +166,8 @@ export function getKyberSwapRateLimiterStatus() {
 // 获取指定交易对的兑换数据
 export async function getSwapDataForPair(
   pairConfig: TradingPairConfig,
-  chainsConfig: Record<string, ChainAppConfig>
+  chainsConfig: Record<string, ChainAppConfig>,
+  dexAggregators?: ConfigData['dexAggregators']
 ): Promise<ChainSwapData[]> {
   const results: ChainSwapData[] = [];
   const pairId = pairConfig.id;
@@ -227,7 +228,8 @@ export async function getSwapDataForPair(
         tokenBAddress,
         tokenADecimals,
         tokenBDecimals,
-        appChainConfig
+        appChainConfig,
+        dexAggregators
       });
 
       results.push(...onchainRows);

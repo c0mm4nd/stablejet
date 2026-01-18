@@ -1,5 +1,5 @@
 import { fromWei, toWei } from './config';
-import { ChainAppConfig, ChainSwapData, QuoteResult } from './types';
+import { ChainAppConfig, ChainSwapData, QuoteResult, ConfigData } from './types';
 import { getQuote } from './kyberswap';
 import { getNordsternQuoteByChainKey } from './nordstern';
 import { getLiFiQuoteByChainId } from './lifi';
@@ -16,6 +16,7 @@ interface OnchainSourceParams {
   tokenADecimals: number;
   tokenBDecimals: number;
   appChainConfig: ChainAppConfig;
+  dexAggregators?: ConfigData['dexAggregators'];
 }
 
 export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): Promise<ChainSwapData[]> {
@@ -34,17 +35,20 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
   const kyberChainParam = appChainConfig.kyberCode || chainKey;
   const nordsternChainParam = appChainConfig.nordsternCode || chainKey;
   const lifiChainId = appChainConfig.lifiChainId || appChainConfig.nordsternCode;
-  const enableNordstern = !!appChainConfig.nordsternCode;
-  const enableLiFi = !!lifiChainId;
+  const enableKyber = dexAggregators?.kyberswap !== false;
+  const enableNordstern = dexAggregators?.nordstern !== false && !!appChainConfig.nordsternCode;
+  const enableLiFi = dexAggregators?.lifi !== false && !!lifiChainId;
 
   const amountInAToB = toWei(amount, tokenADecimals);
   const amountInBToA = toWei(amount, tokenBDecimals);
 
   const sources: SourceEntry[] = [];
 
-  const kyberPromise = getQuote(kyberChainParam, tokenAAddress, tokenBAddress, amountInAToB)
-    .then(aToB => getQuote(kyberChainParam, tokenBAddress, tokenAAddress, amountInBToA)
-      .then(bToA => ({ source: 'kyberswap' as const, aToB, bToA })));
+  const kyberPromise = enableKyber
+    ? getQuote(kyberChainParam, tokenAAddress, tokenBAddress, amountInAToB)
+      .then(aToB => getQuote(kyberChainParam, tokenBAddress, tokenAAddress, amountInBToA)
+        .then(bToA => ({ source: 'kyberswap' as const, aToB, bToA })))
+    : null;
 
   const nordsternPromise = enableNordstern
     ? getNordsternQuoteByChainKey(nordsternChainParam, tokenAAddress, tokenBAddress, amountInAToB)
@@ -59,7 +63,7 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
     : null;
 
   const fetched = await Promise.all([
-    kyberPromise,
+    ...(kyberPromise ? [kyberPromise] : []),
     ...(nordsternPromise ? [nordsternPromise] : []),
     ...(lifiPromise ? [lifiPromise] : [])
   ]);

@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
+import { isDexSourceEnabled } from '@/lib/utils';
 
 interface RoundTripArbitrageProps {
     history: HistoryDataPoint[];
@@ -22,7 +23,7 @@ interface ArbOpportunity {
 }
 
 export default function RoundTripArbitrage({ history, amount, pairId }: RoundTripArbitrageProps) {
-    const { pairs } = useConfig();
+    const { pairs, dexAggregators } = useConfig();
     const configPair = pairs[pairId];
     const [fallbackA, fallbackB] = pairId.split('_');
     const tokenA = configPair?.tokenA || fallbackA || 'TokenA';
@@ -32,7 +33,9 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
 
     // Get latest data
     const latest = history[history.length - 1]; // Assuming sorted by time
-    const data = latest.data.filter(d => d.amount === amount);
+    const data = latest.data
+        .filter(d => d.amount === amount)
+        .filter(d => isDexSourceEnabled(d.dataSource, dexAggregators));
 
     // Strategy: 
     // 1. Find Best Buy (Maximize Output A->B)

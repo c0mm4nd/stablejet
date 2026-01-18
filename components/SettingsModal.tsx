@@ -11,12 +11,13 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
-  const { chains, pairs, clientRefreshInterval, updateChains, updatePairs, updateClientRefreshInterval } = useConfig();
+  const { chains, pairs, clientRefreshInterval, dexAggregators, updateChains, updatePairs, updateDexAggregators, updateClientRefreshInterval } = useConfig();
 
   // Local State for Edit Mode
   const [editingChains, setEditingChains] = useState<Record<string, ChainAppConfig>>({});
   const [editingPairs, setEditingPairs] = useState<Record<string, TradingPairConfig>>({});
   const [editingInterval, setEditingInterval] = useState<number>(10);
+  const [editingDexAggregators, setEditingDexAggregators] = useState(dexAggregators);
 
   // UI State: Active Editing Pair ID
   const [activePairId, setActivePairId] = useState<string | null>(null);
@@ -61,8 +62,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       }
       setEditingPairs(normalizedPairs);
       setEditingInterval(clientRefreshInterval);
+      setEditingDexAggregators(dexAggregators);
     }
-  }, [isOpen, chains, pairs, clientRefreshInterval]);
+  }, [isOpen, chains, pairs, clientRefreshInterval, dexAggregators]);
 
   if (!isOpen) return null;
 
@@ -90,6 +92,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       updatePairs(normalizedPairs),
     ]);
     setEditingPairs(normalizedPairs);
+    await updateDexAggregators(editingDexAggregators);
     updateClientRefreshInterval(editingInterval);
     onClose();
   };
@@ -98,6 +101,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     const payload = {
       chains: editingChains,
       pairs: editingPairs,
+      dexAggregators: editingDexAggregators,
       clientRefreshInterval: editingInterval
     };
     const json = JSON.stringify(payload, null, 2);
@@ -120,6 +124,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
       setEditingChains(parsed.chains);
       setEditingPairs(parsed.pairs);
+      setEditingDexAggregators(parsed.dexAggregators || { kyberswap: true, nordstern: true, lifi: true });
       if (typeof parsed.clientRefreshInterval === 'number') {
         setEditingInterval(parsed.clientRefreshInterval);
       }
@@ -340,6 +345,35 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               // Chains View
               <div className="max-w-3xl mx-auto">
                 <h3 className="text-xl font-bold text-gray-800 mb-6">Chains & Data Sources</h3>
+                <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 mb-6">
+                  <h4 className="text-sm font-semibold text-gray-800 mb-3">DEX Aggregators (Global)</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
+                      <input
+                        type="checkbox"
+                        checked={!!editingDexAggregators.kyberswap}
+                        onChange={e => setEditingDexAggregators({ ...editingDexAggregators, kyberswap: e.target.checked })}
+                      />
+                      <span className="font-medium text-gray-700">KyberSwap</span>
+                    </label>
+                    <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
+                      <input
+                        type="checkbox"
+                        checked={!!editingDexAggregators.nordstern}
+                        onChange={e => setEditingDexAggregators({ ...editingDexAggregators, nordstern: e.target.checked })}
+                      />
+                      <span className="font-medium text-gray-700">Nordstern</span>
+                    </label>
+                    <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
+                      <input
+                        type="checkbox"
+                        checked={!!editingDexAggregators.lifi}
+                        onChange={e => setEditingDexAggregators({ ...editingDexAggregators, lifi: e.target.checked })}
+                      />
+                      <span className="font-medium text-gray-700">Li.Fi (Jumper)</span>
+                    </label>
+                  </div>
+                </div>
 
                 <div className="space-y-4">
                   {Object.entries(editingChains).map(([id, config]) => (

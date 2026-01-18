@@ -2,7 +2,7 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { HistoryDataPoint } from '@/lib/history';
-import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, filterOutliers } from '@/lib/utils';
+import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, filterOutliers, isDexSourceEnabled } from '@/lib/utils';
 import { useConfig } from '@/contexts/ConfigContext';
 
 interface SpreadLineChartProps {
@@ -141,7 +141,7 @@ const CustomTooltip = ({ active, payload, label, pairConfig }: any) => {
 // ... (existing constants)
 
 export default function SpreadLineChart({ history, amount, pairId }: SpreadLineChartProps) {
-  const { pairs } = useConfig();
+  const { pairs, dexAggregators } = useConfig();
   const pair = pairId ? pairs[pairId] : undefined;
 
   if (!pair) return null;
@@ -152,7 +152,9 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
   // 每个时间点的“基准汇率”（使用该时间点全体链/数据源的中位数）
   const baselineByTimestamp: Record<string, { aToB: number | null; bToA: number | null }> = {};
   history.forEach(point => {
-    const amountItems = point.data.filter(item => item.amount === amount);
+    const amountItems = point.data
+      .filter(item => item.amount === amount)
+      .filter(item => isDexSourceEnabled(item.dataSource, dexAggregators));
     const ratesAToB = amountItems
       .map(item => {
         const quote = item.tokenAToB;
@@ -177,6 +179,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
       history
         .flatMap(point => point.data)
         .filter(item => item.amount === amount)
+        .filter(item => isDexSourceEnabled(item.dataSource, dexAggregators))
         .map(item => `${item.chainKey}@${item.dataSource || 'kyberswap'}`)
     )
   ).sort();
@@ -205,6 +208,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
   history.forEach(point => {
     point.data
       .filter(item => item.amount === amount)
+      .filter(item => isDexSourceEnabled(item.dataSource, dexAggregators))
       .forEach(item => {
         const base = `${item.chainKey}@${item.dataSource || 'kyberswap'}`;
         const tokenAToB = item.tokenAToB;

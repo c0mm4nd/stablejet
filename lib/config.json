@@ -541,6 +541,22 @@
     "rari": {
       "name": "rari",
       "nordsternCode": "1380012617"
+    },
+    "ab_chain": {
+      "name": "AB Chain",
+      "disable": true
+    },
+    "conflux_espace": {
+      "name": "Conflux eSpace",
+      "disable": true
+    },
+    "megaeth": {
+      "name": "MegaETH",
+      "disable": true
+    },
+    "x_layer": {
+      "name": "XLayer",
+      "disable": true
     }
   },
   "pairs": {
@@ -618,7 +634,7 @@
         },
         "sei": {
           "addressA": "0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392",
-          "addressB": "0xB75D0B03c06A926e488e2659DF1A861F860bD3d1",
+          "addressB": "0x9151434b16b9763660705744891fA906F660EcC5",
           "decimalsA": 6,
           "decimalsB": 6
         },
@@ -632,6 +648,42 @@
           "addressA": "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75",
           "addressB": "0xcc1b99dDAc1a33c201a742A1851662E87BC7f22C",
           "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "ink": {
+          "addressA": "0x2D270e6886d130D724215A266106e6832161EAEd",
+          "decimalsA": 6,
+          "addressB": "0x0200C29006150606B650577BBE7B6248F58470c1",
+          "decimalsB": 6
+        },
+        "monad": {
+          "addressA": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+          "decimalsA": 6,
+          "addressB": "0xe7cd86e13AC4309349F30B3435a9d337750fC82D",
+          "decimalsB": 6
+        },
+        "flare": {
+          "addressA": "0xFbDa5F676cB37624f28265A144A48B0d6e87d3b6",
+          "decimalsA": 6
+        },
+        "rootstock": {
+          "addressA": "0x74c9f2b00581F1B11AA7ff05aa9F608B7389De67",
+          "decimalsA": 6
+        },
+        "stable": {
+          "addressA": "0x8a2B28364102Bea189D99A475C494330Ef2bDD0B",
+          "decimalsA": 6
+        },
+        "hyperevm": {
+          "addressA": "0xb88339CB7199b77E23DB6E890353E22632Ba630f",
+          "decimalsA": 6,
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsB": 6
+        },
+        "x_layer": {
+          "addressA": "0x74AFfbE5E43EA0548C152B4fB7b62B80a0170aE4",
+          "decimalsA": 6,
+          "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
           "decimalsB": 6
         }
       }
@@ -810,6 +862,24 @@
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
           "decimalsA": 18,
           "decimalsB": 6
+        },
+        "bnb_chain": {
+          "addressA": "0x8d0D000Ee44948FC98c9B98A4FA4921476f08B0d",
+          "decimalsA": 18,
+          "addressB": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "decimalsB": 18
+        },
+        "mantle": {
+          "addressA": "0x111111d2bf19e43C34263401e0CAd979eD1cdb61",
+          "decimalsA": 18,
+          "addressB": "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
+          "decimalsB": 6
+        },
+        "monad": {
+          "addressA": "0x111111d2bf19e43C34263401e0CAd979eD1cdb61",
+          "decimalsA": 6,
+          "addressB": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+          "decimalsB": 6
         }
       }
     },
@@ -827,6 +897,18 @@
           "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
           "decimalsA": 18,
           "decimalsB": 6
+        },
+        "bnb_chain": {
+          "addressA": "0x8d0D000Ee44948FC98c9B98A4FA4921476f08B0d",
+          "decimalsA": 18,
+          "addressB": "0x55d398326f99059fF775485246999027B3197955",
+          "decimalsB": 18
+        },
+        "mantle": {
+          "addressA": "0x111111d2bf19e43C34263401e0CAd979eD1cdb61",
+          "decimalsA": 18,
+          "addressB": "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
+          "decimalsB": 6
         }
       }
     },
@@ -843,6 +925,24 @@
           "addressA": "0xFa2B947eEc368f42195f24F36d2aF29f7c24CeC2",
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
           "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x8210c0634AB8f273806e4b7866E9Db353773c44B",
+          "decimalsA": 18,
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsB": 6
+        },
+        "bnb_chain": {
+          "addressA": "0xb3b02E4A9Fb2bD28CC2ff97B0aB3F6B3Ec1eE9D2",
+          "decimalsA": 18,
+          "addressB": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "decimalsB": 18
+        },
+        "xdc": {
+          "addressA": "0x8210c0634AB8f273806e4b7866E9Db353773c44B",
+          "decimalsA": 18,
+          "addressB": "0xfA2958CB79b0491CC627c1557F441eF849Ca8eb1",
           "decimalsB": 6
         }
       }
@@ -873,6 +973,12 @@
           "addressB": "0x55d398326f99059fF775485246999027B3197955",
           "decimalsA": 18,
           "decimalsB": 18
+        },
+        "xdc": {
+          "addressA": "0x8210c0634AB8f273806e4b7866E9Db353773c44B",
+          "decimalsA": 18,
+          "addressB": "0xcdA5b77E2E2268D9E09c874c1b9A4c3F07b37555",
+          "decimalsB": 6
         }
       }
     },
@@ -1266,5 +1372,10 @@
       }
     }
   },
-  "clientRefreshInterval": 20
+  "clientRefreshInterval": 20,
+  "dexAggregators": {
+    "kyberswap": true,
+    "nordstern": true,
+    "lifi": true
+  }
 }

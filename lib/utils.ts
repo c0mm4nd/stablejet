@@ -69,3 +69,16 @@ export function filterOutliers(value: number | null, allValues: (number | null)[
 
   return value;
 }
+
+export function isDexSourceEnabled(
+  source: string | undefined,
+  dexAggregators?: { kyberswap: boolean; nordstern: boolean; lifi: boolean }
+): boolean {
+  const normalized = (source || 'kyberswap').toLowerCase();
+  if (['binance', 'mexc', 'bybit'].includes(normalized)) return true;
+  if (!dexAggregators) return true;
+  if (normalized === 'kyberswap') return dexAggregators.kyberswap !== false;
+  if (normalized === 'nordstern') return dexAggregators.nordstern !== false;
+  if (normalized === 'lifi') return dexAggregators.lifi !== false;
+  return true;
+}
