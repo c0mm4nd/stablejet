@@ -64,6 +64,7 @@ export async function getLiFiQuoteByChainId(
       maxPriceImpact: 0.4,
       jitoBundle: true,
       allowSwitchChain: true,
+      denyExchanges: ["fly"],
       executionType: 'all'
     }
   };
