@@ -30,9 +30,11 @@
       "nordsternCode": "8453",
       "lifiChainId": "8453"
     },
-    "bsc": {
+    "bnb_chain": {
       "name": "BNB Chain",
-      "kyberCode": "bsc"
+      "kyberCode": "bsc",
+      "lifiChainId": "56",
+      "nordsternCode": "56"
     },
     "avalanche": {
       "name": "Avalanche",
@@ -48,7 +50,7 @@
       "name": "Gnosis",
       "kyberCode": "gnosis"
     },
-    "zksync": {
+    "zksync_era": {
       "name": "zkSync Era",
       "kyberCode": "zksync"
     },
@@ -97,11 +99,453 @@
     "bybit": {
       "name": "Bybit",
       "disable": false
+    },
+    "coredao": {
+      "name": "Coredao",
+      "kyberCode": "coredao",
+      "disable": true
+    },
+    "peaq": {
+      "name": "Peaq",
+      "kyberCode": "peaq",
+      "disable": true
+    },
+    "sei": {
+      "name": "Sei",
+      "kyberCode": "sei",
+      "disable": true,
+      "lifiChainId": "1329",
+      "nordsternCode": "1329"
+    },
+    "xdc": {
+      "name": "Xdc",
+      "kyberCode": "xdc",
+      "disable": true,
+      "lifiChainId": "50",
+      "nordsternCode": "50"
+    },
+    "ink": {
+      "name": "Ink",
+      "kyberCode": "ink",
+      "disable": true,
+      "lifiChainId": "57073",
+      "nordsternCode": "57073"
+    },
+    "flare": {
+      "name": "Flare",
+      "lifiChainId": "14",
+      "nordsternCode": "14"
+    },
+    "cronos": {
+      "name": "Cronos",
+      "lifiChainId": "25",
+      "nordsternCode": "25"
+    },
+    "rootstock": {
+      "name": "Rootstock",
+      "lifiChainId": "30"
+    },
+    "viction": {
+      "name": "Viction",
+      "lifiChainId": "88"
+    },
+    "gnosis_100": {
+      "name": "Gnosis",
+      "lifiChainId": "100",
+      "nordsternCode": "100"
+    },
+    "fuse": {
+      "name": "FUSE",
+      "lifiChainId": "122"
+    },
+    "monad": {
+      "name": "Monad",
+      "lifiChainId": "143",
+      "nordsternCode": "143"
+    },
+    "opbnb": {
+      "name": "opBNB",
+      "lifiChainId": "204",
+      "nordsternCode": "204"
+    },
+    "lens": {
+      "name": "Lens",
+      "lifiChainId": "232"
+    },
+    "fraxtal": {
+      "name": "Fraxtal",
+      "lifiChainId": "252",
+      "nordsternCode": "252"
+    },
+    "boba": {
+      "name": "Boba",
+      "lifiChainId": "288",
+      "nordsternCode": "288"
+    },
+    "zksync": {
+      "name": "zkSync",
+      "lifiChainId": "324"
+    },
+    "world_chain": {
+      "name": "World Chain",
+      "lifiChainId": "480",
+      "nordsternCode": "480"
+    },
+    "flow": {
+      "name": "Flow",
+      "lifiChainId": "747",
+      "nordsternCode": "747"
+    },
+    "stable": {
+      "name": "Stable",
+      "lifiChainId": "988"
+    },
+    "hyperevm": {
+      "name": "HyperEVM",
+      "lifiChainId": "999",
+      "nordsternCode": "999",
+      "kyberCode": "hyp"
+    },
+    "metis": {
+      "name": "Metis",
+      "lifiChainId": "1088",
+      "nordsternCode": "1088"
+    },
+    "lisk": {
+      "name": "Lisk",
+      "lifiChainId": "1135",
+      "nordsternCode": "1135"
+    },
+    "moonbeam": {
+      "name": "Moonbeam",
+      "lifiChainId": "1284"
+    },
+    "vana": {
+      "name": "Vana",
+      "lifiChainId": "1480",
+      "nordsternCode": "1480"
+    },
+    "gravity": {
+      "name": "Gravity",
+      "lifiChainId": "1625",
+      "nordsternCode": "1625"
+    },
+    "soneium": {
+      "name": "Soneium",
+      "lifiChainId": "1868",
+      "nordsternCode": "1868"
+    },
+    "swellchain": {
+      "name": "Swellchain",
+      "lifiChainId": "1923",
+      "nordsternCode": "1923"
+    },
+    "ronin": {
+      "name": "Ronin",
+      "lifiChainId": "2020",
+      "nordsternCode": "2020",
+      "kyberCode": "ron"
+    },
+    "abstract": {
+      "name": "Abstract",
+      "lifiChainId": "2741"
+    },
+    "kaia": {
+      "name": "Kaia",
+      "lifiChainId": "8217",
+      "nordsternCode": "8217"
+    },
+    "plasma": {
+      "name": "Plasma",
+      "lifiChainId": "9745",
+      "nordsternCode": "9745",
+      "kyberCode": "pla"
+    },
+    "immutable_zkevm": {
+      "name": "Immutable zkEVM",
+      "lifiChainId": "13371",
+      "nordsternCode": "13371"
+    },
+    "apechain": {
+      "name": "Apechain",
+      "lifiChainId": "33139",
+      "nordsternCode": "33139"
+    },
+    "mode": {
+      "name": "Mode",
+      "lifiChainId": "34443",
+      "nordsternCode": "34443"
+    },
+    "celo": {
+      "name": "Celo",
+      "lifiChainId": "42220",
+      "nordsternCode": "42220"
+    },
+    "etherlink": {
+      "name": "Etherlink",
+      "lifiChainId": "42793",
+      "kyberCode": "etl"
+    },
+    "hemi": {
+      "name": "Hemi",
+      "lifiChainId": "43111",
+      "nordsternCode": "43111"
+    },
+    "sophon": {
+      "name": "Sophon",
+      "lifiChainId": "50104"
+    },
+    "superposition": {
+      "name": "Superposition",
+      "lifiChainId": "55244",
+      "nordsternCode": "55244"
+    },
+    "bob": {
+      "name": "BOB",
+      "lifiChainId": "60808",
+      "nordsternCode": "60808"
+    },
+    "blast": {
+      "name": "Blast",
+      "lifiChainId": "81457",
+      "nordsternCode": "81457"
+    },
+    "plume": {
+      "name": "Plume",
+      "lifiChainId": "98866"
+    },
+    "taiko": {
+      "name": "Taiko",
+      "lifiChainId": "167000",
+      "nordsternCode": "167000"
+    },
+    "scroll_534352": {
+      "name": "Scroll",
+      "lifiChainId": "534352",
+      "nordsternCode": "534352"
+    },
+    "katana": {
+      "name": "Katana",
+      "lifiChainId": "747474",
+      "nordsternCode": "747474"
+    },
+    "corn": {
+      "name": "Corn",
+      "lifiChainId": "21000000",
+      "nordsternCode": "21000000"
+    },
+    "songbird": {
+      "name": "songbird",
+      "nordsternCode": "19"
+    },
+    "telos": {
+      "name": "telos",
+      "nordsternCode": "40"
+    },
+    "kub": {
+      "name": "kub",
+      "nordsternCode": "96"
+    },
+    "thundercore": {
+      "name": "thundercore",
+      "nordsternCode": "108"
+    },
+    "shibarium": {
+      "name": "shibarium",
+      "nordsternCode": "109"
+    },
+    "mantapacific": {
+      "name": "mantapacific",
+      "nordsternCode": "169"
+    },
+    "hashkey": {
+      "name": "hashkey",
+      "nordsternCode": "177"
+    },
+    "mint": {
+      "name": "mint",
+      "nordsternCode": "185"
+    },
+    "bittorrent": {
+      "name": "bittorrent",
+      "nordsternCode": "199"
+    },
+    "b2": {
+      "name": "b2",
+      "nordsternCode": "223"
+    },
+    "kroma": {
+      "name": "kroma",
+      "nordsternCode": "255"
+    },
+    "kcc": {
+      "name": "kcc",
+      "nordsternCode": "321"
+    },
+    "shape": {
+      "name": "shape",
+      "nordsternCode": "360"
+    },
+    "appchain": {
+      "name": "appchain",
+      "nordsternCode": "466"
+    },
+    "astar": {
+      "name": "astar",
+      "nordsternCode": "592"
+    },
+    "endurance": {
+      "name": "endurance",
+      "nordsternCode": "648"
+    },
+    "redstone": {
+      "name": "redstone",
+      "nordsternCode": "690"
+    },
+    "matchain": {
+      "name": "matchain",
+      "nordsternCode": "698"
+    },
+    "qitmeer": {
+      "name": "qitmeer",
+      "nordsternCode": "813"
+    },
+    "wanchain": {
+      "name": "wanchain",
+      "nordsternCode": "888"
+    },
+    "wemix": {
+      "name": "wemix",
+      "nordsternCode": "1111"
+    },
+    "core": {
+      "name": "core",
+      "nordsternCode": "1116"
+    },
+    "ultron": {
+      "name": "ultron",
+      "nordsternCode": "1231"
+    },
+    "step": {
+      "name": "step",
+      "nordsternCode": "1234"
+    },
+    "elysium": {
+      "name": "elysium",
+      "nordsternCode": "1339"
+    },
+    "story": {
+      "name": "story",
+      "nordsternCode": "1514"
+    },
+    "reya": {
+      "name": "reya",
+      "nordsternCode": "1729"
+    },
+    "sanko": {
+      "name": "sanko",
+      "nordsternCode": "1996"
+    },
+    "goat": {
+      "name": "goat",
+      "nordsternCode": "2345"
+    },
+    "morphl2": {
+      "name": "morphl2",
+      "nordsternCode": "2818"
+    },
+    "muster": {
+      "name": "muster",
+      "nordsternCode": "4078"
+    },
+    "beam": {
+      "name": "beam",
+      "nordsternCode": "4337"
+    },
+    "superseed": {
+      "name": "superseed",
+      "nordsternCode": "5330"
+    },
+    "duckchain": {
+      "name": "duckchain",
+      "nordsternCode": "5545"
+    },
+    "cyber": {
+      "name": "cyber",
+      "nordsternCode": "7560"
+    },
+    "b3": {
+      "name": "b3",
+      "nordsternCode": "8333"
+    },
+    "rss3vsl": {
+      "name": "rss3vsl",
+      "nordsternCode": "12553"
+    },
+    "genesys": {
+      "name": "genesys",
+      "nordsternCode": "16507"
+    },
+    "mapprotocol": {
+      "name": "mapprotocol",
+      "nordsternCode": "22776"
+    },
+    "bitgert": {
+      "name": "bitgert",
+      "nordsternCode": "32520"
+    },
+    "funki": {
+      "name": "funki",
+      "nordsternCode": "33979"
+    },
+    "qnetwork": {
+      "name": "qnetwork",
+      "nordsternCode": "35441"
+    },
+    "arbitrumnova": {
+      "name": "arbitrumnova",
+      "nordsternCode": "42170"
+    },
+    "zircuit": {
+      "name": "zircuit",
+      "nordsternCode": "48900"
+    },
+    "electroneum": {
+      "name": "electroneum",
+      "nordsternCode": "52014"
+    },
+    "chilizchain": {
+      "name": "chilizchain",
+      "nordsternCode": "88888"
+    },
+    "bitlayer": {
+      "name": "bitlayer",
+      "nordsternCode": "200901"
+    },
+    "platon": {
+      "name": "platon",
+      "nordsternCode": "210425"
+    },
+    "parex": {
+      "name": "parex",
+      "nordsternCode": "322202"
+    },
+    "zora": {
+      "name": "zora",
+      "nordsternCode": "7777777"
+    },
+    "ancient8": {
+      "name": "ancient8",
+      "nordsternCode": "888888888"
+    },
+    "rari": {
+      "name": "rari",
+      "nordsternCode": "1380012617"
     }
   },
   "pairs": {
-    "usdc_usdt": {
-      "id": "usdc_usdt",
+    "USDC_USDT": {
+      "id": "USDC_USDT",
       "name": "USDC/USDT",
       "tokenA": "USDC",
       "tokenB": "USDT",
@@ -153,11 +597,47 @@
           "addressB": "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
           "decimalsA": 6,
           "decimalsB": 6
+        },
+        "bnb_chain": {
+          "addressA": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "addressB": "0x55d398326f99059fF775485246999027B3197955",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "coredao": {
+          "addressA": "0xa4151B2B3e269645181dCcF2D426cE75fcbDeca9",
+          "addressB": "0x900101d06A7426441Ae63e9AB3B9b0F63Be145F1",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "peaq": {
+          "addressA": "0xbbA60da06c2c5424f03f7434542280FCAd453d10",
+          "addressB": "0xf4D9235269a96aaDaFc9aDAe454a0618eBE37949",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "sei": {
+          "addressA": "0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392",
+          "addressB": "0xB75D0B03c06A926e488e2659DF1A861F860bD3d1",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "xdc": {
+          "addressA": "0xfA2958CB79b0491CC627c1557F441eF849Ca8eb1",
+          "addressB": "0xcdA5b77E2E2268D9E09c874c1b9A4c3F07b37555",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "fantom": {
+          "addressA": "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75",
+          "addressB": "0xcc1b99dDAc1a33c201a742A1851662E87BC7f22C",
+          "decimalsA": 6,
+          "decimalsB": 6
         }
       }
     },
-    "usde_usdt": {
-      "id": "usde_usdt",
+    "USDe_USDT": {
+      "id": "USDe_USDT",
       "name": "USDe/USDT",
       "tokenA": "USDe",
       "tokenB": "USDT",
@@ -215,11 +695,17 @@
           "addressA": "",
           "addressB": "",
           "cexPairSymbol": "USDEUSDT"
+        },
+        "bnb_chain": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x55d398326f99059fF775485246999027B3197955",
+          "decimalsA": 18,
+          "decimalsB": 18
         }
       }
     },
-    "usde_usdc": {
-      "id": "usde_usdc",
+    "USDe_USDC": {
+      "id": "USDe_USDC",
       "name": "USDe/USDC",
       "tokenA": "USDe",
       "tokenB": "USDC",
@@ -277,11 +763,41 @@
           "addressA": "",
           "addressB": "",
           "cexPairSymbol": "USDEUSDC"
+        },
+        "avalanche": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "bnb_chain": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "mantle": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "scroll": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "ink": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x2D270e6886d130D724215A266106e6832161EAEd",
+          "decimalsA": 18,
+          "decimalsB": 6
         }
       }
     },
-    "usd1_usdc": {
-      "id": "usd1_usdc",
+    "USD1_USDC": {
+      "id": "USD1_USDC",
       "name": "USD1/USDC",
       "tokenA": "USD1",
       "tokenB": "USDC",
@@ -297,8 +813,8 @@
         }
       }
     },
-    "usd1_usdt": {
-      "id": "usd1_usdt",
+    "USD1_USDT": {
+      "id": "USD1_USDT",
       "name": "USD1/USDT",
       "tokenA": "USD1",
       "tokenB": "USDT",
@@ -314,8 +830,8 @@
         }
       }
     },
-    "usdf_usdc": {
-      "id": "usdf_usdc",
+    "USDf_USDC": {
+      "id": "USDf_USDC",
       "name": "USDf/USDC",
       "tokenA": "USDf",
       "tokenB": "USDC",
@@ -331,8 +847,8 @@
         }
       }
     },
-    "usdf_usdt": {
-      "id": "usdf_usdt",
+    "USDf_USDT": {
+      "id": "USDf_USDT",
       "name": "USDf/USDT",
       "tokenA": "USDf",
       "tokenB": "USDT",
@@ -352,7 +868,7 @@
           "decimalsA": 18,
           "decimalsB": 6
         },
-        "bsc": {
+        "bnb_chain": {
           "addressA": "0xb3b02E4A9Fb2bD28CC2ff97B0aB3F6B3Ec1eE9D2",
           "addressB": "0x55d398326f99059fF775485246999027B3197955",
           "decimalsA": 18,
@@ -360,8 +876,8 @@
         }
       }
     },
-    "usr_usdc": {
-      "id": "usr_usdc",
+    "USR_USDC": {
+      "id": "USR_USDC",
       "name": "USR/USDC",
       "tokenA": "USR",
       "tokenB": "USDC",
@@ -386,11 +902,17 @@
           "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
           "decimalsA": 18,
           "decimalsB": 6
+        },
+        "bnb_chain": {
+          "addressA": "0x2492D0006411Af6C8bbb1c8afc1B0197350a79e9",
+          "addressB": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "decimalsA": 18,
+          "decimalsB": 18
         }
       }
     },
-    "usr_usdt": {
-      "id": "usr_usdt",
+    "USR_USDT": {
+      "id": "USR_USDT",
       "name": "USR/USDT",
       "tokenA": "USR",
       "tokenB": "USDT",
@@ -415,9 +937,334 @@
           "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
           "decimalsA": 18,
           "decimalsB": 6
+        },
+        "bnb_chain": {
+          "addressA": "0x2492D0006411Af6C8bbb1c8afc1B0197350a79e9",
+          "addressB": "0x55d398326f99059fF775485246999027B3197955",
+          "decimalsA": 18,
+          "decimalsB": 18
+        }
+      }
+    },
+    "sUSDe_USDT": {
+      "id": "sUSDe_USDT",
+      "name": "sUSDe/USDT",
+      "tokenA": "sUSDe",
+      "tokenB": "USDT",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "bnb_chain": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "addressB": "0x55d398326f99059fF775485246999027B3197955",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "mantle": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "addressB": "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "optimism": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "addressB": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "ethereum": {
+          "addressA": "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497",
+          "addressB": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    },
+    "sUSDe_USDC": {
+      "id": "sUSDe_USDC",
+      "name": "sUSDe/USDC",
+      "tokenA": "sUSDe",
+      "tokenB": "USDC",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "arbitrum": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "avalanche": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "addressB": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "bnb_chain": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "addressB": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "mantle": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "addressB": "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "optimism": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "addressB": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "scroll": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "addressB": "0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "ethereum": {
+          "addressA": "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497",
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "ink": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "addressB": "0x2D270e6886d130D724215A266106e6832161EAEd",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "linea": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "addressB": "0x176211869cA2b568f2A7D4EE941E073a821EE1ff",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    },
+    "wstUSR_USDT": {
+      "id": "wstUSR_USDT",
+      "name": "wstUSR/USDT",
+      "tokenA": "wstUSR",
+      "tokenB": "USDT",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "bnb_chain": {
+          "addressA": "0x4254813524695def4163A169e901f3d7a1a55429",
+          "addressB": "0x55d398326f99059fF775485246999027B3197955",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "ethereum": {
+          "addressA": "0x1202F5C7b4B9E47a1A484E8B270be34dbbC75055",
+          "addressB": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    },
+    "wstUSR_USDC": {
+      "id": "wstUSR_USDC",
+      "name": "wstUSR/USDC",
+      "tokenA": "wstUSR",
+      "tokenB": "USDC",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "arbitrum": {
+          "addressA": "0x66CFbD79257dC5217903A36293120282548E2254",
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0xB67675158B412D53fe6B68946483ba920b135bA1",
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "bnb_chain": {
+          "addressA": "0x4254813524695def4163A169e901f3d7a1a55429",
+          "addressB": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "ethereum": {
+          "addressA": "0x1202F5C7b4B9E47a1A484E8B270be34dbbC75055",
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    },
+    "RLP_USDT": {
+      "id": "RLP_USDT",
+      "name": "RLP/USDT",
+      "tokenA": "RLP",
+      "tokenB": "USDT",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "bnb_chain": {
+          "addressA": "0x35E5dB674D8e93a03d814FA0ADa70731efe8a4b9",
+          "addressB": "0x55d398326f99059fF775485246999027B3197955",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "ethereum": {
+          "addressA": "0x4956b52aE2fF65D74CA2d61207523288e4528f96",
+          "addressB": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    },
+    "RLP_USDC": {
+      "id": "RLP_USDC",
+      "name": "RLP/USDC",
+      "tokenA": "RLP",
+      "tokenB": "USDC",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "arbitrum": {
+          "addressA": "0x35E5dB674D8e93a03d814FA0ADa70731efe8a4b9",
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0xC31389794Ffac23331E0D9F611b7953f90AA5fDC",
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "bnb_chain": {
+          "addressA": "0x35E5dB674D8e93a03d814FA0ADa70731efe8a4b9",
+          "addressB": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "ethereum": {
+          "addressA": "0x4956b52aE2fF65D74CA2d61207523288e4528f96",
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    },
+    "YUSD_USDT": {
+      "id": "YUSD_USDT",
+      "name": "YUSD/USDT",
+      "tokenA": "YUSD",
+      "tokenB": "USDT",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "bnb_chain": {
+          "addressA": "0xAB3dBcD9B096C3fF76275038bf58eAC10D22C61f",
+          "addressB": "0x55d398326f99059fF775485246999027B3197955",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "ethereum": {
+          "addressA": "0x4274cD7277C7bb0806Bd5FE84b9aDAE466a8DA0a",
+          "addressB": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    },
+    "YUSD_USDC": {
+      "id": "YUSD_USDC",
+      "name": "YUSD/USDC",
+      "tokenA": "YUSD",
+      "tokenB": "USDC",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "arbitrum": {
+          "addressA": "0xF07781182B47e728B040f9e35321260e359fF9f7",
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0xca2671Dcd031a72359f456C212F62A9bDa737cD7",
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "avalanche": {
+          "addressA": "0xca2671Dcd031a72359f456C212F62A9bDa737cD7",
+          "addressB": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "bnb_chain": {
+          "addressA": "0xAB3dBcD9B096C3fF76275038bf58eAC10D22C61f",
+          "addressB": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "ethereum": {
+          "addressA": "0x4274cD7277C7bb0806Bd5FE84b9aDAE466a8DA0a",
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    },
+    "yUSD_USDT": {
+      "id": "yUSD_USDT",
+      "name": "yUSD/USDT",
+      "tokenA": "yUSD",
+      "tokenB": "USDT",
+      "amounts": [
+        10000
+      ],
+      "chains": {}
+    },
+    "yUSD_USDC": {
+      "id": "yUSD_USDC",
+      "name": "yUSD/USDC",
+      "tokenA": "yUSD",
+      "tokenB": "USDC",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "arbitrum": {
+          "addressA": "0x4772D2e014F9fC3a820C444e3313968e9a5C8121",
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x4772D2e014F9fC3a820C444e3313968e9a5C8121",
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsA": 18,
+          "decimalsB": 6
         }
       }
     }
   },
-  "clientRefreshInterval": 10
+  "clientRefreshInterval": 20
 }
