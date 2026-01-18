@@ -91,8 +91,8 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
         const tokenAToB = item.tokenAToB;
         const tokenBToA = item.tokenBToA;
 
-        const rateAtoB = calculateImpliedRate(tokenAToB.input, tokenAToB.output);
-        const rateBtoA = calculateImpliedRate(tokenBToA.input, tokenBToA.output);
+        const rateAtoB = tokenAToB ? calculateImpliedRate(tokenAToB.input, tokenAToB.output) : null;
+        const rateBtoA = tokenBToA ? calculateImpliedRate(tokenBToA.input, tokenBToA.output) : null;
 
         return {
           chain: item.chain,
