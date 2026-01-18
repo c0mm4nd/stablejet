@@ -47,6 +47,7 @@ export interface ChainSwapData {
   amount: number;
   pairId?: string; // Trading pair identifier
   dataSource?: 'kyberswap' | 'nordstern' | 'lifi' | 'binance' | 'mexc' | 'bybit'; // 数据来源
+  quoteTimestamp?: string; // ISO timestamp for this specific quote
   // Generic swap results for any pair
   tokenAToB?: SwapResult; // tokenA -> tokenB
   tokenBToA?: SwapResult; // tokenB -> tokenA

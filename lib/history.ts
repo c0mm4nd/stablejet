@@ -34,10 +34,10 @@ export function saveDataPoint(data: ChainSwapData[], pairId: string) {
 
     const insertChainSwap = db.prepare(`
       INSERT INTO chain_swaps (
-        history_point_id, chain, chain_key, data_source, pair_id, amount,
+        history_point_id, chain, chain_key, data_source, pair_id, amount, quote_timestamp,
         token_a_to_b_input, token_a_to_b_output, token_a_to_b_output_usd, token_a_to_b_error, token_a_to_b_route,
         token_b_to_a_input, token_b_to_a_output, token_b_to_a_output_usd, token_b_to_a_error, token_b_to_a_route
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const transaction = db.transaction((data: ChainSwapData[], pairId: string) => {
@@ -47,6 +47,7 @@ export function saveDataPoint(data: ChainSwapData[], pairId: string) {
 
       // 插入每条链的数据
       for (const item of data) {
+        const quoteTimestamp = item.quoteTimestamp || new Date().toISOString();
         insertChainSwap.run(
           historyPointId,
           item.chain,
@@ -54,6 +55,7 @@ export function saveDataPoint(data: ChainSwapData[], pairId: string) {
           item.dataSource || 'kyberswap',
           item.pairId || pairId,
           item.amount,
+          quoteTimestamp,
           item.tokenAToB?.input || null,
           item.tokenAToB?.output || null,
           item.tokenAToB?.outputUsd || null,
@@ -128,6 +130,7 @@ export function getHistoryInRange(hours: number = 24, pairId?: string): HistoryD
         dataSource: (row.data_source || 'kyberswap'),
         pairId: row.pair_id || undefined,
         amount: row.amount,
+        quoteTimestamp: row.quote_timestamp || point.timestamp,
         tokenAToB: row.token_a_to_b_input ? {
           input: row.token_a_to_b_input,
           output: row.token_a_to_b_output,

@@ -22,6 +22,7 @@ interface TableRow {
   spreadAtoB: number | null;
   spreadBtoA: number | null;
   arbitrageSpace: number | null;
+  timestamp: string;
   routeAtoB?: any;
   routeBtoA?: any;
 }
@@ -34,6 +35,7 @@ interface RawRow {
   arbitrageSpace: number | null;
   rateAtoB: number | null;
   rateBtoA: number | null;
+  timestamp: string;
   routeAtoB?: any;
   routeBtoA?: any;
 }
@@ -104,6 +106,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
           arbitrageSpace: calculateRoundTripBps(rateAtoB, rateBtoA),
           rateAtoB,
           rateBtoA,
+          timestamp: item.quoteTimestamp || latestData.timestamp,
           routeAtoB: tokenAToB?.route,
           routeBtoA: tokenBToA?.route
         };
@@ -122,6 +125,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
       spreadAtoB: calculateRateDeviationBps(r.rateAtoB, baselineAtoB),
       spreadBtoA: calculateRateDeviationBps(r.rateBtoA, baselineBtoA),
       arbitrageSpace: r.arbitrageSpace,
+      timestamp: r.timestamp,
       routeAtoB: r.routeAtoB,
       routeBtoA: r.routeBtoA
     }));
@@ -327,9 +331,10 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
           <tbody className="divide-y divide-gray-100">
             {sortedData.map((row, idx) => {
               const sourceDisplayInfo = sourceInfo[row.dataSource] || { name: row.dataSource, color: 'text-gray-600' };
+              const rowTime = new Date(row.timestamp).toLocaleString('zh-CN');
 
               return (
-                <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                <tr key={idx} className="hover:bg-gray-50 transition-colors" title={`Quote time: ${rowTime}`}>
                   <td className="px-4 py-3 font-medium text-gray-900">
                     {row.chain}
                   </td>

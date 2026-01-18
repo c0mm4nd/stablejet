@@ -20,6 +20,7 @@ interface TableRow {
     dataSource: string;
     outputAtoB: number | null;
     outputBtoA: number | null;
+    timestamp: string;
     routeAtoB?: any;
     routeBtoA?: any;
 }
@@ -73,6 +74,7 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
                     dataSource: source,
                     outputAtoB: tokenAToB?.output ?? null,
                     outputBtoA: tokenBToA?.output ?? null,
+                    timestamp: item.quoteTimestamp || latestData.timestamp,
                     routeAtoB: tokenAToB?.route,
                     routeBtoA: tokenBToA?.route
                 };
@@ -237,8 +239,9 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
                     <tbody className="divide-y divide-gray-100">
                         {sortedData.map((row, idx) => {
                             const src = sourceInfo[row.dataSource] || { name: row.dataSource, color: 'text-gray-600' };
+                            const rowTime = new Date(row.timestamp).toLocaleString('zh-CN');
                             return (
-                                <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                                <tr key={idx} className="hover:bg-gray-50 transition-colors" title={`Quote time: ${rowTime}`}>
                                     <td className="px-4 py-3 font-medium text-gray-900">{row.chain}</td>
                                     <td className="px-4 py-3">
                                         <button

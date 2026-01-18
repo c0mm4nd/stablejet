@@ -99,6 +99,7 @@ export function initDatabase() {
       data_source TEXT NOT NULL DEFAULT 'kyberswap',
       pair_id TEXT NOT NULL DEFAULT '',
       amount INTEGER NOT NULL,
+      quote_timestamp TEXT,
 
       token_a_to_b_input REAL,
       token_a_to_b_output REAL,
@@ -119,6 +120,7 @@ export function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_swap_chain_amount ON chain_swaps(chain, amount);
     CREATE INDEX IF NOT EXISTS idx_swap_pair_chain_amount ON chain_swaps(pair_id, chain, amount);
     CREATE INDEX IF NOT EXISTS idx_swap_source_chain_amount ON chain_swaps(data_source, chain, amount);
+    CREATE INDEX IF NOT EXISTS idx_swap_quote_timestamp ON chain_swaps(quote_timestamp);
   `);
 
   // 轻量迁移：如果旧表缺少 data_source 列，则补齐
