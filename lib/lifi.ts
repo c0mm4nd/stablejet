@@ -2,16 +2,20 @@ import axios from 'axios';
 import { log, error, warn } from './logger';
 import { QuoteResult } from './types';
 
-const LIFI_API_BASE = 'https://li.quest/v1/quote';
-const LIFI_API_KEY = process.env.LIFI_API_KEY || '90cd4879-4b63-4860-ad95-88d7a139e437.5887670a-dd66-40ab-a3a6-7539a5be09aa';
-const LIFI_FROM_ADDRESS = process.env.LIFI_FROM_ADDRESS || '0x0000000000000000000000000000000000000001';
+const JUMPER_API_BASE = 'https://api.jumper.exchange/pipeline/v1/advanced/routes';
+const JUMPER_FROM_ADDRESS = process.env.LIFI_FROM_ADDRESS || '0x0000000000000000000000000000000000000001';
 
 const axiosInstance = axios.create({
-  timeout: 15000,
+  timeout: 20000,
   headers: {
-    'Accept': 'application/json',
+    Accept: '*/*',
+    'Content-Type': 'application/json',
+    Origin: 'https://jumper.exchange',
+    Referer: 'https://jumper.exchange/',
     'User-Agent': 'stablejet-monitor/1.0',
-    'x-lifi-api-key': LIFI_API_KEY
+    'x-lifi-integrator': 'jumper.exchange',
+    'x-lifi-sdk': '3.15.1',
+    'x-lifi-widget': '3.40.1'
   }
 });
 
@@ -42,29 +46,39 @@ export async function getLiFiQuoteByChainId(
   amountDecimals: string
 ): Promise<QuoteResult> {
   if (!chainId) {
-    error('[LiFi] Missing chainId');
-    return { success: false, error: 'LiFi missing chainId' };
+    error('[LiFi/Jumper] Missing chainId');
+    return { success: false, error: 'LiFi/Jumper missing chainId' };
   }
 
-  const params = {
-    fromChain: chainId,
-    toChain: chainId,
-    fromToken,
-    toToken,
+  const payload = {
+    fromAddress: JUMPER_FROM_ADDRESS,
     fromAmount: amountDecimals,
-    fromAddress: LIFI_FROM_ADDRESS,
-    toAddress: LIFI_FROM_ADDRESS
+    fromChainId: Number(chainId),
+    fromTokenAddress: fromToken,
+    toChainId: Number(chainId),
+    toTokenAddress: toToken,
+    options: {
+      integrator: 'jumper.exchange',
+      order: 'CHEAPEST',
+      slippage: 0.0001,
+      maxPriceImpact: 0.4,
+      jitoBundle: true,
+      allowSwitchChain: true,
+      executionType: 'all'
+    }
   };
 
   try {
     await rateLimiter.waitForSlot();
-    const response = await axiosInstance.get<any>(LIFI_API_BASE, { params });
+    const response = await axiosInstance.post<any>(JUMPER_API_BASE, payload);
     const data = response.data;
-    const amountOut = data?.estimate?.toAmount;
-    const amountOutUsd = data?.estimate?.toAmountUSD;
+    const route = data?.routes?.[0];
+    const amountOut = route?.toAmount;
+    const amountOutUsd = route?.toAmountUSD;
+    const tool = route?.steps?.[0]?.tool || route?.steps?.[0]?.toolDetails?.name;
 
     if (amountOut) {
-      log(`[LiFi] ✓ Success for ${chainId}: ${amountOut} out (${data?.tool || 'unknown tool'})`);
+      log(`[LiFi/Jumper] ✓ Success for ${chainId}: ${amountOut} out (${tool || 'unknown tool'})`);
       return {
         success: true,
         amountOut,
@@ -72,19 +86,19 @@ export async function getLiFiQuoteByChainId(
         route: {
           type: 'lifi',
           raw: data,
-          note: data?.tool ? `tool: ${data.tool}` : undefined
+          note: tool ? `tool: ${tool}` : undefined
         }
       };
     }
 
-    warn(`[LiFi] Quote missing amount for ${chainId}`);
+    warn(`[LiFi/Jumper] Quote missing amount for ${chainId}`);
     return {
       success: false,
-      error: 'LiFi quote missing amount',
+      error: 'LiFi/Jumper quote missing amount',
       route: {
         type: 'lifi',
         raw: data,
-        note: data?.tool ? `tool: ${data.tool}` : undefined
+        note: tool ? `tool: ${tool}` : undefined
       }
     };
   } catch (err) {
@@ -92,11 +106,11 @@ export async function getLiFiQuoteByChainId(
       const statusText = err.response?.statusText || '';
       const errorData = err.response?.data || '';
       const message = `${err.message} (status: ${err.response?.status || 'N/A'}${statusText ? ', ' + statusText : ''}${errorData ? ', ' + JSON.stringify(errorData).slice(0, 200) : ''})`;
-      error('[LiFi] Error:', message);
+      error('[LiFi/Jumper] Error:', message);
       return { success: false, error: message };
     }
     const message = err instanceof Error ? err.message : 'Unknown error';
-    error('[LiFi] Error:', message);
+    error('[LiFi/Jumper] Error:', message);
     return { success: false, error: message };
   }
 }
