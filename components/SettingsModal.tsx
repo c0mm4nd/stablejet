@@ -18,6 +18,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [editingPairs, setEditingPairs] = useState<Record<string, TradingPairConfig>>({});
   const [editingInterval, setEditingInterval] = useState<number>(10);
   const [editingSources, setEditingSources] = useState(sources);
+  const [importStatus, setImportStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // UI State: Active Editing Pair ID
   const [activePairId, setActivePairId] = useState<string | null>(null);
@@ -122,14 +123,24 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       if (!parsed || typeof parsed !== 'object') throw new Error('Invalid JSON');
       if (!parsed.chains || !parsed.pairs) throw new Error('Missing chains/pairs');
 
+      const nextSources = parsed.sources || { kyberswap: true, nordstern: true, lifi: true, binance: true, bybit: true, mexc: true };
+      const nextInterval = typeof parsed.clientRefreshInterval === 'number' ? parsed.clientRefreshInterval : editingInterval;
+
       setEditingChains(parsed.chains);
       setEditingPairs(parsed.pairs);
-      setEditingSources(parsed.sources || { kyberswap: true, nordstern: true, lifi: true, binance: true, bybit: true, mexc: true });
-      if (typeof parsed.clientRefreshInterval === 'number') {
-        setEditingInterval(parsed.clientRefreshInterval);
-      }
+      setEditingSources(nextSources);
+      setEditingInterval(nextInterval);
+
+      await Promise.all([
+        updateChains(parsed.chains),
+        updatePairs(parsed.pairs),
+        updateSources(nextSources)
+      ]);
+      updateClientRefreshInterval(nextInterval);
+      setImportStatus({ type: 'success', message: 'Config imported and applied.' });
     } catch (err) {
-      alert(`Import failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setImportStatus({ type: 'error', message: `Import failed: ${message}` });
     }
   };
 
@@ -291,6 +302,11 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             <button onClick={onClose} className="text-gray-400 hover:text-gray-700 text-3xl font-light">×</button>
           </div>
         </div>
+        {importStatus && (
+          <div className={`px-6 py-2 text-sm ${importStatus.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+            {importStatus.message}
+          </div>
+        )}
 
         <div className="flex-1 overflow-hidden flex">
           {/* Sidebar: Navigation & Pairs List */}
