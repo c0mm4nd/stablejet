@@ -167,7 +167,7 @@ export function getKyberSwapRateLimiterStatus() {
 export async function getSwapDataForPair(
   pairConfig: TradingPairConfig,
   chainsConfig: Record<string, ChainAppConfig>,
-  dexAggregators?: ConfigData['dexAggregators']
+  sources?: ConfigData['sources']
 ): Promise<ChainSwapData[]> {
   const results: ChainSwapData[] = [];
   const pairId = pairConfig.id;
@@ -193,6 +193,11 @@ export async function getSwapDataForPair(
 
     // CEX Logic: Fetch if configured in the pair's chain map
     if (['binance', 'mexc', 'bybit'].includes(chainKey)) {
+      if (sources) {
+        if (chainKey === 'binance' && sources.binance === false) continue;
+        if (chainKey === 'mexc' && sources.mexc === false) continue;
+        if (chainKey === 'bybit' && sources.bybit === false) continue;
+      }
       const symbol = chainPairData.cexPairSymbol;
       if (!symbol) continue; // Skip if no symbol and not default pair
 
@@ -229,7 +234,7 @@ export async function getSwapDataForPair(
         tokenADecimals,
         tokenBDecimals,
         appChainConfig,
-        dexAggregators
+        sources
       });
 
       results.push(...onchainRows);

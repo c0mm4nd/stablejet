@@ -106,7 +106,7 @@ class BackgroundFetcher {
 
             // Pass full config to usage logic, or pass relevant parts
             // getSwapDataForPair will now need to accept TradingPairConfig and the Global Chain Config map
-            const data = await getSwapDataForPair(pairConfig, config.chains, config.dexAggregators);
+            const data = await getSwapDataForPair(pairConfig, config.chains, config.sources);
 
             // 统计成功和失败
             let successCount = 0;

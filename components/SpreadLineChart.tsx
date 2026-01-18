@@ -2,7 +2,7 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { HistoryDataPoint } from '@/lib/history';
-import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, filterOutliers, isDexSourceEnabled } from '@/lib/utils';
+import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, filterOutliers, isSourceEnabled } from '@/lib/utils';
 import { useConfig } from '@/contexts/ConfigContext';
 
 interface SpreadLineChartProps {
@@ -141,7 +141,7 @@ const CustomTooltip = ({ active, payload, label, pairConfig }: any) => {
 // ... (existing constants)
 
 export default function SpreadLineChart({ history, amount, pairId }: SpreadLineChartProps) {
-  const { pairs, dexAggregators } = useConfig();
+  const { pairs, sources } = useConfig();
   const pair = pairId ? pairs[pairId] : undefined;
 
   if (!pair) return null;
@@ -154,7 +154,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
   history.forEach(point => {
     const amountItems = point.data
       .filter(item => item.amount === amount)
-      .filter(item => isDexSourceEnabled(item.dataSource, dexAggregators));
+      .filter(item => isSourceEnabled(item.dataSource, sources));
     const ratesAToB = amountItems
       .map(item => {
         const quote = item.tokenAToB;
@@ -179,7 +179,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
       history
         .flatMap(point => point.data)
         .filter(item => item.amount === amount)
-        .filter(item => isDexSourceEnabled(item.dataSource, dexAggregators))
+        .filter(item => isSourceEnabled(item.dataSource, sources))
         .map(item => `${item.chainKey}@${item.dataSource || 'kyberswap'}`)
     )
   ).sort();
@@ -208,7 +208,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
   history.forEach(point => {
     point.data
       .filter(item => item.amount === amount)
-      .filter(item => isDexSourceEnabled(item.dataSource, dexAggregators))
+      .filter(item => isSourceEnabled(item.dataSource, sources))
       .forEach(item => {
         const base = `${item.chainKey}@${item.dataSource || 'kyberswap'}`;
         const tokenAToB = item.tokenAToB;

@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
-import { isDexSourceEnabled } from '@/lib/utils';
+import { isSourceEnabled } from '@/lib/utils';
 
 interface TriangularArbitrageProps {
     history: HistoryDataPoint[];
@@ -28,7 +28,7 @@ interface TriangularOpp {
 }
 
 export default function TriangularArbitrage({ history, amount }: TriangularArbitrageProps) {
-    const { pairs, dexAggregators } = useConfig();
+    const { pairs, sources } = useConfig();
     const pairsByLower = useMemo(() => {
         const map = new Map<string, { tokenA: string; tokenB: string }>();
         Object.entries(pairs).forEach(([id, pair]) => {
@@ -54,7 +54,7 @@ export default function TriangularArbitrage({ history, amount }: TriangularArbit
             .filter(h => new Date(h.timestamp).getTime() > timeThreshold)
             .flatMap(h => h.data)
             .filter(d => d.tokenAToB || d.tokenBToA)
-            .filter(d => isDexSourceEnabled(d.dataSource, dexAggregators));
+            .filter(d => isSourceEnabled(d.dataSource, sources));
 
         // Build a Graph: Token -> Token -> List of Quotes (Edges)
         // Edge: { chain, source, rate }

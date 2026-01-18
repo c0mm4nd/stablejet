@@ -8,12 +8,12 @@ const DEFAULT_CLIENT_REFRESH_INTERVAL = 10; // 默认客户端刷新间隔10秒
 interface ConfigContextType {
   chains: Record<string, ChainAppConfig>;
   pairs: Record<string, TradingPairConfig>;
-  dexAggregators: ConfigData['dexAggregators'];
+  sources: ConfigData['sources'];
   clientRefreshInterval: number; // 客户端刷新显示的间隔（秒）
   selectedPair: string; // 当前选中的交易对
   updateChains: (chains: Record<string, ChainAppConfig>) => Promise<void>;
   updatePairs: (pairs: Record<string, TradingPairConfig>) => Promise<void>;
-  updateDexAggregators: (dexAggregators: ConfigData['dexAggregators']) => Promise<void>;
+  updateSources: (sources: ConfigData['sources']) => Promise<void>;
   updateClientRefreshInterval: (interval: number) => void;
   updateSelectedPair: (pairId: string) => void;
   resetToDefaults: () => void;
@@ -25,10 +25,13 @@ const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 export function ConfigProvider({ children }: { children: ReactNode }) {
   const [chains, setChains] = useState<Record<string, ChainAppConfig>>({});
   const [pairs, setPairs] = useState<Record<string, TradingPairConfig>>({});
-  const [dexAggregators, setDexAggregators] = useState<ConfigData['dexAggregators']>({
+  const [sources, setSources] = useState<ConfigData['sources']>({
     kyberswap: true,
     nordstern: true,
-    lifi: true
+    lifi: true,
+    binance: true,
+    bybit: true,
+    mexc: true
   });
   const [clientRefreshInterval, setClientRefreshInterval] = useState<number>(DEFAULT_CLIENT_REFRESH_INTERVAL);
   const [selectedPair, setSelectedPair] = useState<string>('');
@@ -45,7 +48,14 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
         const data: ConfigData = await res.json();
         setChains(data.chains);
         setPairs(data.pairs);
-        setDexAggregators(data.dexAggregators || { kyberswap: true, nordstern: true, lifi: true });
+        setSources(data.sources || {
+          kyberswap: true,
+          nordstern: true,
+          lifi: true,
+          binance: true,
+          bybit: true,
+          mexc: true
+        });
         if (!selectedPair) {
           const firstPairId = Object.keys(data.pairs || {})[0];
           if (firstPairId) {
@@ -136,8 +146,8 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateDexAggregators = async (newDexAggregators: ConfigData['dexAggregators']) => {
-    setDexAggregators(newDexAggregators);
+  const updateSources = async (newSources: ConfigData['sources']) => {
+    setSources(newSources);
     try {
       const res = await fetch('/api/config');
       const currentConfig: ConfigData = await res.json();
@@ -147,11 +157,11 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...currentConfig,
-          dexAggregators: newDexAggregators
+          sources: newSources
         })
       });
     } catch (err) {
-      console.error('Failed to save dex aggregators:', err);
+      console.error('Failed to save sources:', err);
       fetchConfig();
     }
   };
@@ -186,12 +196,12 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
       value={{
         chains,
         pairs,
-        dexAggregators,
+        sources,
         clientRefreshInterval,
         selectedPair,
         updateChains,
         updatePairs,
-        updateDexAggregators,
+        updateSources,
         updateClientRefreshInterval,
         updateSelectedPair,
         resetToDefaults,

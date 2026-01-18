@@ -1373,9 +1373,12 @@
     }
   },
   "clientRefreshInterval": 20,
-  "dexAggregators": {
+  "sources": {
     "kyberswap": true,
     "nordstern": true,
-    "lifi": true
+    "lifi": true,
+    "binance": true,
+    "bybit": true,
+    "mexc": true
   }
 }

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
-import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, calculateRoundTripBps, isDexSourceEnabled } from '@/lib/utils';
+import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, calculateRoundTripBps, isSourceEnabled } from '@/lib/utils';
 import { useConfig } from '@/contexts/ConfigContext';
 
 interface LiveQuotesTableProps {
@@ -39,7 +39,7 @@ interface RawRow {
 }
 
 export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesTableProps) {
-  const { pairs, dexAggregators } = useConfig();
+  const { pairs, sources } = useConfig();
   const [sortKey, setSortKey] = useState<SortKey>('arbitrageSpace');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [activeRoute, setActiveRoute] = useState<{
@@ -86,7 +86,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
   const tableData: TableRow[] = useMemo(() => {
     const rawRows: RawRow[] = latestData.data
       .filter(item => item.amount === amount)
-      .filter(item => isDexSourceEnabled(item.dataSource, dexAggregators))
+      .filter(item => isSourceEnabled(item.dataSource, sources))
       .map(item => {
         const source = item.dataSource || 'kyberswap';
         const tokenAToB = item.tokenAToB;

@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
-import { isDexSourceEnabled } from '@/lib/utils';
+import { isSourceEnabled } from '@/lib/utils';
 // import { hydrateTradingPairs } from '@/lib/config'; // If we need to lookup token names from context
 
 interface QuotesTableProps {
@@ -25,7 +25,7 @@ interface TableRow {
 }
 
 export default function QuotesTable({ history, amount, pairId }: QuotesTableProps) {
-    const { pairs, dexAggregators } = useConfig();
+    const { pairs, sources } = useConfig();
     const pair = pairs[pairId];
     const [fallbackA, fallbackB] = pairId.split('_');
     const tokenA = pair?.tokenA || fallbackA || 'TokenA';
@@ -63,7 +63,7 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
     const tableData: TableRow[] = useMemo(() => {
         return latestData.data
             .filter(item => item.amount === amount)
-            .filter(item => isDexSourceEnabled(item.dataSource, dexAggregators))
+            .filter(item => isSourceEnabled(item.dataSource, sources))
             .map(item => {
                 const source = item.dataSource || 'kyberswap';
                 const tokenAToB = item.tokenAToB;

@@ -16,7 +16,7 @@ interface OnchainSourceParams {
   tokenADecimals: number;
   tokenBDecimals: number;
   appChainConfig: ChainAppConfig;
-  dexAggregators?: ConfigData['dexAggregators'];
+  sources?: ConfigData['sources'];
 }
 
 export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): Promise<ChainSwapData[]> {
@@ -29,20 +29,21 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
     tokenBAddress,
     tokenADecimals,
     tokenBDecimals,
-    appChainConfig
+    appChainConfig,
+    sources
   } = params;
 
   const kyberChainParam = appChainConfig.kyberCode || chainKey;
   const nordsternChainParam = appChainConfig.nordsternCode || chainKey;
   const lifiChainId = appChainConfig.lifiChainId || appChainConfig.nordsternCode;
-  const enableKyber = dexAggregators?.kyberswap !== false;
-  const enableNordstern = dexAggregators?.nordstern !== false && !!appChainConfig.nordsternCode;
-  const enableLiFi = dexAggregators?.lifi !== false && !!lifiChainId;
+  const enableKyber = sources?.kyberswap !== false;
+  const enableNordstern = sources?.nordstern !== false && !!appChainConfig.nordsternCode;
+  const enableLiFi = sources?.lifi !== false && !!lifiChainId;
 
   const amountInAToB = toWei(amount, tokenADecimals);
   const amountInBToA = toWei(amount, tokenBDecimals);
 
-  const sources: SourceEntry[] = [];
+  const sourceEntries: SourceEntry[] = [];
 
   const kyberPromise = enableKyber
     ? getQuote(kyberChainParam, tokenAAddress, tokenBAddress, amountInAToB)
@@ -68,11 +69,11 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
     ...(lifiPromise ? [lifiPromise] : [])
   ]);
 
-  sources.push(...fetched);
+  sourceEntries.push(...fetched);
 
   const results: ChainSwapData[] = [];
 
-  for (const { source, aToB, bToA } of sources) {
+  for (const { source, aToB, bToA } of sourceEntries) {
     const tokenAToB = {
       input: amount,
       output: aToB.success && aToB.amountOut ? fromWei(aToB.amountOut, tokenBDecimals) : null,

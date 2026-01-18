@@ -18,7 +18,7 @@ export async function POST(request: Request) {
         const data = await request.json();
 
     // Basic validation (can be expanded)
-    if (!data.chains || !data.pairs || !data.dexAggregators) {
+    if (!data.chains || !data.pairs || !data.sources) {
       return NextResponse.json({ error: 'Invalid config structure' }, { status: 400 });
     }
 

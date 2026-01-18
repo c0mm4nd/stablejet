@@ -132,10 +132,13 @@ export interface TradingPairConfig {
 export interface ConfigData {
   chains: Record<string, ChainAppConfig>; // chainId -> Config
   pairs: Record<string, TradingPairConfig>; // pairId -> Config
-  dexAggregators: {
+  sources: {
     kyberswap: boolean;
     nordstern: boolean;
     lifi: boolean;
+    binance: boolean;
+    bybit: boolean;
+    mexc: boolean;
   };
   clientRefreshInterval: number;
 }

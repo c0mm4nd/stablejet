@@ -3,7 +3,7 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
-import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, calculateRoundTripBps, filterOutliers, isDexSourceEnabled } from '@/lib/utils';
+import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, calculateRoundTripBps, filterOutliers, isSourceEnabled } from '@/lib/utils';
 
 interface CrossChainArbitrageChartProps {
   history: HistoryDataPoint[];
@@ -129,7 +129,7 @@ interface ArbitrageDetail {
 
 
 export default function CrossChainArbitrageChart({ history, amount, pairId }: CrossChainArbitrageChartProps) {
-  const { pairs, dexAggregators } = useConfig();
+  const { pairs, sources } = useConfig();
   const sourceSuffix = (source?: string) => {
     if (source === 'nordstern') return 'NS';
     if (source === 'lifi') return 'LF';
@@ -153,7 +153,7 @@ export default function CrossChainArbitrageChart({ history, amount, pairId }: Cr
   history.forEach(point => {
     const amountData = point.data
       .filter(item => item.amount === amount)
-      .filter(item => isDexSourceEnabled(item.dataSource, dexAggregators));
+      .filter(item => isSourceEnabled(item.dataSource, sources));
 
     const ratesAtoB = amountData
       .map(item => {
