@@ -12,7 +12,7 @@ interface HeaderProps {
 
 export default function Header({ countdown, selectedPair, onPairChange, onSettingsClick }: HeaderProps) {
   const { pairs: pairsConfig } = useConfig();
-  const pairs = Object.values(pairsConfig);
+  const pairs = Object.values(pairsConfig).filter(pair => !pair.disabled);
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);

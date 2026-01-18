@@ -330,7 +330,12 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       className={`flex-1 text-left px-3 py-2 rounded-lg text-sm transition-colors ${activePairId === pair.id ? 'bg-white shadow-sm border border-gray-200 font-semibold text-gray-900' : 'text-gray-600 hover:bg-gray-200'
                         }`}
                     >
-                      {pair.name}
+                      <div className="flex items-center justify-between">
+                        <span>{pair.name}</span>
+                        {pair.disabled && (
+                          <span className="text-[10px] uppercase tracking-wide text-gray-400">Disabled</span>
+                        )}
+                      </div>
                     </button>
                     <button onClick={() => handleRemovePair(pair.id)} className="text-red-400 hover:text-red-600 px-2 opacity-0 group-hover:opacity-100">×</button>
                   </div>
@@ -413,8 +418,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         </div>
                         <div className="flex items-center gap-3">
                           <label className="flex items-center gap-2 text-sm text-gray-600">
-                            <input type="checkbox" checked={config.disable} onChange={e => handleUpdateChain(id, 'disable', e.target.checked)} />
-                            Disable
+                            <input type="checkbox" checked={!!config.disabled} onChange={e => handleUpdateChain(id, 'disabled', e.target.checked)} />
+                            Disabled
                           </label>
                           <button onClick={() => handleRemoveChain(id)} className="text-red-500 hover:text-red-700 text-xs font-semibold">Remove</button>
                         </div>
@@ -487,6 +492,23 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       <div className="text-right">
                         <div className="text-sm text-gray-500">Token A: <span className="font-bold text-gray-900">{editingPairs[activePairId].tokenA}</span></div>
                         <div className="text-sm text-gray-500">Token B: <span className="font-bold text-gray-900">{editingPairs[activePairId].tokenB}</span></div>
+                        <label className="mt-2 inline-flex items-center gap-2 text-sm text-gray-600">
+                          <input
+                            type="checkbox"
+                            checked={!editingPairs[activePairId].disabled}
+                            onChange={e => {
+                              const enabled = e.target.checked;
+                              setEditingPairs({
+                                ...editingPairs,
+                                [activePairId]: {
+                                  ...editingPairs[activePairId],
+                                  disabled: !enabled
+                                }
+                              });
+                            }}
+                          />
+                          Enabled
+                        </label>
                       </div>
                     </div>
 
@@ -528,7 +550,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     <div className="space-y-4">
                       <h3 className="text-md font-bold text-gray-800">Chain Configurations</h3>
                       <div className="grid grid-cols-1 gap-4">
-                        {Object.keys(editingChains).filter(id => !editingChains[id].disable).map(chainId => {
+                        {Object.keys(editingChains).filter(id => !editingChains[id].disabled).map(chainId => {
                           const isConfigured = !!editingPairs[activePairId].chains[chainId];
                           const config = editingPairs[activePairId].chains[chainId] || { addressA: '', addressB: '' };
                           const isCex = ['binance', 'mexc', 'bybit'].includes(chainId);
@@ -546,6 +568,16 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
                               {isConfigured && (
                                 <div className="grid grid-cols-2 gap-4 ml-7">
+                                  <div className="col-span-2 flex items-center justify-end">
+                                    <label className="inline-flex items-center gap-2 text-xs text-gray-600">
+                                      <input
+                                        type="checkbox"
+                                        checked={!config.disabled}
+                                        onChange={e => handleUpdatePairChain(activePairId, chainId, 'disabled', !e.target.checked)}
+                                      />
+                                      Enabled
+                                    </label>
+                                  </div>
                                   {isCex ? (
                                     <div className="col-span-2">
                                       <label className="block text-xs text-gray-500 mb-1">CEX Pair Symbol</label>

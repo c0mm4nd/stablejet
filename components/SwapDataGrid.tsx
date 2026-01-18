@@ -114,6 +114,18 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
       </div>
     );
   }
+  if (currentPairConfig.disabled) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
+        <div className="text-xl font-semibold text-gray-700">Trading Pair Disabled</div>
+        <button onClick={() => setIsSettingsOpen(true)} className="text-blue-600 hover:underline">Open Settings</button>
+        <SettingsModal
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50/50">

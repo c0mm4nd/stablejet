@@ -108,7 +108,7 @@ export interface ChainAppConfig {
   kyberCode?: string;     // e.g. "ethereum"
   nordsternCode?: string; // e.g. "8118"
   lifiChainId?: string;   // e.g. "1"
-  disable?: boolean;
+  disabled?: boolean;
 }
 
 export interface ChainPairConfig {
@@ -126,6 +126,7 @@ export interface TradingPairConfig {
   tokenA: string;      // Symbol A (e.g. "USDC")
   tokenB: string;      // Symbol B (e.g. "USDT")
   amounts: number[];   // e.g. [10000, 50000, 100000]
+  disabled?: boolean;  // globally disable this pair
   chains: Record<string, ChainPairConfig>; // chainId -> { addressA, addressB }
 }
 

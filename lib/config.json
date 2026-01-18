@@ -4,559 +4,669 @@
       "name": "Ethereum",
       "kyberCode": "ethereum",
       "nordsternCode": "1",
-      "lifiChainId": "1"
+      "lifiChainId": "1",
+      "disabled": false
     },
     "polygon": {
       "name": "Polygon",
       "kyberCode": "polygon",
       "nordsternCode": "137",
-      "lifiChainId": "137"
+      "lifiChainId": "137",
+      "disabled": false
     },
     "arbitrum": {
       "name": "Arbitrum",
       "kyberCode": "arbitrum",
       "nordsternCode": "42161",
-      "lifiChainId": "42161"
+      "lifiChainId": "42161",
+      "disabled": false
     },
     "optimism": {
       "name": "Optimism",
       "kyberCode": "optimism",
       "nordsternCode": "10",
-      "lifiChainId": "10"
+      "lifiChainId": "10",
+      "disabled": false
     },
     "base": {
       "name": "Base",
       "kyberCode": "base",
       "nordsternCode": "8453",
-      "lifiChainId": "8453"
+      "lifiChainId": "8453",
+      "disabled": false
     },
     "bnb_chain": {
       "name": "BNB Chain",
       "kyberCode": "bsc",
       "lifiChainId": "56",
-      "nordsternCode": "56"
+      "nordsternCode": "56",
+      "disabled": false
     },
     "avalanche": {
       "name": "Avalanche",
       "kyberCode": "avalanche",
       "nordsternCode": "43114",
-      "lifiChainId": "43114"
+      "lifiChainId": "43114",
+      "disabled": false
     },
     "fantom": {
       "name": "Fantom",
-      "kyberCode": "fantom"
+      "kyberCode": "fantom",
+      "disabled": false
     },
     "gnosis": {
       "name": "Gnosis",
-      "kyberCode": "gnosis"
+      "kyberCode": "gnosis",
+      "disabled": false
     },
     "zksync_era": {
       "name": "zkSync Era",
-      "kyberCode": "zksync"
+      "kyberCode": "zksync",
+      "disabled": false
     },
     "linea": {
       "name": "Linea",
       "kyberCode": "linea",
       "nordsternCode": "59144",
-      "lifiChainId": "59144"
+      "lifiChainId": "59144",
+      "disabled": false
     },
     "scroll": {
       "name": "Scroll",
-      "kyberCode": "scroll"
+      "kyberCode": "scroll",
+      "disabled": false
     },
     "sonic": {
       "name": "Sonic",
       "kyberCode": "sonic",
       "nordsternCode": "146",
-      "lifiChainId": "146"
+      "lifiChainId": "146",
+      "disabled": false
     },
     "unichain": {
       "name": "Unichain",
       "kyberCode": "unichain",
       "nordsternCode": "130",
-      "lifiChainId": "130"
+      "lifiChainId": "130",
+      "disabled": false
     },
     "berachain": {
       "name": "Berachain",
       "kyberCode": "berachain",
       "nordsternCode": "80094",
-      "lifiChainId": "80094"
+      "lifiChainId": "80094",
+      "disabled": false
     },
     "mantle": {
       "name": "Mantle",
       "kyberCode": "mantle",
       "nordsternCode": "5000",
-      "lifiChainId": "5000"
+      "lifiChainId": "5000",
+      "disabled": false
     },
     "binance": {
       "name": "Binance",
-      "disable": false
+      "disabled": false
     },
     "mexc": {
       "name": "MEXC",
-      "disable": false
+      "disabled": false
     },
     "bybit": {
       "name": "Bybit",
-      "disable": false
+      "disabled": false
     },
     "coredao": {
       "name": "Coredao",
       "kyberCode": "coredao",
-      "disable": true
+      "disabled": true
     },
     "peaq": {
       "name": "Peaq",
       "kyberCode": "peaq",
-      "disable": true
+      "disabled": true
     },
     "sei": {
       "name": "Sei",
       "kyberCode": "sei",
-      "disable": true,
       "lifiChainId": "1329",
-      "nordsternCode": "1329"
+      "nordsternCode": "1329",
+      "disabled": true
     },
     "xdc": {
       "name": "Xdc",
       "kyberCode": "xdc",
-      "disable": true,
       "lifiChainId": "50",
-      "nordsternCode": "50"
+      "nordsternCode": "50",
+      "disabled": true
     },
     "ink": {
       "name": "Ink",
       "kyberCode": "ink",
-      "disable": true,
       "lifiChainId": "57073",
-      "nordsternCode": "57073"
+      "nordsternCode": "57073",
+      "disabled": true
     },
     "flare": {
       "name": "Flare",
       "lifiChainId": "14",
-      "nordsternCode": "14"
+      "nordsternCode": "14",
+      "disabled": false
     },
     "cronos": {
       "name": "Cronos",
       "lifiChainId": "25",
-      "nordsternCode": "25"
+      "nordsternCode": "25",
+      "disabled": false
     },
     "rootstock": {
       "name": "Rootstock",
-      "lifiChainId": "30"
+      "lifiChainId": "30",
+      "disabled": false
     },
     "viction": {
       "name": "Viction",
-      "lifiChainId": "88"
+      "lifiChainId": "88",
+      "disabled": false
     },
     "gnosis_100": {
       "name": "Gnosis",
       "lifiChainId": "100",
-      "nordsternCode": "100"
+      "nordsternCode": "100",
+      "disabled": false
     },
     "fuse": {
       "name": "FUSE",
-      "lifiChainId": "122"
+      "lifiChainId": "122",
+      "disabled": false
     },
     "monad": {
       "name": "Monad",
       "lifiChainId": "143",
-      "nordsternCode": "143"
+      "nordsternCode": "143",
+      "disabled": false
     },
     "opbnb": {
       "name": "opBNB",
       "lifiChainId": "204",
-      "nordsternCode": "204"
+      "nordsternCode": "204",
+      "disabled": false
     },
     "lens": {
       "name": "Lens",
-      "lifiChainId": "232"
+      "lifiChainId": "232",
+      "disabled": false
     },
     "fraxtal": {
       "name": "Fraxtal",
       "lifiChainId": "252",
-      "nordsternCode": "252"
+      "nordsternCode": "252",
+      "disabled": false
     },
     "boba": {
       "name": "Boba",
       "lifiChainId": "288",
-      "nordsternCode": "288"
+      "nordsternCode": "288",
+      "disabled": false
     },
     "zksync": {
       "name": "zkSync",
-      "lifiChainId": "324"
+      "lifiChainId": "324",
+      "disabled": false
     },
     "world_chain": {
       "name": "World Chain",
       "lifiChainId": "480",
-      "nordsternCode": "480"
+      "nordsternCode": "480",
+      "disabled": false
     },
     "flow": {
       "name": "Flow",
       "lifiChainId": "747",
-      "nordsternCode": "747"
+      "nordsternCode": "747",
+      "disabled": false
     },
     "stable": {
       "name": "Stable",
-      "lifiChainId": "988"
+      "lifiChainId": "988",
+      "disabled": false
     },
     "hyperevm": {
       "name": "HyperEVM",
       "lifiChainId": "999",
       "nordsternCode": "999",
-      "kyberCode": "hyp"
+      "kyberCode": "hyp",
+      "disabled": false
     },
     "metis": {
       "name": "Metis",
       "lifiChainId": "1088",
-      "nordsternCode": "1088"
+      "nordsternCode": "1088",
+      "disabled": false
     },
     "lisk": {
       "name": "Lisk",
       "lifiChainId": "1135",
-      "nordsternCode": "1135"
+      "nordsternCode": "1135",
+      "disabled": false
     },
     "moonbeam": {
       "name": "Moonbeam",
-      "lifiChainId": "1284"
+      "lifiChainId": "1284",
+      "disabled": false
     },
     "vana": {
       "name": "Vana",
       "lifiChainId": "1480",
-      "nordsternCode": "1480"
+      "nordsternCode": "1480",
+      "disabled": false
     },
     "gravity": {
       "name": "Gravity",
       "lifiChainId": "1625",
-      "nordsternCode": "1625"
+      "nordsternCode": "1625",
+      "disabled": false
     },
     "soneium": {
       "name": "Soneium",
       "lifiChainId": "1868",
-      "nordsternCode": "1868"
+      "nordsternCode": "1868",
+      "disabled": false
     },
     "swellchain": {
       "name": "Swellchain",
       "lifiChainId": "1923",
-      "nordsternCode": "1923"
+      "nordsternCode": "1923",
+      "disabled": false
     },
     "ronin": {
       "name": "Ronin",
       "lifiChainId": "2020",
       "nordsternCode": "2020",
-      "kyberCode": "ron"
+      "kyberCode": "ron",
+      "disabled": false
     },
     "abstract": {
       "name": "Abstract",
-      "lifiChainId": "2741"
+      "lifiChainId": "2741",
+      "disabled": false
     },
     "kaia": {
       "name": "Kaia",
       "lifiChainId": "8217",
-      "nordsternCode": "8217"
+      "nordsternCode": "8217",
+      "disabled": false
     },
     "plasma": {
       "name": "Plasma",
       "lifiChainId": "9745",
       "nordsternCode": "9745",
-      "kyberCode": "pla"
+      "kyberCode": "pla",
+      "disabled": false
     },
     "immutable_zkevm": {
       "name": "Immutable zkEVM",
       "lifiChainId": "13371",
-      "nordsternCode": "13371"
+      "nordsternCode": "13371",
+      "disabled": false
     },
     "apechain": {
       "name": "Apechain",
       "lifiChainId": "33139",
-      "nordsternCode": "33139"
+      "nordsternCode": "33139",
+      "disabled": false
     },
     "mode": {
       "name": "Mode",
       "lifiChainId": "34443",
-      "nordsternCode": "34443"
+      "nordsternCode": "34443",
+      "disabled": false
     },
     "celo": {
       "name": "Celo",
       "lifiChainId": "42220",
-      "nordsternCode": "42220"
+      "nordsternCode": "42220",
+      "disabled": false
     },
     "etherlink": {
       "name": "Etherlink",
       "lifiChainId": "42793",
-      "kyberCode": "etl"
+      "kyberCode": "etl",
+      "disabled": false
     },
     "hemi": {
       "name": "Hemi",
       "lifiChainId": "43111",
-      "nordsternCode": "43111"
+      "nordsternCode": "43111",
+      "disabled": false
     },
     "sophon": {
       "name": "Sophon",
-      "lifiChainId": "50104"
+      "lifiChainId": "50104",
+      "disabled": false
     },
     "superposition": {
       "name": "Superposition",
       "lifiChainId": "55244",
-      "nordsternCode": "55244"
+      "nordsternCode": "55244",
+      "disabled": false
     },
     "bob": {
       "name": "BOB",
       "lifiChainId": "60808",
-      "nordsternCode": "60808"
+      "nordsternCode": "60808",
+      "disabled": false
     },
     "blast": {
       "name": "Blast",
       "lifiChainId": "81457",
-      "nordsternCode": "81457"
+      "nordsternCode": "81457",
+      "disabled": false
     },
     "plume": {
       "name": "Plume",
-      "lifiChainId": "98866"
+      "lifiChainId": "98866",
+      "disabled": false
     },
     "taiko": {
       "name": "Taiko",
       "lifiChainId": "167000",
-      "nordsternCode": "167000"
+      "nordsternCode": "167000",
+      "disabled": false
     },
     "scroll_534352": {
       "name": "Scroll",
       "lifiChainId": "534352",
-      "nordsternCode": "534352"
+      "nordsternCode": "534352",
+      "disabled": false
     },
     "katana": {
       "name": "Katana",
       "lifiChainId": "747474",
-      "nordsternCode": "747474"
+      "nordsternCode": "747474",
+      "disabled": false
     },
     "corn": {
       "name": "Corn",
       "lifiChainId": "21000000",
-      "nordsternCode": "21000000"
+      "nordsternCode": "21000000",
+      "disabled": false
     },
     "songbird": {
       "name": "songbird",
-      "nordsternCode": "19"
+      "nordsternCode": "19",
+      "disabled": false
     },
     "telos": {
       "name": "telos",
-      "nordsternCode": "40"
+      "nordsternCode": "40",
+      "disabled": false
     },
     "kub": {
       "name": "kub",
-      "nordsternCode": "96"
+      "nordsternCode": "96",
+      "disabled": false
     },
     "thundercore": {
       "name": "thundercore",
-      "nordsternCode": "108"
+      "nordsternCode": "108",
+      "disabled": false
     },
     "shibarium": {
       "name": "shibarium",
-      "nordsternCode": "109"
+      "nordsternCode": "109",
+      "disabled": false
     },
     "mantapacific": {
       "name": "mantapacific",
-      "nordsternCode": "169"
+      "nordsternCode": "169",
+      "disabled": false
     },
     "hashkey": {
       "name": "hashkey",
-      "nordsternCode": "177"
+      "nordsternCode": "177",
+      "disabled": false
     },
     "mint": {
       "name": "mint",
-      "nordsternCode": "185"
+      "nordsternCode": "185",
+      "disabled": false
     },
     "bittorrent": {
       "name": "bittorrent",
-      "nordsternCode": "199"
+      "nordsternCode": "199",
+      "disabled": false
     },
     "b2": {
       "name": "b2",
-      "nordsternCode": "223"
+      "nordsternCode": "223",
+      "disabled": false
     },
     "kroma": {
       "name": "kroma",
-      "nordsternCode": "255"
+      "nordsternCode": "255",
+      "disabled": false
     },
     "kcc": {
       "name": "kcc",
-      "nordsternCode": "321"
+      "nordsternCode": "321",
+      "disabled": false
     },
     "shape": {
       "name": "shape",
-      "nordsternCode": "360"
+      "nordsternCode": "360",
+      "disabled": false
     },
     "appchain": {
       "name": "appchain",
-      "nordsternCode": "466"
+      "nordsternCode": "466",
+      "disabled": false
     },
     "astar": {
       "name": "astar",
-      "nordsternCode": "592"
+      "nordsternCode": "592",
+      "disabled": false
     },
     "endurance": {
       "name": "endurance",
-      "nordsternCode": "648"
+      "nordsternCode": "648",
+      "disabled": false
     },
     "redstone": {
       "name": "redstone",
-      "nordsternCode": "690"
+      "nordsternCode": "690",
+      "disabled": false
     },
     "matchain": {
       "name": "matchain",
-      "nordsternCode": "698"
+      "nordsternCode": "698",
+      "disabled": false
     },
     "qitmeer": {
       "name": "qitmeer",
-      "nordsternCode": "813"
+      "nordsternCode": "813",
+      "disabled": false
     },
     "wanchain": {
       "name": "wanchain",
-      "nordsternCode": "888"
+      "nordsternCode": "888",
+      "disabled": false
     },
     "wemix": {
       "name": "wemix",
-      "nordsternCode": "1111"
+      "nordsternCode": "1111",
+      "disabled": false
     },
     "core": {
       "name": "core",
-      "nordsternCode": "1116"
+      "nordsternCode": "1116",
+      "disabled": false
     },
     "ultron": {
       "name": "ultron",
-      "nordsternCode": "1231"
+      "nordsternCode": "1231",
+      "disabled": false
     },
     "step": {
       "name": "step",
-      "nordsternCode": "1234"
+      "nordsternCode": "1234",
+      "disabled": false
     },
     "elysium": {
       "name": "elysium",
-      "nordsternCode": "1339"
+      "nordsternCode": "1339",
+      "disabled": false
     },
     "story": {
       "name": "story",
-      "nordsternCode": "1514"
+      "nordsternCode": "1514",
+      "disabled": false
     },
     "reya": {
       "name": "reya",
-      "nordsternCode": "1729"
+      "nordsternCode": "1729",
+      "disabled": false
     },
     "sanko": {
       "name": "sanko",
-      "nordsternCode": "1996"
+      "nordsternCode": "1996",
+      "disabled": false
     },
     "goat": {
       "name": "goat",
-      "nordsternCode": "2345"
+      "nordsternCode": "2345",
+      "disabled": false
     },
     "morphl2": {
       "name": "morphl2",
-      "nordsternCode": "2818"
+      "nordsternCode": "2818",
+      "disabled": false
     },
     "muster": {
       "name": "muster",
-      "nordsternCode": "4078"
+      "nordsternCode": "4078",
+      "disabled": false
     },
     "beam": {
       "name": "beam",
-      "nordsternCode": "4337"
+      "nordsternCode": "4337",
+      "disabled": false
     },
     "superseed": {
       "name": "superseed",
-      "nordsternCode": "5330"
+      "nordsternCode": "5330",
+      "disabled": false
     },
     "duckchain": {
       "name": "duckchain",
-      "nordsternCode": "5545"
+      "nordsternCode": "5545",
+      "disabled": false
     },
     "cyber": {
       "name": "cyber",
-      "nordsternCode": "7560"
+      "nordsternCode": "7560",
+      "disabled": false
     },
     "b3": {
       "name": "b3",
-      "nordsternCode": "8333"
+      "nordsternCode": "8333",
+      "disabled": false
     },
     "rss3vsl": {
       "name": "rss3vsl",
-      "nordsternCode": "12553"
+      "nordsternCode": "12553",
+      "disabled": false
     },
     "genesys": {
       "name": "genesys",
-      "nordsternCode": "16507"
+      "nordsternCode": "16507",
+      "disabled": false
     },
     "mapprotocol": {
       "name": "mapprotocol",
-      "nordsternCode": "22776"
+      "nordsternCode": "22776",
+      "disabled": false
     },
     "bitgert": {
       "name": "bitgert",
-      "nordsternCode": "32520"
+      "nordsternCode": "32520",
+      "disabled": false
     },
     "funki": {
       "name": "funki",
-      "nordsternCode": "33979"
+      "nordsternCode": "33979",
+      "disabled": false
     },
     "qnetwork": {
       "name": "qnetwork",
-      "nordsternCode": "35441"
+      "nordsternCode": "35441",
+      "disabled": false
     },
     "arbitrumnova": {
       "name": "arbitrumnova",
-      "nordsternCode": "42170"
+      "nordsternCode": "42170",
+      "disabled": false
     },
     "zircuit": {
       "name": "zircuit",
-      "nordsternCode": "48900"
+      "nordsternCode": "48900",
+      "disabled": false
     },
     "electroneum": {
       "name": "electroneum",
-      "nordsternCode": "52014"
+      "nordsternCode": "52014",
+      "disabled": false
     },
     "chilizchain": {
       "name": "chilizchain",
-      "nordsternCode": "88888"
+      "nordsternCode": "88888",
+      "disabled": false
     },
     "bitlayer": {
       "name": "bitlayer",
-      "nordsternCode": "200901"
+      "nordsternCode": "200901",
+      "disabled": false
     },
     "platon": {
       "name": "platon",
-      "nordsternCode": "210425"
+      "nordsternCode": "210425",
+      "disabled": false
     },
     "parex": {
       "name": "parex",
-      "nordsternCode": "322202"
+      "nordsternCode": "322202",
+      "disabled": false
     },
     "zora": {
       "name": "zora",
-      "nordsternCode": "7777777"
+      "nordsternCode": "7777777",
+      "disabled": false
     },
     "ancient8": {
       "name": "ancient8",
-      "nordsternCode": "888888888"
+      "nordsternCode": "888888888",
+      "disabled": false
     },
     "rari": {
       "name": "rari",
-      "nordsternCode": "1380012617"
+      "nordsternCode": "1380012617",
+      "disabled": false
     },
     "ab_chain": {
       "name": "AB Chain",
-      "disable": true
+      "disabled": true
     },
     "conflux_espace": {
       "name": "Conflux eSpace",
-      "disable": true
+      "disabled": true
     },
     "megaeth": {
       "name": "MegaETH",
-      "disable": true
+      "disabled": true
     },
     "x_layer": {
       "name": "XLayer",
-      "disable": true
+      "disabled": true
     }
   },
   "pairs": {
@@ -686,7 +796,8 @@
           "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "USDe_USDT": {
       "id": "USDe_USDT",
@@ -754,7 +865,8 @@
           "decimalsA": 18,
           "decimalsB": 18
         }
-      }
+      },
+      "disabled": false
     },
     "USDe_USDC": {
       "id": "USDe_USDC",
@@ -846,7 +958,8 @@
           "decimalsA": 18,
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "USD1_USDC": {
       "id": "USD1_USDC",
@@ -881,7 +994,8 @@
           "addressB": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "USD1_USDT": {
       "id": "USD1_USDT",
@@ -910,7 +1024,8 @@
           "addressB": "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "USDf_USDC": {
       "id": "USDf_USDC",
@@ -945,7 +1060,8 @@
           "addressB": "0xfA2958CB79b0491CC627c1557F441eF849Ca8eb1",
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "USDf_USDT": {
       "id": "USDf_USDT",
@@ -980,7 +1096,8 @@
           "addressB": "0xcdA5b77E2E2268D9E09c874c1b9A4c3F07b37555",
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "USR_USDC": {
       "id": "USR_USDC",
@@ -1015,7 +1132,8 @@
           "decimalsA": 18,
           "decimalsB": 18
         }
-      }
+      },
+      "disabled": false
     },
     "USR_USDT": {
       "id": "USR_USDT",
@@ -1050,7 +1168,8 @@
           "decimalsA": 18,
           "decimalsB": 18
         }
-      }
+      },
+      "disabled": false
     },
     "sUSDe_USDT": {
       "id": "sUSDe_USDT",
@@ -1085,7 +1204,8 @@
           "decimalsA": 18,
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "sUSDe_USDC": {
       "id": "sUSDe_USDC",
@@ -1156,7 +1276,8 @@
           "decimalsA": 18,
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "wstUSR_USDT": {
       "id": "wstUSR_USDT",
@@ -1179,7 +1300,8 @@
           "decimalsA": 18,
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "wstUSR_USDC": {
       "id": "wstUSR_USDC",
@@ -1214,7 +1336,8 @@
           "decimalsA": 18,
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "RLP_USDT": {
       "id": "RLP_USDT",
@@ -1237,7 +1360,8 @@
           "decimalsA": 18,
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "RLP_USDC": {
       "id": "RLP_USDC",
@@ -1272,7 +1396,8 @@
           "decimalsA": 18,
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "YUSD_USDT": {
       "id": "YUSD_USDT",
@@ -1295,7 +1420,8 @@
           "decimalsA": 18,
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "YUSD_USDC": {
       "id": "YUSD_USDC",
@@ -1336,7 +1462,8 @@
           "decimalsA": 18,
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     },
     "yUSD_USDT": {
       "id": "yUSD_USDT",
@@ -1346,7 +1473,8 @@
       "amounts": [
         10000
       ],
-      "chains": {}
+      "chains": {},
+      "disabled": false
     },
     "yUSD_USDC": {
       "id": "yUSD_USDC",
@@ -1369,7 +1497,8 @@
           "decimalsA": 18,
           "decimalsB": 6
         }
-      }
+      },
+      "disabled": false
     }
   },
   "clientRefreshInterval": 20,

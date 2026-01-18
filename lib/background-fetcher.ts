@@ -95,7 +95,7 @@ class BackgroundFetcher {
           return;
         }
 
-        const pairIds = Object.keys(config.pairs);
+        const pairIds = Object.keys(config.pairs).filter(pairId => !config.pairs[pairId]?.disabled);
 
         log(`[BackgroundFetcher] Fetching data for ${pairIds.length} trading pairs: ${pairIds.join(', ')}`);
 

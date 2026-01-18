@@ -57,7 +57,8 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
           mexc: true
         });
         if (!selectedPair) {
-          const firstPairId = Object.keys(data.pairs || {})[0];
+          const enabledPairs = Object.values(data.pairs || {}).filter(p => !p.disabled);
+          const firstPairId = enabledPairs[0]?.id;
           if (firstPairId) {
             setSelectedPair(firstPairId);
             if (typeof window !== 'undefined') {

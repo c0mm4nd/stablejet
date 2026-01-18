@@ -181,7 +181,7 @@ export async function getSwapDataForPair(
   for (const [chainKey, chainPairData] of Object.entries(pairConfig.chains)) {
     // Check if chain is globally enabled
     const appChainConfig = chainsConfig[chainKey];
-    if (!appChainConfig || appChainConfig.disable) continue;
+    if (!appChainConfig || appChainConfig.disabled) continue;
 
     // Check if pair is enabled on this chain
     // (Our new type doesn't have disable on chainPairData yet, but good to check if we added it)
