@@ -36,7 +36,7 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
   const kyberChainParam = appChainConfig.kyberCode || chainKey;
   const nordsternChainParam = appChainConfig.nordsternCode || chainKey;
   const lifiChainId = appChainConfig.lifiChainId || appChainConfig.nordsternCode;
-  const enableKyber = sources?.kyberswap !== false;
+  const enableKyber = sources?.kyberswap !== false && !!appChainConfig.kyberCode;
   const enableNordstern = sources?.nordstern !== false && !!appChainConfig.nordsternCode;
   const enableLiFi = sources?.lifi !== false && !!lifiChainId;
 
