@@ -101,7 +101,7 @@ const CustomTooltip = ({ active, payload, label, pairConfig }: any) => {
                 </span>
                 {entry.value !== null && entry.value !== undefined ? (
                   <span className={`font-bold ${entry.value >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {entry.value.toFixed(2)} bps
+                    {entry.value.toFixed(6)} bps
                   </span>
                 ) : (
                   <span className="font-bold text-gray-400">N/A</span>
@@ -124,7 +124,7 @@ const CustomTooltip = ({ active, payload, label, pairConfig }: any) => {
                 </span>
                 {entry.value !== null && entry.value !== undefined ? (
                   <span className={`font-bold ${entry.value >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {entry.value.toFixed(2)} bps
+                    {entry.value.toFixed(6)} bps
                   </span>
                 ) : (
                   <span className="font-bold text-gray-400">N/A</span>
@@ -258,7 +258,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
         const tokenAToBRate = tokenAToB ? calculateImpliedRate(tokenAToB.input, tokenAToB.output) : null;
         const tokenAToBSpread = calculateRateDeviationBps(tokenAToBRate, baseline.aToB);
         const filteredTokenAToB = filterOutliers(
-          tokenAToBSpread !== null ? parseFloat(tokenAToBSpread.toFixed(2)) : null,
+          tokenAToBSpread !== null ? parseFloat(tokenAToBSpread.toFixed(6)) : null,
           allSpreads[`${base} (${tokenAShort}→${tokenBShort})`],
           10
         );
@@ -268,7 +268,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
         const tokenBToARate = tokenBToA ? calculateImpliedRate(tokenBToA.input, tokenBToA.output) : null;
         const tokenBToASpread = calculateRateDeviationBps(tokenBToARate, baseline.bToA);
         const filteredTokenBToA = filterOutliers(
-          tokenBToASpread !== null ? parseFloat(tokenBToASpread.toFixed(2)) : null,
+          tokenBToASpread !== null ? parseFloat(tokenBToASpread.toFixed(6)) : null,
           allSpreads[`${base} (${tokenBShort}→${tokenAShort})`],
           10
         );

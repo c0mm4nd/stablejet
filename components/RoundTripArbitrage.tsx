@@ -132,13 +132,13 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
                                         </div>
                                     </td>
                                     <td className="px-4 py-3 text-right font-bold text-green-600">
-                                        +{opp.profitBps.toFixed(2)}
+                                        +{opp.profitBps.toFixed(6)}
                                     </td>
                                     <td className="px-4 py-3 text-right text-gray-600">
-                                        {opp.buyPrice.toFixed(4)}
+                                        {opp.buyPrice.toFixed(6)}
                                     </td>
                                     <td className="px-4 py-3 text-right text-gray-600">
-                                        {opp.sellPrice.toFixed(4)}
+                                        {opp.sellPrice.toFixed(6)}
                                     </td>
                                 </tr>
                             ))}

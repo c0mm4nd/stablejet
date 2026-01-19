@@ -353,7 +353,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                   <td className="px-4 py-3 text-right">
                     {row.outputAtoB !== null ? (
                       <span className="text-gray-700">
-                        {row.outputAtoB.toFixed(2)}
+                        {row.outputAtoB.toFixed(6)}
                       </span>
                     ) : (
                       <span className="text-red-500 text-xs">错误</span>
@@ -362,7 +362,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                   <td className="px-4 py-3 text-right">
                     {row.spreadAtoB !== null ? (
                       <span className={`font-semibold ${row.spreadAtoB >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {row.spreadAtoB >= 0 ? '+' : ''}{row.spreadAtoB.toFixed(2)}
+                        {row.spreadAtoB >= 0 ? '+' : ''}{row.spreadAtoB.toFixed(6)}
                       </span>
                     ) : (
                       <span className="text-gray-400">-</span>
@@ -371,7 +371,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                   <td className="px-4 py-3 text-right">
                     {row.outputBtoA !== null ? (
                       <span className="text-gray-700">
-                        {row.outputBtoA.toFixed(2)}
+                        {row.outputBtoA.toFixed(6)}
                       </span>
                     ) : (
                       <span className="text-red-500 text-xs">错误</span>
@@ -380,7 +380,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                   <td className="px-4 py-3 text-right">
                     {row.spreadBtoA !== null ? (
                       <span className={`font-semibold ${row.spreadBtoA >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {row.spreadBtoA >= 0 ? '+' : ''}{row.spreadBtoA.toFixed(2)}
+                        {row.spreadBtoA >= 0 ? '+' : ''}{row.spreadBtoA.toFixed(6)}
                       </span>
                     ) : (
                       <span className="text-gray-400">-</span>
@@ -389,7 +389,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                   <td className="px-4 py-3 text-right">
                     {row.arbitrageSpace !== null ? (
                       <span className={`font-bold ${row.arbitrageSpace >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {row.arbitrageSpace >= 0 ? '+' : ''}{row.arbitrageSpace.toFixed(2)}
+                        {row.arbitrageSpace >= 0 ? '+' : ''}{row.arbitrageSpace.toFixed(6)}
                       </span>
                     ) : (
                       <span className="text-gray-400">-</span>

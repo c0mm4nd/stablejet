@@ -172,11 +172,11 @@ export default function TriangularArbitrage({ history, amount }: TriangularArbit
                         {opportunities.slice(0, 10).map((opp, idx) => (
                             <tr key={idx}>
                                 <td className="px-4 py-3 font-medium">{opp.path}</td>
-                                <td className="px-4 py-3 text-right font-bold text-green-600">+{opp.profitBps.toFixed(2)} bps</td>
+                                <td className="px-4 py-3 text-right font-bold text-green-600">+{opp.profitBps.toFixed(6)} bps</td>
                                 <td className="px-4 py-3 text-xs text-gray-600">
                                     {opp.steps.map((s, i) => (
                                         <div key={i}>
-                                            {i + 1}. {s.from}→{s.to} on {s.chain} ({s.source}) @ {s.rate.toFixed(4)}
+                                            {i + 1}. {s.from}→{s.to} on {s.chain} ({s.source}) @ {s.rate.toFixed(6)}
                                         </div>
                                     ))}
                                 </td>

@@ -64,7 +64,7 @@ const CustomTooltip = ({ active, payload, label, detailsMap }: any) => {
                   {entry.dataKey}
                 </span>
                 <span className={`font-bold text-base ${entry.value >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {entry.value >= 0 ? '+' : ''}{entry.value.toFixed(2)} bps
+                  {entry.value >= 0 ? '+' : ''}{entry.value.toFixed(6)} bps
                 </span>
               </div>
 
@@ -284,7 +284,7 @@ export default function CrossChainArbitrageChart({ history, amount, pairId }: Cr
         10
       );
 
-      dataPoint[pairKey] = filtered !== null ? parseFloat(filtered.toFixed(2)) : null;
+      dataPoint[pairKey] = filtered !== null ? parseFloat(filtered.toFixed(6)) : null;
     });
 
     return dataPoint;

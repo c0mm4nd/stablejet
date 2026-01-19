@@ -254,10 +254,10 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
                                         </button>
                                     </td>
                                     <td className="px-4 py-3 text-right font-mono">
-                                        {row.outputAtoB !== null ? row.outputAtoB.toFixed(4) : <span className="text-red-400">N/A</span>}
+                                        {row.outputAtoB !== null ? row.outputAtoB.toFixed(6) : <span className="text-red-400">N/A</span>}
                                     </td>
                                     <td className="px-4 py-3 text-right font-mono">
-                                        {row.outputBtoA !== null ? row.outputBtoA.toFixed(4) : <span className="text-red-400">N/A</span>}
+                                        {row.outputBtoA !== null ? row.outputBtoA.toFixed(6) : <span className="text-red-400">N/A</span>}
                                     </td>
                                 </tr>
                             );
