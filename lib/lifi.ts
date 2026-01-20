@@ -23,7 +23,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 class LiFiRateLimiter {
   private lastRequestTime = 0;
-  private readonly minInterval = 1000; // 1 RPS
+  private readonly minInterval = 100; // 10 RPS
 
   async waitForSlot(): Promise<void> {
     const now = Date.now();
@@ -64,7 +64,7 @@ export async function getLiFiQuoteByChainId(
       maxPriceImpact: 0.4,
       jitoBundle: true,
       allowSwitchChain: true,
-      denyExchanges: ["fly"],
+      denyExchanges: ["fly", ],
       executionType: 'all'
     }
   };

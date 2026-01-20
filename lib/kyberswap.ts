@@ -19,7 +19,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 // KyberSwap 速率限制器 - 10 RPS (100 requests / 10 seconds)
 class KyberSwapRateLimiter {
   private requestTimes: number[] = [];
-  private readonly maxRequests = 100; // 10秒内最多100个请求
+  private readonly maxRequests = 500; // 10秒内最多500个请求
   private readonly windowMs = 10000; // 10秒窗口
   private readonly minInterval = 100; // 最小间隔100ms (10 RPS)
 
