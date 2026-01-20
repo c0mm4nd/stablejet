@@ -1,5 +1,6 @@
 import { log, error } from './logger';
-import { getSwapDataForPair, getKyberSwapRateLimiterStatus } from './kyberswap';
+import { getKyberSwapRateLimiterStatus } from './kyberswap';
+import { getSwapDataForPair } from './swap-data';
 import { saveDataPoint } from './history';
 import { getNordsternRateLimiterStatus } from './nordstern';
 import { getBinanceRateLimiterStatus } from './binance';

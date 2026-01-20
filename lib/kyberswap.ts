@@ -1,11 +1,7 @@
 import axios from 'axios';
 import { error } from './logger';
-import { QuoteResult, KyberSwapQuoteResponse, ChainSwapData, TradingPairConfig, ChainAppConfig, ConfigData } from './types';
-import { getAllUnstableTokens, getTokenDecimals } from './config';
-import { getOnchainSwapDataForAmount } from './onchain-sources';
-import { getBinanceSwapData } from './binance';
-import { getMexcSwapData } from './mexc';
-import { getBybitSwapData } from './bybit';
+import { QuoteResult, KyberSwapQuoteResponse } from './types';
+import { getAllUnstableTokens } from './config';
 
 // axios 会自动使用环境变量中的代理：HTTP_PROXY, HTTPS_PROXY, NO_PROXY
 const axiosInstance = axios.create({
@@ -164,83 +160,4 @@ export function getKyberSwapRateLimiterStatus() {
 }
 
 // 获取指定交易对的兑换数据
-export async function getSwapDataForPair(
-  pairConfig: TradingPairConfig,
-  chainsConfig: Record<string, ChainAppConfig>,
-  sources?: ConfigData['sources']
-): Promise<ChainSwapData[]> {
-  const results: ChainSwapData[] = [];
-  const pairId = pairConfig.id;
-  const amounts = pairConfig.amounts;
-
-  const defaultTokenADecimals = getTokenDecimals(pairConfig.tokenA);
-  const defaultTokenBDecimals = getTokenDecimals(pairConfig.tokenB);
-
-  // console.log(`[SwapData] Fetching data for pair: ${pairConfig.name} (${pairId})`);
-
-  for (const [chainKey, chainPairData] of Object.entries(pairConfig.chains)) {
-    // Check if chain is globally enabled
-    const appChainConfig = chainsConfig[chainKey];
-    if (!appChainConfig || appChainConfig.disabled) continue;
-
-    // Check if pair is enabled on this chain
-    // (Our new type doesn't have disable on chainPairData yet, but good to check if we added it)
-    if (chainPairData.disabled) continue;
-
-    // Determine effective decimals for this chain
-    const tokenADecimals = chainPairData.decimalsA ?? defaultTokenADecimals;
-    const tokenBDecimals = chainPairData.decimalsB ?? defaultTokenBDecimals;
-
-    // CEX Logic: Fetch if configured in the pair's chain map
-    if (['binance', 'mexc', 'bybit'].includes(chainKey)) {
-      if (sources) {
-        if (chainKey === 'binance' && sources.binance === false) continue;
-        if (chainKey === 'mexc' && sources.mexc === false) continue;
-        if (chainKey === 'bybit' && sources.bybit === false) continue;
-      }
-      const symbol = chainPairData.cexPairSymbol;
-      if (!symbol) continue; // Skip if no symbol and not default pair
-
-      try {
-        let cexData: ChainSwapData[] = [];
-        if (chainKey === 'binance') {
-          cexData = await getBinanceSwapData(amounts, symbol);
-        } else if (chainKey === 'mexc') {
-          cexData = await getMexcSwapData(amounts, symbol);
-        } else if (chainKey === 'bybit') {
-          cexData = await getBybitSwapData(amounts, symbol);
-        }
-
-        results.push(...cexData.map(d => ({ ...d, pairId })));
-      } catch (err) {
-        error(`[CEX] Error fetching ${chainKey} data:`, err);
-      }
-      continue;
-    }
-
-    const tokenAAddress = chainPairData.addressA;
-    const tokenBAddress = chainPairData.addressB;
-
-    if (!tokenAAddress || !tokenBAddress) continue;
-
-    for (const amount of amounts) {
-      const onchainRows = await getOnchainSwapDataForAmount({
-        pairId,
-        chainKey,
-        chainName: appChainConfig.name,
-        amount,
-        tokenAAddress,
-        tokenBAddress,
-        tokenADecimals,
-        tokenBDecimals,
-        appChainConfig,
-        sources
-      });
-
-      results.push(...onchainRows);
-    }
-  }
-
-  // console.log(`[SwapData] Fetched ${results.length} data points for ${pair.name}`);
-  return results;
-}
+// getSwapDataForPair moved to lib/swap-data.ts
