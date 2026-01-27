@@ -4,6 +4,10 @@ import { getOnchainSwapDataForAmount } from './onchain-sources';
 import { getBinanceSwapData } from './binance';
 import { getMexcSwapData } from './mexc';
 import { getBybitSwapData } from './bybit';
+import { getBitgetSwapData } from './bitget';
+import { getGateSwapData } from './gate';
+import { getHtxSwapData } from './htx';
+import { getKrakenSwapData } from './kraken';
 import { ChainAppConfig, ChainSwapData, TradingPairConfig, ConfigData } from './types';
 
 export async function getSwapDataForPair(
@@ -33,11 +37,15 @@ export async function getSwapDataForPair(
     const tokenBDecimals = chainPairData.decimalsB ?? defaultTokenBDecimals;
 
     // CEX Logic: Fetch if configured in the pair's chain map
-    if (['binance', 'mexc', 'bybit'].includes(chainKey)) {
+    if (['binance', 'mexc', 'bybit', 'bitget', 'gate', 'htx', 'kraken'].includes(chainKey)) {
       if (sources) {
         if (chainKey === 'binance' && sources.binance === false) continue;
         if (chainKey === 'mexc' && sources.mexc === false) continue;
         if (chainKey === 'bybit' && sources.bybit === false) continue;
+        if (chainKey === 'bitget' && sources.bitget === false) continue;
+        if (chainKey === 'gate' && sources.gate === false) continue;
+        if (chainKey === 'htx' && sources.htx === false) continue;
+        if (chainKey === 'kraken' && sources.kraken === false) continue;
       }
       const symbol = chainPairData.cexPairSymbol;
       if (!symbol) continue;
@@ -51,6 +59,14 @@ export async function getSwapDataForPair(
             cexData = await getMexcSwapData(amounts, symbol);
           } else if (chainKey === 'bybit') {
             cexData = await getBybitSwapData(amounts, symbol);
+          } else if (chainKey === 'bitget') {
+            cexData = await getBitgetSwapData(amounts, symbol);
+          } else if (chainKey === 'gate') {
+            cexData = await getGateSwapData(amounts, symbol);
+          } else if (chainKey === 'htx') {
+            cexData = await getHtxSwapData(amounts, symbol);
+          } else if (chainKey === 'kraken') {
+            cexData = await getKrakenSwapData(amounts, symbol);
           }
           return cexData.map(d => ({ ...d, pairId }));
         } catch (err) {

@@ -46,7 +46,7 @@ export interface ChainSwapData {
   chainKey: string;
   amount: number;
   pairId?: string; // Trading pair identifier
-  dataSource?: 'kyberswap' | 'nordstern' | 'lifi' | 'binance' | 'mexc' | 'bybit'; // 数据来源
+  dataSource?: 'kyberswap' | 'nordstern' | 'lifi' | 'binance' | 'mexc' | 'bybit' | 'bitget' | 'gate' | 'htx' | 'kraken'; // 数据来源
   quoteTimestamp?: string; // ISO timestamp for this specific quote
   // Generic swap results for any pair
   tokenAToB?: SwapResult; // tokenA -> tokenB
@@ -141,6 +141,10 @@ export interface ConfigData {
     binance: boolean;
     bybit: boolean;
     mexc: boolean;
+    bitget: boolean;
+    gate: boolean;
+    htx: boolean;
+    kraken: boolean;
   };
   clientRefreshInterval: number;
 }

@@ -4,6 +4,12 @@ import { getSwapDataForPair } from './swap-data';
 import { saveDataPoint } from './history';
 import { getNordsternRateLimiterStatus } from './nordstern';
 import { getBinanceRateLimiterStatus } from './binance';
+import { getBybitRateLimiterStatus } from './bybit';
+import { getMexcRateLimiterStatus } from './mexc';
+import { getBitgetRateLimiterStatus } from './bitget';
+import { getGateRateLimiterStatus } from './gate';
+import { getHtxRateLimiterStatus } from './htx';
+import { getKrakenRateLimiterStatus } from './kraken';
 import { getConfig } from './server-config';
 
 type FetcherState = {
@@ -180,6 +186,36 @@ class BackgroundFetcher {
         try {
           const binanceStatus = getBinanceRateLimiterStatus();
           log(`  Binance: ${binanceStatus.rate}`);
+        } catch (e) { /* ignore */ }
+
+        try {
+          const bybitStatus = getBybitRateLimiterStatus();
+          log(`  Bybit: ${bybitStatus.rate}`);
+        } catch (e) { /* ignore */ }
+
+        try {
+          const mexcStatus = getMexcRateLimiterStatus();
+          log(`  MEXC: ${mexcStatus.rate}`);
+        } catch (e) { /* ignore */ }
+
+        try {
+          const bitgetStatus = getBitgetRateLimiterStatus();
+          log(`  Bitget: ${bitgetStatus.rate}`);
+        } catch (e) { /* ignore */ }
+
+        try {
+          const gateStatus = getGateRateLimiterStatus();
+          log(`  Gate.io: ${gateStatus.rate}`);
+        } catch (e) { /* ignore */ }
+
+        try {
+          const htxStatus = getHtxRateLimiterStatus();
+          log(`  HTX: ${htxStatus.rate}`);
+        } catch (e) { /* ignore */ }
+
+        try {
+          const krakenStatus = getKrakenRateLimiterStatus();
+          log(`  Kraken: ${krakenStatus.rate}`);
         } catch (e) { /* ignore */ }
 
       } catch (err) {

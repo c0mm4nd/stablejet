@@ -31,7 +31,11 @@ function ConfigProviderInner({ children }: { children: ReactNode }) {
     lifi: true,
     binance: true,
     bybit: true,
-    mexc: true
+    mexc: true,
+    bitget: true,
+    gate: true,
+    htx: true,
+    kraken: true
   });
   const [clientRefreshInterval, setClientRefreshInterval] = useState<number>(DEFAULT_CLIENT_REFRESH_INTERVAL);
 
@@ -64,7 +68,11 @@ function ConfigProviderInner({ children }: { children: ReactNode }) {
           lifi: true,
           binance: true,
           bybit: true,
-          mexc: true
+          mexc: true,
+          bitget: true,
+          gate: true,
+          htx: true,
+          kraken: true
         });
 
         // Set initial pair if not already set

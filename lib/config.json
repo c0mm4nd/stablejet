@@ -116,6 +116,22 @@
       "name": "Bybit",
       "disabled": false
     },
+    "bitget": {
+      "name": "Bitget",
+      "disabled": false
+    },
+    "gate": {
+      "name": "Gate.io",
+      "disabled": false
+    },
+    "htx": {
+      "name": "HTX",
+      "disabled": false
+    },
+    "kraken": {
+      "name": "Kraken",
+      "disabled": false
+    },
     "coredao": {
       "name": "Coredao",
       "kyberCode": "coredao",
@@ -1508,6 +1524,10 @@
     "lifi": true,
     "binance": true,
     "bybit": true,
-    "mexc": true
+    "mexc": true,
+    "bitget": true,
+    "gate": true,
+    "htx": true,
+    "kraken": true
   }
 }
