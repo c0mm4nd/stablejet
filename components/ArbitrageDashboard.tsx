@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { HistoryDataPoint } from '@/lib/history';
 import RoundTripArbitrage from './RoundTripArbitrage';
 import TriangularArbitrage from './TriangularArbitrage';
@@ -13,7 +14,23 @@ interface ArbitrageDashboardProps {
 }
 
 export default function ArbitrageDashboard({ history, amount, pairId, onModeChange }: ArbitrageDashboardProps) {
-    const [activeTab, setActiveTab] = useState<'roundtrip' | 'triangular'>('roundtrip');
+    const searchParams = useSearchParams();
+
+    // Initialize from URL params
+    const [activeTab, setActiveTab] = useState<'roundtrip' | 'triangular'>(() => {
+        const modeParam = searchParams.get('mode');
+        return (modeParam === 'triangular' || modeParam === 'roundtrip') ? modeParam : 'roundtrip';
+    });
+
+    // Sync with URL params changes (browser back/forward)
+    useEffect(() => {
+        const modeParam = searchParams.get('mode');
+        if (modeParam && (modeParam === 'roundtrip' || modeParam === 'triangular') && modeParam !== activeTab) {
+            setActiveTab(modeParam);
+            // Notify parent to avoid conflicts
+            onModeChange?.(modeParam);
+        }
+    }, [searchParams]);
 
     const handleTabChange = (mode: 'roundtrip' | 'triangular') => {
         setActiveTab(mode);

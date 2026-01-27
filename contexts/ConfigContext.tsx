@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback, Suspense } from 'react';
 import { ChainAppConfig, TradingPairConfig, ConfigData } from '@/lib/types';
 
 const DEFAULT_CLIENT_REFRESH_INTERVAL = 10; // 默认客户端刷新间隔10秒
@@ -22,7 +22,7 @@ interface ConfigContextType {
 
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 
-export function ConfigProvider({ children }: { children: ReactNode }) {
+function ConfigProviderInner({ children }: { children: ReactNode }) {
   const [chains, setChains] = useState<Record<string, ChainAppConfig>>({});
   const [pairs, setPairs] = useState<Record<string, TradingPairConfig>>({});
   const [sources, setSources] = useState<ConfigData['sources']>({
@@ -34,7 +34,17 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     mexc: true
   });
   const [clientRefreshInterval, setClientRefreshInterval] = useState<number>(DEFAULT_CLIENT_REFRESH_INTERVAL);
-  const [selectedPair, setSelectedPair] = useState<string>('');
+
+  // Initialize selectedPair from localStorage only (URL params handled by components)
+  const [selectedPair, setSelectedPair] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const savedPair = localStorage.getItem('stablejet_selected_pair');
+      if (savedPair) {
+        return savedPair;
+      }
+    }
+    return '';
+  });
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoadingConfig, setIsLoadingConfig] = useState(true);
@@ -56,13 +66,20 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
           bybit: true,
           mexc: true
         });
+
+        // Set initial pair if not already set
         if (!selectedPair) {
-          const enabledPairs = Object.values(data.pairs || {}).filter(p => !p.disabled);
-          const firstPairId = enabledPairs[0]?.id;
-          if (firstPairId) {
-            setSelectedPair(firstPairId);
+          const savedPair = typeof window !== 'undefined' ? localStorage.getItem('stablejet_selected_pair') : null;
+
+          // Validate that the pair exists and is enabled
+          const pairToUse = savedPair && data.pairs[savedPair] && !data.pairs[savedPair].disabled
+            ? savedPair
+            : Object.values(data.pairs || {}).filter(p => !p.disabled)[0]?.id;
+
+          if (pairToUse) {
+            setSelectedPair(pairToUse);
             if (typeof window !== 'undefined') {
-              localStorage.setItem('stablejet_selected_pair', firstPairId);
+              localStorage.setItem('stablejet_selected_pair', pairToUse);
             }
           }
         }
@@ -74,7 +91,8 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoadingConfig(false);
     }
-  }, []);
+  }, [selectedPair]);
+
 
   // Initial Load
   useEffect(() => {
@@ -82,11 +100,14 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
       const loadLocalSettings = () => {
         try {
           const savedClientRefreshInterval = localStorage.getItem('stablejet_client_refresh_interval');
-          const savedSelectedPair = localStorage.getItem('stablejet_selected_pair');
 
           if (savedClientRefreshInterval) {
             setClientRefreshInterval(JSON.parse(savedClientRefreshInterval));
           }
+
+          // Priority: URL param > localStorage > default from config
+          const savedSelectedPair = localStorage.getItem('stablejet_selected_pair');
+
           if (savedSelectedPair) {
             setSelectedPair(savedSelectedPair);
             // Best-effort sync for server-side background fetcher
@@ -174,17 +195,18 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateSelectedPair = (pairId: string) => {
+  const updateSelectedPair = useCallback((pairId: string) => {
     setSelectedPair(pairId);
     if (typeof window !== 'undefined') {
       localStorage.setItem('stablejet_selected_pair', pairId);
     }
+
     fetch('/api/background/active-pair', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pairId })
     }).catch(() => {});
-  };
+  }, []);
 
   const resetToDefaults = () => {
     alert("Reset feature is disabled in dynamic mode.");
@@ -212,6 +234,10 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
       {children}
     </ConfigContext.Provider>
   );
+}
+
+export function ConfigProvider({ children }: { children: ReactNode }) {
+  return <ConfigProviderInner>{children}</ConfigProviderInner>;
 }
 
 export function useConfig() {
