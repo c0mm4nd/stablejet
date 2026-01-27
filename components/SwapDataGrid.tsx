@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useConfig } from '@/contexts/ConfigContext';
 import { HistoryDataPoint } from '@/lib/history';
 import Header from './Header';
+import BottomPairSelector from './BottomPairSelector';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
 import SettingsModal from './SettingsModal';
@@ -210,18 +211,18 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
         onSettingsClick={() => setIsSettingsOpen(true)}
       />
 
-      <main className="max-w-[1920px] mx-auto px-6 py-8">
+      <main className="max-w-[1920px] mx-auto px-4 md:px-6 py-6 md:py-8 pb-24 md:pb-8">
         {/* Tabs */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-white p-1 rounded-xl shadow-sm border border-gray-200 inline-flex">
+        <div className="flex justify-center mb-6 md:mb-8">
+          <div className="bg-white p-1 rounded-xl shadow-sm border border-gray-200 inline-flex w-full max-w-sm md:w-auto">
             <button
               onClick={() => {
                 setActiveTab('quotes');
                 updateUrlParams({ pair: pairId, tab: 'quotes', mode: arbitrageMode });
               }}
-              className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'quotes'
+              className={`flex-1 md:flex-none px-4 md:px-6 py-2 rounded-lg text-sm font-semibold transition-all touch-manipulation ${activeTab === 'quotes'
                 ? 'bg-blue-600 text-white shadow-md'
-                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50 active:bg-gray-100'
                 }`}
             >
               Quotes
@@ -231,9 +232,9 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
                 setActiveTab('arbitrage');
                 updateUrlParams({ pair: pairId, tab: 'arbitrage', mode: arbitrageMode });
               }}
-              className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'arbitrage'
+              className={`flex-1 md:flex-none px-4 md:px-6 py-2 rounded-lg text-sm font-semibold transition-all touch-manipulation ${activeTab === 'arbitrage'
                 ? 'bg-blue-600 text-white shadow-md'
-                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50 active:bg-gray-100'
                 }`}
             >
               Arbitrage
@@ -293,6 +294,12 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      {/* 移动端底部交易对选择器 */}
+      <BottomPairSelector
+        selectedPair={pairId}
+        onPairChange={handlePairChange}
       />
     </div>
   );

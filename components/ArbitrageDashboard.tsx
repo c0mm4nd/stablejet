@@ -39,27 +39,29 @@ export default function ArbitrageDashboard({ history, amount, pairId, onModeChan
 
     return (
         <div className="space-y-6">
-            <div className="flex gap-4 border-b border-gray-200">
+            <div className="flex gap-2 md:gap-4 border-b border-gray-200 overflow-x-auto">
                 <button
                     onClick={() => handleTabChange('roundtrip')}
-                    className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'roundtrip'
+                    className={`pb-2 px-3 md:px-4 font-medium transition-colors relative whitespace-nowrap touch-manipulation ${activeTab === 'roundtrip'
                             ? 'text-blue-600'
-                            : 'text-gray-500 hover:text-gray-700'
+                            : 'text-gray-500 hover:text-gray-700 active:text-gray-800'
                         }`}
                 >
-                    Round Trip (A→B→A)
+                    <span className="hidden md:inline">Round Trip (A→B→A)</span>
+                    <span className="md:hidden">Round Trip</span>
                     {activeTab === 'roundtrip' && (
                         <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full" />
                     )}
                 </button>
                 <button
                     onClick={() => handleTabChange('triangular')}
-                    className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'triangular'
+                    className={`pb-2 px-3 md:px-4 font-medium transition-colors relative whitespace-nowrap touch-manipulation ${activeTab === 'triangular'
                             ? 'text-blue-600'
-                            : 'text-gray-500 hover:text-gray-700'
+                            : 'text-gray-500 hover:text-gray-700 active:text-gray-800'
                         }`}
                 >
-                    Triangular (A→B→C→A)
+                    <span className="hidden md:inline">Triangular (A→B→C→A)</span>
+                    <span className="md:hidden">Triangular</span>
                     {activeTab === 'triangular' && (
                         <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full" />
                     )}

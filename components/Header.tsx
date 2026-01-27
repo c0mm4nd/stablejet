@@ -50,26 +50,25 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
 
   return (
     <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-      <div className="max-w-[1920px] mx-auto px-6 py-4">
-        <div className="flex items-center justify-between gap-6">
-          {/* 左侧：Logo 和标题 */}
-          <div className="flex items-center gap-4 flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-800">StableJet Monitor</h1>
-                <p className="text-xs text-gray-500">稳定币跨链套利监控</p>
-              </div>
+      <div className="max-w-[1920px] mx-auto px-4 md:px-6 py-3 md:py-4">
+        <div className="flex items-center justify-between gap-3 md:gap-6">
+          {/* 左侧：仅Logo */}
+          <div className="flex items-center flex-shrink-0">
+            <div className="w-9 h-9 md:w-10 md:h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+              <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+            {/* 桌面端显示标题 */}
+            <div className="ml-3 hidden lg:block">
+              <h1 className="text-xl font-bold text-gray-800">StableJet Monitor</h1>
+              <p className="text-xs text-gray-500">稳定币跨链套利监控</p>
             </div>
           </div>
 
-          {/* 中间：交易对搜索 */}
-          <div className="flex-1 max-w-md" ref={searchRef}>
-            <div className="relative">
+          {/* 中间：桌面端显示交易对搜索 */}
+          <div className="hidden md:flex flex-1 max-w-md" ref={searchRef}>
+            <div className="relative w-full">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500 whitespace-nowrap">交易对:</span>
                 <div className="relative flex-1">
@@ -136,14 +135,40 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
             </div>
           </div>
 
-          {/* 右侧：状态和设置 */}
-          <div className="flex items-center gap-4 flex-shrink-0">
-            {/* 实时状态 */}
-            <div className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg border border-green-200">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-green-700">
-                {countdown > 0 ? `${countdown}s` : '更新中...'}
-              </span>
+          {/* 右侧：倒计时图标和设置 */}
+          <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+            {/* 倒计时图标 */}
+            <div className="relative flex items-center justify-center">
+              {/* 圆形进度指示器 */}
+              <svg className="w-8 h-8 md:w-9 md:h-9 -rotate-90" viewBox="0 0 36 36">
+                {/* 背景圆 */}
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="16"
+                  fill="none"
+                  className="stroke-gray-200"
+                  strokeWidth="2"
+                />
+                {/* 进度圆 */}
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="16"
+                  fill="none"
+                  className="stroke-green-500"
+                  strokeWidth="2"
+                  strokeDasharray={`${2 * Math.PI * 16}`}
+                  strokeDashoffset={`${2 * Math.PI * 16 * (1 - countdown / 10)}`}
+                  strokeLinecap="round"
+                />
+              </svg>
+              {/* 时钟图标 */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <svg className="w-4 h-4 md:w-5 md:h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
             </div>
 
             {/* 设置按钮 */}
