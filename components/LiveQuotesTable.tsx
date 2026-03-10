@@ -4,6 +4,9 @@ import { useState, useMemo } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, calculateRoundTripBps, isSourceEnabled } from '@/lib/utils';
 import { useConfig } from '@/contexts/ConfigContext';
+import RouteDetailsModal from '@/components/RouteDetailsModal';
+import { extractLiFiAlternatives } from '@/lib/lifi-route';
+import { RouteInfo } from '@/lib/types';
 
 interface LiveQuotesTableProps {
   history: HistoryDataPoint[];
@@ -23,8 +26,8 @@ interface TableRow {
   spreadBtoA: number | null;
   arbitrageSpace: number | null;
   timestamp: string;
-  routeAtoB?: any;
-  routeBtoA?: any;
+  routeAtoB?: RouteInfo;
+  routeBtoA?: RouteInfo;
 }
 
 interface RawRow {
@@ -36,8 +39,8 @@ interface RawRow {
   rateAtoB: number | null;
   rateBtoA: number | null;
   timestamp: string;
-  routeAtoB?: any;
-  routeBtoA?: any;
+  routeAtoB?: RouteInfo;
+  routeBtoA?: RouteInfo;
 }
 
 export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesTableProps) {
@@ -47,8 +50,8 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
   const [activeRoute, setActiveRoute] = useState<{
     chain: string;
     source: string;
-    routeAtoB?: any;
-    routeBtoA?: any;
+    routeAtoB?: RouteInfo;
+    routeBtoA?: RouteInfo;
   } | null>(null);
 
   if (history.length === 0) {
@@ -131,79 +134,6 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
     }));
   }, [latestData, amount]);
 
-  const formatRouteBlocks = (route: any): string[] => {
-    if (!route) return [];
-    if (route.note) return [route.note];
-    if (Array.isArray(route.paths)) {
-      const lines: string[] = [];
-      route.paths.forEach((path: any[], idx: number) => {
-        lines.push(`Path ${idx + 1}`);
-        path.forEach((hop: any, hopIdx: number) => {
-          const from = hop.tokenIn || '';
-          const to = hop.tokenOut || '';
-          const pool = hop.pool ? ` (${hop.pool})` : '';
-          lines.push(`${hopIdx + 1}. ${from} -> ${to}${pool}`);
-        });
-      });
-      return lines;
-    }
-    if (Array.isArray(route.swaps)) {
-      return [JSON.stringify(route.swaps, null, 2)];
-    }
-    if (route.raw || route.tx) {
-      return [JSON.stringify({ raw: route.raw, tx: route.tx }, null, 2)];
-    }
-    return [JSON.stringify(route, null, 2)];
-  };
-
-  const getToolLabel = (route: any): string | null => {
-    if (!route) return null;
-    const raw = route.raw || {};
-    return raw.tool || raw.toolDetails?.name || null;
-  };
-
-  const renderRouteModal = () => {
-    if (!activeRoute) return null;
-    const aLines = formatRouteBlocks(activeRoute.routeAtoB);
-    const bLines = formatRouteBlocks(activeRoute.routeBtoA);
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setActiveRoute(null)}>
-        <div className="w-full max-w-2xl rounded-xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
-          <div className="flex items-center justify-between border-b px-5 py-4">
-            <div>
-              <div className="text-sm text-gray-500">Route Details</div>
-              <div className="text-lg font-semibold text-gray-900">{activeRoute.chain} · {activeRoute.source}</div>
-            </div>
-            <button onClick={() => setActiveRoute(null)} className="text-gray-400 hover:text-gray-700 text-2xl leading-none">×</button>
-          </div>
-          <div className="max-h-[70vh] overflow-y-auto px-5 py-4 text-sm text-gray-700">
-            {aLines.length > 0 && (
-              <div className="mb-6">
-                <div className="font-semibold text-gray-800 mb-2">A → B</div>
-                {getToolLabel(activeRoute.routeAtoB) && (
-                  <div className="mb-2 text-xs text-gray-500">Tool: {getToolLabel(activeRoute.routeAtoB)}</div>
-                )}
-                <pre className="whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-700">{aLines.join('\n')}</pre>
-              </div>
-            )}
-            {bLines.length > 0 && (
-              <div>
-                <div className="font-semibold text-gray-800 mb-2">B → A</div>
-                {getToolLabel(activeRoute.routeBtoA) && (
-                  <div className="mb-2 text-xs text-gray-500">Tool: {getToolLabel(activeRoute.routeBtoA)}</div>
-                )}
-                <pre className="whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-700">{bLines.join('\n')}</pre>
-              </div>
-            )}
-            {aLines.length === 0 && bLines.length === 0 && (
-              <div className="text-gray-500">No route info available.</div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   // 排序数据
   const sortedData = useMemo(() => {
     const data = [...tableData];
@@ -249,7 +179,12 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-      {renderRouteModal()}
+      <RouteDetailsModal
+        activeRoute={activeRoute}
+        onClose={() => setActiveRoute(null)}
+        tokenA={pair.tokenA}
+        tokenB={pair.tokenB}
+      />
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800">
           输入数量: {amount.toLocaleString()} - 实时报价数据 (共 {sortedData.length} 个链)
@@ -332,6 +267,9 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
             {sortedData.map((row, idx) => {
               const sourceDisplayInfo = sourceInfo[row.dataSource] || { name: row.dataSource, color: 'text-gray-600' };
               const rowTime = new Date(row.timestamp).toLocaleString('zh-CN');
+              const lifiRouteCount = row.dataSource === 'lifi'
+                ? Math.max(extractLiFiAlternatives(row.routeAtoB).length, extractLiFiAlternatives(row.routeBtoA).length)
+                : 0;
 
               return (
                 <tr key={idx} className="hover:bg-gray-50 transition-colors" title={`Quote time: ${rowTime}`}>
@@ -341,12 +279,17 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                   <td className="px-4 py-3">
                     <button
                       type="button"
-                      className="inline-flex items-center gap-1"
+                      className="inline-flex items-center gap-2"
                       onClick={() => setActiveRoute({ chain: row.chain, source: sourceDisplayInfo.name, routeAtoB: row.routeAtoB, routeBtoA: row.routeBtoA })}
                     >
                       <span className={`font-semibold ${sourceDisplayInfo.color}`}>
                         {sourceDisplayInfo.name}
                       </span>
+                      {lifiRouteCount > 0 && (
+                        <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[11px] font-semibold text-teal-700">
+                          {lifiRouteCount} 条报价
+                        </span>
+                      )}
                       <span className="text-xs text-gray-400">ⓘ</span>
                     </button>
                   </td>

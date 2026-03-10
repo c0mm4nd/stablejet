@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { log, error, warn } from './logger';
 import { QuoteResult } from './types';
+import { mapLiFiRouteAlternative } from './lifi-route';
 
 const JUMPER_API_BASE = 'https://api.jumper.exchange/pipeline/v1/advanced/routes';
 const JUMPER_FROM_ADDRESS = process.env.LIFI_FROM_ADDRESS || '0x0000000000000000000000000000000000000001';
@@ -73,10 +74,14 @@ export async function getLiFiQuoteByChainId(
     await rateLimiter.waitForSlot();
     const response = await axiosInstance.post<any>(JUMPER_API_BASE, payload);
     const data = response.data;
-    const route = data?.routes?.[0];
-    const amountOut = route?.toAmount;
-    const amountOutUsd = route?.toAmountUSD;
-    const tool = route?.steps?.[0]?.tool || route?.steps?.[0]?.toolDetails?.name;
+    const routes = Array.isArray(data?.routes) ? data.routes : [];
+    const alternatives = routes.map((route: any) => mapLiFiRouteAlternative(route));
+    const bestRoute = routes[0];
+    const amountOut = bestRoute?.toAmount;
+    const amountOutUsd = bestRoute?.toAmountUSD;
+    const tool = alternatives[0]?.toolNames?.join(' / ')
+      || bestRoute?.steps?.[0]?.tool
+      || bestRoute?.steps?.[0]?.toolDetails?.name;
 
     if (amountOut) {
       log(`[LiFi/Jumper] ✓ Success for ${chainId}: ${amountOut} out (${tool || 'unknown tool'})`);
@@ -87,6 +92,8 @@ export async function getLiFiQuoteByChainId(
         route: {
           type: 'lifi',
           raw: data,
+          selectedTool: tool,
+          alternatives,
           note: tool ? `tool: ${tool}` : undefined
         }
       };
@@ -99,6 +106,8 @@ export async function getLiFiQuoteByChainId(
       route: {
         type: 'lifi',
         raw: data,
+        selectedTool: tool,
+        alternatives,
         note: tool ? `tool: ${tool}` : undefined
       }
     };
