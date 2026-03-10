@@ -267,9 +267,12 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
             {sortedData.map((row, idx) => {
               const sourceDisplayInfo = sourceInfo[row.dataSource] || { name: row.dataSource, color: 'text-gray-600' };
               const rowTime = new Date(row.timestamp).toLocaleString('zh-CN');
-              const lifiRouteCount = row.dataSource === 'lifi'
-                ? Math.max(extractLiFiAlternatives(row.routeAtoB).length, extractLiFiAlternatives(row.routeBtoA).length)
-                : 0;
+              const lifiRouteCounts = row.dataSource === 'lifi'
+                ? {
+                  aToB: extractLiFiAlternatives(row.routeAtoB).length,
+                  bToA: extractLiFiAlternatives(row.routeBtoA).length
+                }
+                : null;
 
               return (
                 <tr key={idx} className="hover:bg-gray-50 transition-colors" title={`Quote time: ${rowTime}`}>
@@ -285,10 +288,15 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                       <span className={`font-semibold ${sourceDisplayInfo.color}`}>
                         {sourceDisplayInfo.name}
                       </span>
-                      {lifiRouteCount > 0 && (
-                        <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[11px] font-semibold text-teal-700">
-                          {lifiRouteCount} 条报价
-                        </span>
+                      {lifiRouteCounts && (lifiRouteCounts.aToB > 0 || lifiRouteCounts.bToA > 0) && (
+                        <>
+                          <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[11px] font-semibold text-teal-700">
+                            {pair.tokenA} {'->'} {pair.tokenB} {lifiRouteCounts.aToB}
+                          </span>
+                          <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-[11px] font-semibold text-cyan-700">
+                            {pair.tokenB} {'->'} {pair.tokenA} {lifiRouteCounts.bToA}
+                          </span>
+                        </>
                       )}
                       <span className="text-xs text-gray-400">ⓘ</span>
                     </button>

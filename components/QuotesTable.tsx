@@ -175,9 +175,12 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
                         {sortedData.map((row, idx) => {
                             const src = sourceInfo[row.dataSource] || { name: row.dataSource, color: 'text-gray-600' };
                             const rowTime = new Date(row.timestamp).toLocaleString('zh-CN');
-                            const lifiRouteCount = row.dataSource === 'lifi'
-                                ? Math.max(extractLiFiAlternatives(row.routeAtoB).length, extractLiFiAlternatives(row.routeBtoA).length)
-                                : 0;
+                            const lifiRouteCounts = row.dataSource === 'lifi'
+                                ? {
+                                    aToB: extractLiFiAlternatives(row.routeAtoB).length,
+                                    bToA: extractLiFiAlternatives(row.routeBtoA).length
+                                }
+                                : null;
                             return (
                                 <tr key={idx} className="hover:bg-gray-50 transition-colors" title={`Quote time: ${rowTime}`}>
                                     <td className="px-4 py-3 font-medium text-gray-900">{row.chain}</td>
@@ -188,10 +191,15 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
                                             onClick={() => setActiveRoute({ chain: row.chain, source: src.name, routeAtoB: row.routeAtoB, routeBtoA: row.routeBtoA })}
                                         >
                                             <span className={`font-semibold ${src.color}`}>{src.name}</span>
-                                            {lifiRouteCount > 0 && (
-                                                <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[11px] font-semibold text-teal-700">
-                                                    {lifiRouteCount} quotes
-                                                </span>
+                                            {lifiRouteCounts && (lifiRouteCounts.aToB > 0 || lifiRouteCounts.bToA > 0) && (
+                                                <>
+                                                    <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[11px] font-semibold text-teal-700">
+                                                        {tokenA} {'->'} {tokenB} {lifiRouteCounts.aToB}
+                                                    </span>
+                                                    <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-[11px] font-semibold text-cyan-700">
+                                                        {tokenB} {'->'} {tokenA} {lifiRouteCounts.bToA}
+                                                    </span>
+                                                </>
                                             )}
                                             <span className="text-xs text-gray-400">ⓘ</span>
                                         </button>
