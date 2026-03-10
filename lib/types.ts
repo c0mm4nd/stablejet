@@ -30,6 +30,33 @@ export interface RouteHop {
   tokenIn: string;
   tokenOut: string;
   swapAmount?: string;
+  amountOut?: string;
+  exchange?: string;
+  poolType?: string;
+}
+
+export interface RouteAlternativeStep {
+  type?: string;
+  tool?: string;
+  toolName?: string;
+  fromChainId?: number;
+  toChainId?: number;
+  fromTokenSymbol?: string;
+  toTokenSymbol?: string;
+  fromAmountUSD?: string;
+  toAmountUSD?: string;
+  executionDuration?: number;
+}
+
+export interface RouteAlternative {
+  id?: string;
+  fromAmountUSD?: string;
+  toAmountUSD?: string;
+  gasCostUSD?: string;
+  toolNames?: string[];
+  stepCount?: number;
+  executionDuration?: number;
+  steps?: RouteAlternativeStep[];
 }
 
 export interface RouteInfo {
@@ -39,6 +66,8 @@ export interface RouteInfo {
   tx?: any;
   raw?: any;
   note?: string;
+  selectedTool?: string;
+  alternatives?: RouteAlternative[];
 }
 
 export interface ChainSwapData {

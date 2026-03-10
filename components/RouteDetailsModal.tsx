@@ -1,7 +1,8 @@
 'use client';
 
+import { Fragment } from 'react';
 import { extractLiFiAlternatives, getLiFiPrimaryToolLabel } from '@/lib/lifi-route';
-import { RouteAlternative, RouteInfo } from '@/lib/types';
+import { RouteAlternative, RouteHop, RouteInfo } from '@/lib/types';
 
 interface ActiveRouteState {
   chain: string;
@@ -63,6 +64,34 @@ function truncateId(value?: string): string | null {
   return `${value.slice(0, 8)}...${value.slice(-6)}`;
 }
 
+function compactHash(value?: string): string | null {
+  if (!value) {
+    return null;
+  }
+
+  if (value.length <= 14) {
+    return value;
+  }
+
+  return `${value.slice(0, 6)}...${value.slice(-4)}`;
+}
+
+function formatTokenLabel(token?: string, fallback?: string): string {
+  if (fallback) {
+    return fallback;
+  }
+
+  if (!token) {
+    return 'Unknown';
+  }
+
+  if (token.startsWith('0x') && token.length >= 12) {
+    return compactHash(token) || token;
+  }
+
+  return token.toUpperCase();
+}
+
 function formatRouteBlocks(route?: RouteInfo): string[] {
   if (!route) return [];
   if (route.note) {
@@ -88,6 +117,130 @@ function formatRouteBlocks(route?: RouteInfo): string[] {
     return [JSON.stringify({ raw: route.raw, tx: route.tx }, null, 2)];
   }
   return [JSON.stringify(route, null, 2)];
+}
+
+function KyberTokenNode({
+  label,
+  address,
+  accent
+}: {
+  label: string;
+  address?: string;
+  accent: 'start' | 'mid' | 'end';
+}) {
+  const accentStyles = {
+    start: 'border-blue-200 bg-blue-50 text-blue-900',
+    mid: 'border-slate-200 bg-white text-slate-900',
+    end: 'border-cyan-200 bg-cyan-50 text-cyan-900'
+  } as const;
+
+  return (
+    <div className={`min-w-[132px] rounded-2xl border px-4 py-3 shadow-sm ${accentStyles[accent]}`}>
+      <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400">
+        {accent === 'start' ? 'Input' : accent === 'end' ? 'Output' : 'Token'}
+      </div>
+      <div className="mt-2 text-sm font-semibold">{label}</div>
+      {address && <div className="mt-1 text-xs text-slate-500">{compactHash(address)}</div>}
+    </div>
+  );
+}
+
+function KyberSwapCard({ hop, index }: { hop: RouteHop; index: number }) {
+  const poolLabel = compactHash(hop.pool) || 'Direct pool';
+  const venue = hop.exchange || 'KyberSwap';
+  const poolType = hop.poolType ? hop.poolType.toUpperCase() : null;
+
+  return (
+    <div className="min-w-[200px] rounded-2xl border border-blue-100 bg-white px-4 py-3 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-500">
+          Swap {index + 1}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
+            {venue}
+          </span>
+          {poolType && (
+            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+              {poolType}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="mt-3 text-sm font-semibold text-slate-900">{poolLabel}</div>
+      <div className="mt-2 text-xs text-slate-500">
+        {formatTokenLabel(hop.tokenIn)} {'->'} {formatTokenLabel(hop.tokenOut)}
+      </div>
+    </div>
+  );
+}
+
+function KyberArrow() {
+  return (
+    <div className="flex items-center justify-center text-lg font-semibold text-blue-300">
+      <span className="block lg:hidden">↓</span>
+      <span className="hidden lg:block">→</span>
+    </div>
+  );
+}
+
+function KyberPathFlow({
+  path,
+  index,
+  fromTokenSymbol,
+  toTokenSymbol
+}: {
+  path: RouteHop[];
+  index: number;
+  fromTokenSymbol: string;
+  toTokenSymbol: string;
+}) {
+  const totalHops = path.length;
+
+  return (
+    <article className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-cyan-50 p-4 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-blue-100 pb-3">
+        <div>
+          <div className="text-sm font-semibold text-slate-900">Path {index + 1}</div>
+          <div className="mt-1 text-xs text-slate-500">Flow visualization for {totalHops} hop{totalHops > 1 ? 's' : ''}</div>
+        </div>
+        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-blue-700 shadow-sm">
+          {totalHops} hop{totalHops > 1 ? 's' : ''}
+        </span>
+      </div>
+
+      <div className="mt-4 overflow-x-auto pb-1">
+        <div className="flex min-w-max flex-col gap-3 lg:flex-row lg:items-center">
+          <KyberTokenNode
+            label={formatTokenLabel(path[0]?.tokenIn, fromTokenSymbol)}
+            address={path[0]?.tokenIn}
+            accent="start"
+          />
+
+          {path.map((hop, hopIndex) => {
+            const isLastHop = hopIndex === path.length - 1;
+            const outputLabel = formatTokenLabel(
+              hop.tokenOut,
+              isLastHop ? toTokenSymbol : undefined
+            );
+
+            return (
+              <Fragment key={`${hop.pool || 'hop'}-${hopIndex}`}>
+                <KyberArrow />
+                <KyberSwapCard hop={hop} index={hopIndex} />
+                <KyberArrow />
+                <KyberTokenNode
+                  label={outputLabel}
+                  address={hop.tokenOut}
+                  accent={isLastHop ? 'end' : 'mid'}
+                />
+              </Fragment>
+            );
+          })}
+        </div>
+      </div>
+    </article>
+  );
 }
 
 function renderMetric(label: string, value: string | number | null) {
@@ -186,7 +339,17 @@ function LiFiAlternativeCard({ alternative, index }: { alternative: RouteAlterna
   );
 }
 
-function RouteDirectionPanel({ title, route }: { title: string; route?: RouteInfo }) {
+function RouteDirectionPanel({
+  title,
+  route,
+  fromTokenSymbol,
+  toTokenSymbol
+}: {
+  title: string;
+  route?: RouteInfo;
+  fromTokenSymbol: string;
+  toTokenSymbol: string;
+}) {
   if (!route) {
     return null;
   }
@@ -215,6 +378,42 @@ function RouteDirectionPanel({ title, route }: { title: string; route?: RouteInf
               key={alternative.id || `${title}-alternative-${index}`}
               alternative={alternative}
               index={index}
+            />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (route.type === 'kyberswap' && Array.isArray(route.paths) && route.paths.length > 0) {
+    const totalHops = route.paths.reduce((sum, path) => sum + path.length, 0);
+
+    return (
+      <section className="rounded-2xl border border-blue-100 bg-white/90 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-blue-100 pb-3">
+          <div>
+            <div className="text-base font-semibold text-slate-900">{title}</div>
+            <div className="mt-1 text-sm text-slate-500">
+              KyberSwap flow chart across {route.paths.length} path{route.paths.length > 1 ? 's' : ''} and {totalHops} hop{totalHops > 1 ? 's' : ''}
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+              {route.paths.length} path{route.paths.length > 1 ? 's' : ''}
+            </span>
+            <span className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700">
+              {totalHops} hop{totalHops > 1 ? 's' : ''}
+            </span>
+          </div>
+        </div>
+        <div className="mt-4 space-y-3">
+          {route.paths.map((path, index) => (
+            <KyberPathFlow
+              key={`${title}-path-${index}`}
+              path={path}
+              index={index}
+              fromTokenSymbol={fromTokenSymbol}
+              toTokenSymbol={toTokenSymbol}
             />
           ))}
         </div>
@@ -274,8 +473,18 @@ export default function RouteDetailsModal({ activeRoute, onClose, tokenA, tokenB
         </div>
 
         <div className="max-h-[80vh] space-y-4 overflow-y-auto px-5 py-5 sm:px-6">
-          <RouteDirectionPanel title={`${tokenA} -> ${tokenB}`} route={activeRoute.routeAtoB} />
-          <RouteDirectionPanel title={`${tokenB} -> ${tokenA}`} route={activeRoute.routeBtoA} />
+          <RouteDirectionPanel
+            title={`${tokenA} -> ${tokenB}`}
+            route={activeRoute.routeAtoB}
+            fromTokenSymbol={tokenA}
+            toTokenSymbol={tokenB}
+          />
+          <RouteDirectionPanel
+            title={`${tokenB} -> ${tokenA}`}
+            route={activeRoute.routeBtoA}
+            fromTokenSymbol={tokenB}
+            toTokenSymbol={tokenA}
+          />
 
           {!hasRouteInfo && (
             <div className="rounded-2xl border border-dashed border-gray-300 bg-white/70 px-4 py-6 text-center text-sm text-gray-500">
