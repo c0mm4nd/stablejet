@@ -76,6 +76,35 @@ function compactHash(value?: string): string | null {
   return `${value.slice(0, 6)}...${value.slice(-4)}`;
 }
 
+function formatWithGrouping(value: string): string {
+  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function formatTokenAmount(amount?: string | null, decimals?: number, symbol?: string): string | null {
+  if (!amount || decimals === undefined || !Number.isFinite(decimals) || decimals < 0) {
+    return null;
+  }
+
+  try {
+    const negative = amount.startsWith('-');
+    const raw = negative ? amount.slice(1) : amount;
+    const value = BigInt(raw);
+    const base = 10n ** BigInt(decimals);
+    const whole = value / base;
+    const fraction = value % base;
+    const wholeFormatted = formatWithGrouping(whole.toString());
+    const fractionRaw = fraction.toString().padStart(decimals, '0');
+    const fractionTrimmed = fractionRaw.slice(0, 6).replace(/0+$/, '');
+    const formatted = fractionTrimmed.length > 0
+      ? `${wholeFormatted}.${fractionTrimmed}`
+      : wholeFormatted;
+
+    return `${negative ? '-' : ''}${formatted}${symbol ? ` ${symbol}` : ''}`;
+  } catch {
+    return null;
+  }
+}
+
 function formatTokenLabel(token?: string, fallback?: string): string {
   if (fallback) {
     return fallback;
@@ -294,7 +323,9 @@ function LiFiAlternativeCard({ alternative, index }: { alternative: RouteAlterna
         </div>
       </div>
 
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+        {renderMetric('Input', formatTokenAmount(alternative.fromAmount, alternative.fromTokenDecimals, alternative.fromTokenSymbol))}
+        {renderMetric('Output', formatTokenAmount(alternative.toAmount, alternative.toTokenDecimals, alternative.toTokenSymbol))}
         {renderMetric('Output USD', formatUsd(alternative.toAmountUSD))}
         {renderMetric('Gas USD', formatUsd(alternative.gasCostUSD))}
         {renderMetric('Steps', alternative.stepCount ?? null)}
@@ -327,6 +358,16 @@ function LiFiAlternativeCard({ alternative, index }: { alternative: RouteAlterna
                 <div className="mt-2 flex flex-wrap gap-2 text-xs text-gray-600">
                   {tokenRoute && <span className="rounded-full bg-gray-100 px-2 py-1">{tokenRoute}</span>}
                   {chainRoute && <span className="rounded-full bg-gray-100 px-2 py-1">Chain {chainRoute}</span>}
+                  {formatTokenAmount(step.fromAmount, step.fromTokenDecimals, step.fromTokenSymbol) && (
+                    <span className="rounded-full bg-gray-100 px-2 py-1">
+                      In {formatTokenAmount(step.fromAmount, step.fromTokenDecimals, step.fromTokenSymbol)}
+                    </span>
+                  )}
+                  {formatTokenAmount(step.toAmount, step.toTokenDecimals, step.toTokenSymbol) && (
+                    <span className="rounded-full bg-gray-100 px-2 py-1">
+                      Out {formatTokenAmount(step.toAmount, step.toTokenDecimals, step.toTokenSymbol)}
+                    </span>
+                  )}
                   {formatUsd(step.toAmountUSD) && <span className="rounded-full bg-gray-100 px-2 py-1">Out {formatUsd(step.toAmountUSD)}</span>}
                   {formatDuration(step.executionDuration) && <span className="rounded-full bg-gray-100 px-2 py-1">ETA {formatDuration(step.executionDuration)}</span>}
                 </div>

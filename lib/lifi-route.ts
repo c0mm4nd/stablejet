@@ -19,7 +19,11 @@ export function mapLiFiRouteStep(step: any): RouteAlternativeStep {
     fromChainId: asNumber(action?.fromChainId) ?? asNumber(step?.fromChainId),
     toChainId: asNumber(action?.toChainId) ?? asNumber(step?.toChainId),
     fromTokenSymbol: asString(action?.fromToken?.symbol),
+    fromTokenDecimals: asNumber(action?.fromToken?.decimals),
     toTokenSymbol: asString(action?.toToken?.symbol),
+    toTokenDecimals: asNumber(action?.toToken?.decimals),
+    fromAmount: asString(estimate?.fromAmount) || asString(action?.fromAmount),
+    toAmount: asString(estimate?.toAmount) || asString(action?.toAmount),
     fromAmountUSD: asString(estimate?.fromAmountUSD),
     toAmountUSD: asString(estimate?.toAmountUSD),
     executionDuration: asNumber(estimate?.executionDuration) ?? asNumber(step?.executionDuration)
@@ -30,6 +34,7 @@ export function mapLiFiRouteAlternative(route: any): RouteAlternative {
   const steps = Array.isArray(route?.steps)
     ? route.steps.map((step: any) => mapLiFiRouteStep(step))
     : [];
+  const firstStep = steps[0];
 
   const toolNames: string[] = Array.from(
     new Set(
@@ -46,8 +51,14 @@ export function mapLiFiRouteAlternative(route: any): RouteAlternative {
 
   return {
     id: asString(route?.id),
+    fromAmount: asString(route?.fromAmount) || firstStep?.fromAmount,
+    toAmount: asString(route?.toAmount) || firstStep?.toAmount,
     fromAmountUSD: asString(route?.fromAmountUSD),
     toAmountUSD: asString(route?.toAmountUSD),
+    fromTokenSymbol: asString(route?.fromToken?.symbol) || firstStep?.fromTokenSymbol,
+    fromTokenDecimals: asNumber(route?.fromToken?.decimals) ?? firstStep?.fromTokenDecimals,
+    toTokenSymbol: asString(route?.toToken?.symbol) || firstStep?.toTokenSymbol,
+    toTokenDecimals: asNumber(route?.toToken?.decimals) ?? firstStep?.toTokenDecimals,
     gasCostUSD: asString(route?.gasCostUSD),
     toolNames,
     stepCount: steps.length || undefined,

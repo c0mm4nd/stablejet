@@ -42,7 +42,11 @@ export interface RouteAlternativeStep {
   fromChainId?: number;
   toChainId?: number;
   fromTokenSymbol?: string;
+  fromTokenDecimals?: number;
   toTokenSymbol?: string;
+  toTokenDecimals?: number;
+  fromAmount?: string;
+  toAmount?: string;
   fromAmountUSD?: string;
   toAmountUSD?: string;
   executionDuration?: number;
@@ -50,8 +54,14 @@ export interface RouteAlternativeStep {
 
 export interface RouteAlternative {
   id?: string;
+  fromAmount?: string;
+  toAmount?: string;
   fromAmountUSD?: string;
   toAmountUSD?: string;
+  fromTokenSymbol?: string;
+  fromTokenDecimals?: number;
+  toTokenSymbol?: string;
+  toTokenDecimals?: number;
   gasCostUSD?: string;
   toolNames?: string[];
   stepCount?: number;
