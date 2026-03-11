@@ -62,7 +62,7 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
             {/* 桌面端显示标题 */}
             <div className="ml-3 hidden lg:block">
               <h1 className="text-xl font-bold text-gray-800">StableJet Monitor</h1>
-              <p className="text-xs text-gray-500">稳定币跨链套利监控</p>
+              <p className="text-xs text-gray-500">稳定交易对跨链套利监控</p>
             </div>
           </div>
 

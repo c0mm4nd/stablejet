@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { error } from './logger';
 import { QuoteResult, KyberSwapQuoteResponse } from './types';
-import { getAllUnstableTokens } from './config';
 
 // axios 会自动使用环境变量中的代理：HTTP_PROXY, HTTPS_PROXY, NO_PROXY
 const axiosInstance = axios.create({
@@ -68,29 +67,6 @@ const GLOBAL_RATE_LIMITER_KEY = Symbol.for('stablejet.kyberswap.ratelimiter');
 
 const rateLimiter = (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] || new KyberSwapRateLimiter();
 if (process.env.NODE_ENV !== 'production') (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] = rateLimiter;
-
-// 检查路由路径是否包含不稳定代币
-function hasUnstableTokenInRoute(route: Array<Array<{
-  pool: string;
-  tokenIn: string;
-  tokenOut: string;
-  swapAmount: string;
-}>>): boolean {
-  const unstableTokens = getAllUnstableTokens();
-
-  for (const path of route) {
-    for (const hop of path) {
-      // 检查路径中的每个代币是否在不稳定代币列表中
-      if (unstableTokens.has(hop.tokenIn.toLowerCase()) ||
-        unstableTokens.has(hop.tokenOut.toLowerCase())) {
-
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
 
 // 调用 KyberSwap API 获取报价
 export async function getQuote(
