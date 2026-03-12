@@ -5,6 +5,7 @@ import { mapLiFiRouteAlternative } from './lifi-route';
 
 const JUMPER_API_BASE = 'https://api.jumper.exchange/pipeline/v1/advanced/routes';
 const JUMPER_FROM_ADDRESS = process.env.LIFI_FROM_ADDRESS || '0x0000000000000000000000000000000000000001';
+const JUMPER_DENY_EXCHANGES = ['fly', 'cowswap', 'nordstern'];
 
 const axiosInstance = axios.create({
   timeout: 20000,
@@ -65,7 +66,9 @@ export async function getLiFiQuoteByChainId(
       maxPriceImpact: 0.4,
       jitoBundle: true,
       allowSwitchChain: true,
-      denyExchanges: ["fly", ],
+      exchanges: {
+        deny: JUMPER_DENY_EXCHANGES
+      },
       executionType: 'all'
     }
   };
