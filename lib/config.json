@@ -734,6 +734,12 @@
         "bybit": {
           "cexPairSymbol": "USDCUSDT"
         },
+        "gate": {
+          "cexPairSymbol": "USDC_USDT"
+        },
+        "htx": {
+          "cexPairSymbol": "usdcusdt"
+        },
         "mantle": {
           "addressA": "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
           "addressB": "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
@@ -874,6 +880,16 @@
           "addressA": "",
           "addressB": "",
           "cexPairSymbol": "USDEUSDT"
+        },
+        "gate": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USDE_USDT"
+        },
+        "htx": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "usdeusdt"
         },
         "bnb_chain": {
           "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
