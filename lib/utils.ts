@@ -1,4 +1,4 @@
-import { ChainSwapData } from './types';
+import { ChainSwapData, ConfigData } from './types';
 
 // 计算隐含汇率：output / input
 export function calculateImpliedRate(input: number, output: number | null): number | null {
@@ -72,15 +72,12 @@ export function filterOutliers(value: number | null, allValues: (number | null)[
 
 export function isSourceEnabled(
   source: string | undefined,
-  sources?: { kyberswap: boolean; nordstern: boolean; lifi: boolean; binance: boolean; bybit: boolean; mexc: boolean }
+  sources?: Partial<ConfigData['sources']>
 ): boolean {
   const normalized = (source || 'kyberswap').toLowerCase();
   if (!sources) return true;
-  if (normalized === 'kyberswap') return sources.kyberswap !== false;
-  if (normalized === 'nordstern') return sources.nordstern !== false;
-  if (normalized === 'lifi') return sources.lifi !== false;
-  if (normalized === 'binance') return sources.binance !== false;
-  if (normalized === 'bybit') return sources.bybit !== false;
-  if (normalized === 'mexc') return sources.mexc !== false;
+  if (normalized in sources) {
+    return sources[normalized as keyof ConfigData['sources']] !== false;
+  }
   return true;
 }

@@ -2,6 +2,7 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { HistoryDataPoint } from '@/lib/history';
+import { getSourceSuffix } from '@/lib/source-metadata';
 import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, filterOutliers, isSourceEnabled } from '@/lib/utils';
 import { useConfig } from '@/contexts/ConfigContext';
 
@@ -28,6 +29,9 @@ const CHAIN_DISPLAY_NAMES: Record<string, string> = {
   'mantle_0': 'Mantle',
   'unichain': 'UniChain',
   'berachain': 'Berachain',
+  'solana': 'Solana',
+  'aptos': 'Aptos',
+  'sui': 'Sui',
   'binance': 'Binance (CEX)',
   'mexc': 'MEXC (CEX)',
   'bybit': 'Bybit (CEX)',
@@ -49,6 +53,9 @@ const A_TO_B_COLORS: Record<string, string> = {
   'mantle': '#059669',        // 祖母绿
   'unichain': '#1D4ED8',      // 宝蓝
   'berachain': '#0D9488',     // 水鸭青
+  'solana': '#14F195',
+  'aptos': '#111827',
+  'sui': '#2563EB',
   'binance': '#F0B90B',       // Binance 金色
   'mexc': '#00C087',          // MEXC 绿色
   'bybit': '#F7A600',         // Bybit 橙色
@@ -70,6 +77,9 @@ const B_TO_A_COLORS: Record<string, string> = {
   'mantle': '#CA8A04',        // 金黄
   'unichain': '#C2410C',      // 砖红
   'berachain': '#B45309',     // 棕橙
+  'solana': '#DC2626',
+  'aptos': '#7C2D12',
+  'sui': '#1D4ED8',
   'binance': '#E8A317',       // Binance 暖金色
   'mexc': '#009966',          // MEXC 深绿
   'bybit': '#E89500',         // Bybit 深橙
@@ -184,14 +194,6 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
     )
   ).sort();
 
-  const sourceSuffix = (source: string) => {
-    if (source === 'nordstern') return 'NS';
-    if (source === 'lifi') return 'LF';
-    if (source === 'binance') return 'BN';
-    if (source === 'bybit') return 'BY';
-    if (source === 'mexc') return 'MX';
-    return 'KS';
-  };
   const splitBase = (base: string) => {
     const [chainKey, dataSource] = base.split('@');
     return { chainKey, dataSource: dataSource || 'kyberswap' };
@@ -315,7 +317,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
                 key={`${base}-tokena-tokenb`}
                 type="monotone"
                 dataKey={`${base} (${tokenAShort}→${tokenBShort})`}
-                name={`${CHAIN_DISPLAY_NAMES[chainKey] || chainKey} [${sourceSuffix(dataSource)}] (${tokenAShort}→${tokenBShort})`}
+                name={`${CHAIN_DISPLAY_NAMES[chainKey] || chainKey} [${getSourceSuffix(dataSource)}] (${tokenAShort}→${tokenBShort})`}
                 stroke={stroke}
                 strokeWidth={2}
                 dot={false}
@@ -336,7 +338,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
                 key={`${base}-tokenb-tokena`}
                 type="monotone"
                 dataKey={`${base} (${tokenBShort}→${tokenAShort})`}
-                name={`${CHAIN_DISPLAY_NAMES[chainKey] || chainKey} [${sourceSuffix(dataSource)}] (${tokenBShort}→${tokenAShort})`}
+                name={`${CHAIN_DISPLAY_NAMES[chainKey] || chainKey} [${getSourceSuffix(dataSource)}] (${tokenBShort}→${tokenAShort})`}
                 stroke={stroke}
                 strokeWidth={2}
                 strokeDasharray="5 5"

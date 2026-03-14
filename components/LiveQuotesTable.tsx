@@ -6,6 +6,7 @@ import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, calcu
 import { useConfig } from '@/contexts/ConfigContext';
 import RouteDetailsModal from '@/components/RouteDetailsModal';
 import { extractLiFiAlternatives } from '@/lib/lifi-route';
+import { getSourceInfo } from '@/lib/source-metadata';
 import { RouteInfo } from '@/lib/types';
 
 interface LiveQuotesTableProps {
@@ -77,16 +78,6 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
     : history[history.length - 1];
   const timestamp = new Date(latestData.timestamp).toLocaleString('zh-CN');
 
-  // 数据源显示名称和颜色
-  const sourceInfo: Record<string, { name: string; color: string }> = {
-    kyberswap: { name: 'KyberSwap', color: 'text-blue-600' },
-    nordstern: { name: 'Nordstern', color: 'text-cyan-600' },
-    lifi: { name: 'Li.Fi', color: 'text-teal-600' },
-    binance: { name: 'Binance', color: 'text-yellow-600' },
-    bybit: { name: 'Bybit', color: 'text-orange-600' },
-    mexc: { name: 'MEXC', color: 'text-green-600' }
-  };
-
   // 准备表格数据
   const tableData: TableRow[] = useMemo(() => {
     const rawRows: RawRow[] = latestData.data
@@ -132,7 +123,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
       routeAtoB: r.routeAtoB,
       routeBtoA: r.routeBtoA
     }));
-  }, [latestData, amount]);
+  }, [latestData, amount, sources]);
 
   // 排序数据
   const sortedData = useMemo(() => {
@@ -265,7 +256,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
           </thead>
           <tbody className="divide-y divide-gray-100">
             {sortedData.map((row, idx) => {
-              const sourceDisplayInfo = sourceInfo[row.dataSource] || { name: row.dataSource, color: 'text-gray-600' };
+              const sourceDisplayInfo = getSourceInfo(row.dataSource);
               const rowTime = new Date(row.timestamp).toLocaleString('zh-CN');
               const lifiRouteCounts = row.dataSource === 'lifi'
                 ? {

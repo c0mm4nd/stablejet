@@ -5,6 +5,7 @@ import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
 import RouteDetailsModal from '@/components/RouteDetailsModal';
 import { extractLiFiAlternatives } from '@/lib/lifi-route';
+import { getSourceInfo } from '@/lib/source-metadata';
 import { RouteInfo } from '@/lib/types';
 import { isSourceEnabled } from '@/lib/utils';
 // import { hydrateTradingPairs } from '@/lib/config'; // If we need to lookup token names from context
@@ -82,7 +83,7 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
                     routeBtoA: tokenBToA?.route
                 };
             });
-    }, [latestData, amount]);
+    }, [latestData, amount, sources]);
 
     // Sort
     const sortedData = useMemo(() => {
@@ -117,15 +118,6 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
     const SortIcon = ({ columnKey }: { columnKey: SortKey }) => {
         if (sortKey !== columnKey) return <span className="text-gray-400">⇅</span>;
         return <span>{sortDirection === 'asc' ? '↑' : '↓'}</span>;
-    };
-
-    const sourceInfo: Record<string, { name: string; color: string }> = {
-        kyberswap: { name: 'KyberSwap', color: 'text-blue-600' },
-        nordstern: { name: 'Nordstern', color: 'text-cyan-600' },
-        lifi: { name: 'Li.Fi', color: 'text-teal-600' },
-        binance: { name: 'Binance', color: 'text-yellow-600' },
-        bybit: { name: 'Bybit', color: 'text-orange-600' },
-        mexc: { name: 'MEXC', color: 'text-green-600' }
     };
 
     return (
@@ -173,7 +165,7 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {sortedData.map((row, idx) => {
-                            const src = sourceInfo[row.dataSource] || { name: row.dataSource, color: 'text-gray-600' };
+                            const src = getSourceInfo(row.dataSource);
                             const rowTime = new Date(row.timestamp).toLocaleString('zh-CN');
                             const lifiRouteCounts = row.dataSource === 'lifi'
                                 ? {

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback, Suspense } from 'react';
 import { ChainAppConfig, TradingPairConfig, ConfigData } from '@/lib/types';
+import { DEFAULT_SOURCES, normalizeSources } from '@/lib/source-metadata';
 
 const DEFAULT_CLIENT_REFRESH_INTERVAL = 10; // 默认客户端刷新间隔10秒
 
@@ -26,16 +27,7 @@ function ConfigProviderInner({ children }: { children: ReactNode }) {
   const [chains, setChains] = useState<Record<string, ChainAppConfig>>({});
   const [pairs, setPairs] = useState<Record<string, TradingPairConfig>>({});
   const [sources, setSources] = useState<ConfigData['sources']>({
-    kyberswap: true,
-    nordstern: true,
-    lifi: true,
-    binance: true,
-    bybit: true,
-    mexc: true,
-    bitget: true,
-    gate: true,
-    htx: true,
-    kraken: true
+    ...DEFAULT_SOURCES
   });
   const [clientRefreshInterval, setClientRefreshInterval] = useState<number>(DEFAULT_CLIENT_REFRESH_INTERVAL);
 
@@ -62,18 +54,7 @@ function ConfigProviderInner({ children }: { children: ReactNode }) {
         const data: ConfigData = await res.json();
         setChains(data.chains);
         setPairs(data.pairs);
-        setSources(data.sources || {
-          kyberswap: true,
-          nordstern: true,
-          lifi: true,
-          binance: true,
-          bybit: true,
-          mexc: true,
-          bitget: true,
-          gate: true,
-          htx: true,
-          kraken: true
-        });
+        setSources(normalizeSources(data.sources));
 
         // Set initial pair if not already set
         if (!selectedPair) {

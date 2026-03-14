@@ -3,8 +3,17 @@ import { ChainAppConfig, ChainSwapData, QuoteResult, ConfigData } from './types'
 import { getQuote } from './kyberswap';
 import { getNordsternQuoteByChainKey } from './nordstern';
 import { getLiFiQuoteByChainId } from './lifi';
+import { getCetusQuote } from './cetus';
+import { getJupiterQuote } from './jupiter';
+import { getPanoraQuote } from './panora';
+import { getAftermathQuote } from './aftermath';
+import { normalizeSources } from './source-metadata';
 
-type SourceEntry = { source: 'kyberswap' | 'nordstern' | 'lifi'; aToB: QuoteResult; bToA: QuoteResult };
+type SourceEntry = {
+  source: NonNullable<ChainSwapData['dataSource']>;
+  aToB: QuoteResult;
+  bToA: QuoteResult;
+};
 
 interface OnchainSourceParams {
   pairId: string;
@@ -32,16 +41,22 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
     appChainConfig,
     sources
   } = params;
+  const normalizedSources = normalizeSources(sources);
 
   const kyberChainParam = appChainConfig.kyberCode || chainKey;
   const nordsternChainParam = appChainConfig.nordsternCode || chainKey;
   const lifiChainId = appChainConfig.lifiChainId || appChainConfig.nordsternCode;
-  const enableKyber = sources?.kyberswap !== false && !!appChainConfig.kyberCode;
-  const enableNordstern = sources?.nordstern !== false && !!appChainConfig.nordsternCode;
-  const enableLiFi = sources?.lifi !== false && !!lifiChainId;
+  const enableKyber = normalizedSources.kyberswap !== false && !!appChainConfig.kyberCode;
+  const enableNordstern = normalizedSources.nordstern !== false && !!appChainConfig.nordsternCode;
+  const enableLiFi = normalizedSources.lifi !== false && !!lifiChainId;
+  const enableCetus = normalizedSources.cetus !== false && chainKey === 'sui';
+  const enableJupiter = normalizedSources.jupiter !== false && chainKey === 'solana';
+  const enablePanora = normalizedSources.panora !== false && chainKey === 'aptos';
+  const enableAftermath = normalizedSources.aftermath !== false && chainKey === 'sui';
 
   const amountInAToB = toWei(amount, tokenADecimals);
   const amountInBToA = toWei(amount, tokenBDecimals);
+  const humanAmount = String(amount);
 
   const sourceEntries: SourceEntry[] = [];
 
@@ -63,10 +78,38 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
         .then(bToA => ({ source: 'lifi' as const, aToB, bToA })))
     : null;
 
+  const cetusPromise = enableCetus
+    ? getCetusQuote(tokenAAddress, tokenBAddress, amountInAToB)
+      .then(aToB => getCetusQuote(tokenBAddress, tokenAAddress, amountInBToA)
+        .then(bToA => ({ source: 'cetus' as const, aToB, bToA })))
+    : null;
+
+  const jupiterPromise = enableJupiter
+    ? getJupiterQuote(tokenAAddress, tokenBAddress, amountInAToB)
+      .then(aToB => getJupiterQuote(tokenBAddress, tokenAAddress, amountInBToA)
+        .then(bToA => ({ source: 'jupiter' as const, aToB, bToA })))
+    : null;
+
+  const panoraPromise = enablePanora
+    ? getPanoraQuote(tokenAAddress, tokenBAddress, humanAmount, tokenBDecimals)
+      .then(aToB => getPanoraQuote(tokenBAddress, tokenAAddress, humanAmount, tokenADecimals)
+        .then(bToA => ({ source: 'panora' as const, aToB, bToA })))
+    : null;
+
+  const aftermathPromise = enableAftermath
+    ? getAftermathQuote(tokenAAddress, tokenBAddress, amountInAToB)
+      .then(aToB => getAftermathQuote(tokenBAddress, tokenAAddress, amountInBToA)
+        .then(bToA => ({ source: 'aftermath' as const, aToB, bToA })))
+    : null;
+
   const fetched = await Promise.all([
     ...(kyberPromise ? [kyberPromise] : []),
     ...(nordsternPromise ? [nordsternPromise] : []),
-    ...(lifiPromise ? [lifiPromise] : [])
+    ...(lifiPromise ? [lifiPromise] : []),
+    ...(cetusPromise ? [cetusPromise] : []),
+    ...(jupiterPromise ? [jupiterPromise] : []),
+    ...(panoraPromise ? [panoraPromise] : []),
+    ...(aftermathPromise ? [aftermathPromise] : [])
   ]);
 
   sourceEntries.push(...fetched);

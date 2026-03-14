@@ -69,8 +69,52 @@ export interface RouteAlternative {
   steps?: RouteAlternativeStep[];
 }
 
+export type RouteType =
+  | 'kyberswap'
+  | 'nordstern'
+  | 'lifi'
+  | 'cetus'
+  | 'jupiter'
+  | 'panora'
+  | 'aftermath'
+  | 'cex'
+  | 'unknown';
+
+export type DataSource =
+  | 'kyberswap'
+  | 'nordstern'
+  | 'lifi'
+  | 'cetus'
+  | 'jupiter'
+  | 'panora'
+  | 'aftermath'
+  | 'binance'
+  | 'mexc'
+  | 'bybit'
+  | 'bitget'
+  | 'gate'
+  | 'htx'
+  | 'kraken';
+
+export interface SourceConfig {
+  kyberswap: boolean;
+  nordstern: boolean;
+  lifi: boolean;
+  cetus: boolean;
+  jupiter: boolean;
+  panora: boolean;
+  aftermath: boolean;
+  binance: boolean;
+  bybit: boolean;
+  mexc: boolean;
+  bitget: boolean;
+  gate: boolean;
+  htx: boolean;
+  kraken: boolean;
+}
+
 export interface RouteInfo {
-  type: 'kyberswap' | 'nordstern' | 'lifi' | 'cex' | 'unknown';
+  type: RouteType;
   paths?: RouteHop[][];
   swaps?: any[];
   tx?: any;
@@ -85,7 +129,7 @@ export interface ChainSwapData {
   chainKey: string;
   amount: number;
   pairId?: string; // Trading pair identifier
-  dataSource?: 'kyberswap' | 'nordstern' | 'lifi' | 'binance' | 'mexc' | 'bybit' | 'bitget' | 'gate' | 'htx' | 'kraken'; // 数据来源
+  dataSource?: DataSource; // 数据来源
   quoteTimestamp?: string; // ISO timestamp for this specific quote
   // Generic swap results for any pair
   tokenAToB?: SwapResult; // tokenA -> tokenB
@@ -173,17 +217,6 @@ export interface TradingPairConfig {
 export interface ConfigData {
   chains: Record<string, ChainAppConfig>; // chainId -> Config
   pairs: Record<string, TradingPairConfig>; // pairId -> Config
-  sources: {
-    kyberswap: boolean;
-    nordstern: boolean;
-    lifi: boolean;
-    binance: boolean;
-    bybit: boolean;
-    mexc: boolean;
-    bitget: boolean;
-    gate: boolean;
-    htx: boolean;
-    kraken: boolean;
-  };
+  sources: SourceConfig;
   clientRefreshInterval: number;
 }

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useConfig } from '@/contexts/ConfigContext';
 import { ChainAppConfig, TradingPairConfig } from '@/lib/types';
 import { getTokenDecimals } from '@/lib/config';
+import { DEFAULT_SOURCES, normalizeSources } from '@/lib/source-metadata';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -63,7 +64,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       }
       setEditingPairs(normalizedPairs);
       setEditingInterval(clientRefreshInterval);
-      setEditingSources(sources);
+      setEditingSources(normalizeSources(sources));
     }
   }, [isOpen, chains, pairs, clientRefreshInterval, sources]);
 
@@ -123,7 +124,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       if (!parsed || typeof parsed !== 'object') throw new Error('Invalid JSON');
       if (!parsed.chains || !parsed.pairs) throw new Error('Missing chains/pairs');
 
-      const nextSources = parsed.sources || { kyberswap: true, nordstern: true, lifi: true, binance: true, bybit: true, mexc: true, bitget: true, gate: true, htx: true, kraken: true };
+      const nextSources = normalizeSources(parsed.sources || DEFAULT_SOURCES);
       const nextInterval = typeof parsed.clientRefreshInterval === 'number' ? parsed.clientRefreshInterval : editingInterval;
 
       setEditingChains(parsed.chains);
@@ -392,6 +393,38 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         onChange={e => setEditingSources({ ...editingSources, lifi: e.target.checked })}
                       />
                       <span className="font-medium text-gray-700">Li.Fi (Jumper)</span>
+                    </label>
+                    <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
+                      <input
+                        type="checkbox"
+                        checked={!!editingSources.cetus}
+                        onChange={e => setEditingSources({ ...editingSources, cetus: e.target.checked })}
+                      />
+                      <span className="font-medium text-gray-700">Cetus (Sui)</span>
+                    </label>
+                    <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
+                      <input
+                        type="checkbox"
+                        checked={!!editingSources.jupiter}
+                        onChange={e => setEditingSources({ ...editingSources, jupiter: e.target.checked })}
+                      />
+                      <span className="font-medium text-gray-700">Jupiter (Solana)</span>
+                    </label>
+                    <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
+                      <input
+                        type="checkbox"
+                        checked={!!editingSources.panora}
+                        onChange={e => setEditingSources({ ...editingSources, panora: e.target.checked })}
+                      />
+                      <span className="font-medium text-gray-700">Panora (Aptos)</span>
+                    </label>
+                    <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
+                      <input
+                        type="checkbox"
+                        checked={!!editingSources.aftermath}
+                        onChange={e => setEditingSources({ ...editingSources, aftermath: e.target.checked })}
+                      />
+                      <span className="font-medium text-gray-700">Aftermath (Sui)</span>
                     </label>
                     <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
                       <input

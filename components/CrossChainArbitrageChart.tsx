@@ -3,6 +3,7 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
+import { getSourceSuffix } from '@/lib/source-metadata';
 import { calculateImpliedRate, calculateMedian, calculateRateDeviationBps, calculateRoundTripBps, filterOutliers, isSourceEnabled } from '@/lib/utils';
 
 interface CrossChainArbitrageChartProps {
@@ -130,15 +131,7 @@ interface ArbitrageDetail {
 
 export default function CrossChainArbitrageChart({ history, amount, pairId }: CrossChainArbitrageChartProps) {
   const { pairs, sources } = useConfig();
-  const sourceSuffix = (source?: string) => {
-    if (source === 'nordstern') return 'NS';
-    if (source === 'lifi') return 'LF';
-    if (source === 'binance') return 'BN';
-    if (source === 'bybit') return 'BY';
-    if (source === 'mexc') return 'MX';
-    return 'KS';
-  };
-  const itemLabel = (item: any) => `${item.chain} [${sourceSuffix(item.dataSource || 'kyberswap')}]`;
+  const itemLabel = (item: any) => `${item.chain} [${getSourceSuffix(item.dataSource || 'kyberswap')}]`;
 
   const pair = pairs[pairId];
   if (!pair) {
