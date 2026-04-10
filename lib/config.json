@@ -4,105 +4,96 @@
       "name": "Ethereum",
       "kyberCode": "ethereum",
       "nordsternCode": "1",
-      "lifiChainId": "1",
-      "disabled": false
+      "lifiChainId": "1"
     },
     "polygon": {
       "name": "Polygon",
       "kyberCode": "polygon",
       "nordsternCode": "137",
-      "lifiChainId": "137",
-      "disabled": false
+      "lifiChainId": "137"
     },
     "arbitrum": {
       "name": "Arbitrum",
       "kyberCode": "arbitrum",
       "nordsternCode": "42161",
-      "lifiChainId": "42161",
-      "disabled": false
+      "lifiChainId": "42161"
     },
     "optimism": {
       "name": "Optimism",
       "kyberCode": "optimism",
       "nordsternCode": "10",
-      "lifiChainId": "10",
-      "disabled": false
+      "lifiChainId": "10"
     },
     "base": {
       "name": "Base",
       "kyberCode": "base",
       "nordsternCode": "8453",
-      "lifiChainId": "8453",
-      "disabled": false
+      "lifiChainId": "8453"
     },
     "bnb_chain": {
       "name": "BNB Chain",
       "kyberCode": "bsc",
       "lifiChainId": "56",
-      "nordsternCode": "56",
-      "disabled": false
+      "nordsternCode": "56"
     },
     "avalanche": {
       "name": "Avalanche",
       "kyberCode": "avalanche",
       "nordsternCode": "43114",
-      "lifiChainId": "43114",
-      "disabled": false
+      "lifiChainId": "43114"
     },
     "fantom": {
       "name": "Fantom",
-      "kyberCode": "fantom",
-      "disabled": false
+      "kyberCode": "",
+      "nordsternCode": "250",
+      "lifiChainId": "250"
     },
     "gnosis": {
       "name": "Gnosis",
-      "kyberCode": "gnosis",
-      "disabled": false
+      "kyberCode": "",
+      "lifiChainId": "100",
+      "nordsternCode": "100"
     },
     "zksync_era": {
       "name": "zkSync Era",
-      "kyberCode": "zksync",
-      "disabled": false
+      "kyberCode": "",
+      "lifiChainId": "324"
     },
     "linea": {
       "name": "Linea",
       "kyberCode": "linea",
       "nordsternCode": "59144",
-      "lifiChainId": "59144",
-      "disabled": false
+      "lifiChainId": "59144"
     },
     "scroll": {
       "name": "Scroll",
-      "kyberCode": "scroll",
-      "disabled": false
+      "kyberCode": "",
+      "lifiChainId": "534352",
+      "nordsternCode": "534352"
     },
     "sonic": {
       "name": "Sonic",
       "kyberCode": "sonic",
       "nordsternCode": "146",
-      "lifiChainId": "146",
-      "disabled": false
+      "lifiChainId": "146"
     },
     "unichain": {
       "name": "Unichain",
       "kyberCode": "unichain",
       "nordsternCode": "130",
-      "lifiChainId": "130",
-      "disabled": false
+      "lifiChainId": "130"
     },
     "berachain": {
       "name": "Berachain",
       "kyberCode": "berachain",
       "nordsternCode": "80094",
-      "lifiChainId": "80094",
-      "disabled": false
+      "lifiChainId": "80094"
     },
     "mantle": {
       "name": "Mantle",
       "kyberCode": "mantle",
       "nordsternCode": "5000",
-      "lifiChainId": "5000",
-      "disabled": false
+      "lifiChainId": "5000"
     },
     "solana": {
       "name": "Solana",
@@ -117,16 +108,456 @@
       "disabled": false
     },
     "binance": {
-      "name": "Binance",
-      "disabled": false
+      "name": "Binance"
     },
     "mexc": {
-      "name": "MEXC",
-      "disabled": false
+      "name": "MEXC"
     },
     "bybit": {
-      "name": "Bybit",
+      "name": "Bybit"
+    },
+    "core": {
+      "name": "CoreDAO",
+      "nordsternCode": "1116",
+      "lifiChainId": "1116",
+      "disabled": true
+    },
+    "peaq": {
+      "name": "Peaq",
+      "kyberCode": "",
+      "disabled": true
+    },
+    "sei": {
+      "name": "Sei",
+      "kyberCode": "",
+      "lifiChainId": "1329",
+      "nordsternCode": "1329"
+    },
+    "xdc": {
+      "name": "XDC",
+      "kyberCode": "",
+      "lifiChainId": "50",
+      "nordsternCode": "50"
+    },
+    "ink": {
+      "name": "Ink",
+      "kyberCode": "",
+      "lifiChainId": "57073",
+      "nordsternCode": "57073"
+    },
+    "flare": {
+      "name": "Flare",
+      "lifiChainId": "14",
+      "nordsternCode": "14"
+    },
+    "cronos": {
+      "name": "Cronos",
+      "lifiChainId": "25",
+      "nordsternCode": "25"
+    },
+    "rootstock": {
+      "name": "Rootstock",
+      "lifiChainId": "30"
+    },
+    "viction": {
+      "name": "Viction",
+      "lifiChainId": "88"
+    },
+    "fuse": {
+      "name": "FUSE",
+      "lifiChainId": "122"
+    },
+    "monad": {
+      "name": "Monad",
+      "kyberCode": "monad",
+      "lifiChainId": "143",
+      "nordsternCode": "143"
+    },
+    "opbnb": {
+      "name": "opBNB",
+      "lifiChainId": "204",
+      "nordsternCode": "204"
+    },
+    "lens": {
+      "name": "Lens",
+      "lifiChainId": "232"
+    },
+    "fraxtal": {
+      "name": "Fraxtal",
+      "lifiChainId": "252",
+      "nordsternCode": "252"
+    },
+    "boba": {
+      "name": "Boba",
+      "lifiChainId": "288",
+      "nordsternCode": "288"
+    },
+    "world_chain": {
+      "name": "World Chain",
+      "lifiChainId": "480",
+      "nordsternCode": "480"
+    },
+    "flow": {
+      "name": "Flow",
+      "lifiChainId": "747",
+      "nordsternCode": "747"
+    },
+    "stable": {
+      "name": "Stable",
+      "lifiChainId": "988"
+    },
+    "hyperevm": {
+      "name": "HyperEVM",
+      "lifiChainId": "999",
+      "nordsternCode": "999",
+      "kyberCode": "hyperevm"
+    },
+    "metis": {
+      "name": "Metis",
+      "lifiChainId": "1088",
+      "nordsternCode": "1088"
+    },
+    "lisk": {
+      "name": "Lisk",
+      "lifiChainId": "1135",
+      "nordsternCode": "1135"
+    },
+    "moonbeam": {
+      "name": "Moonbeam",
+      "lifiChainId": "1284"
+    },
+    "vana": {
+      "name": "Vana",
+      "lifiChainId": "1480",
+      "nordsternCode": "1480"
+    },
+    "gravity": {
+      "name": "Gravity",
+      "lifiChainId": "1625",
+      "nordsternCode": "1625"
+    },
+    "soneium": {
+      "name": "Soneium",
+      "lifiChainId": "1868",
+      "nordsternCode": "1868"
+    },
+    "swellchain": {
+      "name": "Swellchain",
+      "lifiChainId": "1923",
+      "nordsternCode": "1923"
+    },
+    "ronin": {
+      "name": "Ronin",
+      "lifiChainId": "2020",
+      "nordsternCode": "2020",
+      "kyberCode": "ronin"
+    },
+    "abstract": {
+      "name": "Abstract",
+      "lifiChainId": "2741",
       "disabled": false
+    },
+    "kaia": {
+      "name": "Kaia",
+      "lifiChainId": "8217",
+      "nordsternCode": "8217"
+    },
+    "plasma": {
+      "name": "Plasma",
+      "lifiChainId": "9745",
+      "nordsternCode": "9745",
+      "kyberCode": "plasma"
+    },
+    "immutable_zkevm": {
+      "name": "Immutable zkEVM",
+      "lifiChainId": "13371",
+      "nordsternCode": "13371"
+    },
+    "apechain": {
+      "name": "Apechain",
+      "lifiChainId": "33139",
+      "nordsternCode": "33139"
+    },
+    "mode": {
+      "name": "Mode",
+      "lifiChainId": "34443",
+      "nordsternCode": "34443"
+    },
+    "celo": {
+      "name": "Celo",
+      "lifiChainId": "42220",
+      "nordsternCode": "42220"
+    },
+    "etherlink": {
+      "name": "Etherlink",
+      "lifiChainId": "42793",
+      "kyberCode": "etherlink"
+    },
+    "hemi": {
+      "name": "Hemi",
+      "lifiChainId": "43111",
+      "nordsternCode": "43111"
+    },
+    "sophon": {
+      "name": "Sophon",
+      "lifiChainId": "50104"
+    },
+    "superposition": {
+      "name": "Superposition",
+      "lifiChainId": "55244",
+      "nordsternCode": "55244"
+    },
+    "bob": {
+      "name": "BOB",
+      "lifiChainId": "60808",
+      "nordsternCode": "60808"
+    },
+    "blast": {
+      "name": "Blast",
+      "lifiChainId": "81457",
+      "nordsternCode": "81457"
+    },
+    "plume": {
+      "name": "Plume",
+      "lifiChainId": "98866"
+    },
+    "taiko": {
+      "name": "Taiko",
+      "lifiChainId": "167000",
+      "nordsternCode": "167000"
+    },
+    "katana": {
+      "name": "Katana",
+      "lifiChainId": "747474",
+      "nordsternCode": "747474"
+    },
+    "corn": {
+      "name": "Corn",
+      "lifiChainId": "21000000",
+      "nordsternCode": "21000000"
+    },
+    "songbird": {
+      "name": "songbird",
+      "nordsternCode": "19"
+    },
+    "telos": {
+      "name": "telos",
+      "nordsternCode": "40"
+    },
+    "kub": {
+      "name": "kub",
+      "nordsternCode": "96"
+    },
+    "thundercore": {
+      "name": "thundercore",
+      "nordsternCode": "108"
+    },
+    "shibarium": {
+      "name": "shibarium",
+      "nordsternCode": "109"
+    },
+    "mantapacific": {
+      "name": "Manta Pacific",
+      "nordsternCode": "169"
+    },
+    "hashkey": {
+      "name": "hashkey",
+      "nordsternCode": "177"
+    },
+    "mint": {
+      "name": "mint",
+      "nordsternCode": "185"
+    },
+    "bittorrent": {
+      "name": "bittorrent",
+      "nordsternCode": "199"
+    },
+    "b2": {
+      "name": "b2",
+      "nordsternCode": "223"
+    },
+    "kroma": {
+      "name": "kroma",
+      "nordsternCode": "255"
+    },
+    "kcc": {
+      "name": "kcc",
+      "nordsternCode": "321"
+    },
+    "shape": {
+      "name": "shape",
+      "nordsternCode": "360"
+    },
+    "appchain": {
+      "name": "appchain",
+      "nordsternCode": "466"
+    },
+    "astar": {
+      "name": "astar",
+      "nordsternCode": "592"
+    },
+    "endurance": {
+      "name": "endurance",
+      "nordsternCode": "648"
+    },
+    "redstone": {
+      "name": "redstone",
+      "nordsternCode": "690"
+    },
+    "matchain": {
+      "name": "matchain",
+      "nordsternCode": "698"
+    },
+    "qitmeer": {
+      "name": "qitmeer",
+      "nordsternCode": "813"
+    },
+    "wanchain": {
+      "name": "wanchain",
+      "nordsternCode": "888"
+    },
+    "wemix": {
+      "name": "wemix",
+      "nordsternCode": "1111"
+    },
+    "ultron": {
+      "name": "ultron",
+      "nordsternCode": "1231"
+    },
+    "step": {
+      "name": "step",
+      "nordsternCode": "1234"
+    },
+    "elysium": {
+      "name": "elysium",
+      "nordsternCode": "1339"
+    },
+    "story": {
+      "name": "story",
+      "nordsternCode": "1514"
+    },
+    "reya": {
+      "name": "reya",
+      "nordsternCode": "1729"
+    },
+    "sanko": {
+      "name": "sanko",
+      "nordsternCode": "1996"
+    },
+    "goat": {
+      "name": "goat",
+      "nordsternCode": "2345",
+      "disabled": true
+    },
+    "morphl2": {
+      "name": "morphl2",
+      "nordsternCode": "2818"
+    },
+    "muster": {
+      "name": "muster",
+      "nordsternCode": "4078"
+    },
+    "beam": {
+      "name": "beam",
+      "nordsternCode": "4337"
+    },
+    "superseed": {
+      "name": "superseed",
+      "nordsternCode": "5330"
+    },
+    "duckchain": {
+      "name": "duckchain",
+      "nordsternCode": "5545"
+    },
+    "cyber": {
+      "name": "cyber",
+      "nordsternCode": "7560"
+    },
+    "b3": {
+      "name": "b3",
+      "nordsternCode": "8333"
+    },
+    "rss3vsl": {
+      "name": "rss3vsl",
+      "nordsternCode": "12553"
+    },
+    "genesys": {
+      "name": "genesys",
+      "nordsternCode": "16507"
+    },
+    "mapprotocol": {
+      "name": "mapprotocol",
+      "nordsternCode": "22776"
+    },
+    "bitgert": {
+      "name": "bitgert",
+      "nordsternCode": "32520"
+    },
+    "funki": {
+      "name": "funki",
+      "nordsternCode": "33979"
+    },
+    "qnetwork": {
+      "name": "qnetwork",
+      "nordsternCode": "35441"
+    },
+    "arbitrumnova": {
+      "name": "arbitrumnova",
+      "nordsternCode": "42170"
+    },
+    "zircuit": {
+      "name": "zircuit",
+      "nordsternCode": "48900"
+    },
+    "electroneum": {
+      "name": "electroneum",
+      "nordsternCode": "52014"
+    },
+    "chilizchain": {
+      "name": "chilizchain",
+      "nordsternCode": "88888"
+    },
+    "bitlayer": {
+      "name": "bitlayer",
+      "nordsternCode": "200901"
+    },
+    "platon": {
+      "name": "platon",
+      "nordsternCode": "210425"
+    },
+    "parex": {
+      "name": "parex",
+      "nordsternCode": "322202"
+    },
+    "zora": {
+      "name": "zora",
+      "nordsternCode": "7777777"
+    },
+    "ancient8": {
+      "name": "ancient8",
+      "nordsternCode": "888888888"
+    },
+    "rari": {
+      "name": "rari",
+      "nordsternCode": "1380012617"
+    },
+    "ab_chain": {
+      "name": "AB Chain"
+    },
+    "conflux_espace": {
+      "name": "Conflux eSpace",
+      "nordsternCode": "1030",
+      "lifiChainId": "1030"
+    },
+    "megaeth": {
+      "name": "MegaETH",
+      "nordsternCode": "4326",
+      "lifiChainId": "4326"
+    },
+    "x_layer": {
+      "name": "XLayer",
+      "nordsternCode": "196",
+      "lifiChainId": ""
     },
     "bitget": {
       "name": "Bitget",
@@ -144,557 +575,8 @@
       "name": "Kraken",
       "disabled": false
     },
-    "coredao": {
-      "name": "Coredao",
-      "kyberCode": "coredao",
-      "disabled": true
-    },
-    "peaq": {
-      "name": "Peaq",
-      "kyberCode": "peaq",
-      "disabled": true
-    },
-    "sei": {
-      "name": "Sei",
-      "kyberCode": "sei",
-      "lifiChainId": "1329",
-      "nordsternCode": "1329",
-      "disabled": true
-    },
-    "xdc": {
-      "name": "Xdc",
-      "kyberCode": "xdc",
-      "lifiChainId": "50",
-      "nordsternCode": "50",
-      "disabled": true
-    },
-    "ink": {
-      "name": "Ink",
-      "kyberCode": "ink",
-      "lifiChainId": "57073",
-      "nordsternCode": "57073",
-      "disabled": true
-    },
-    "flare": {
-      "name": "Flare",
-      "lifiChainId": "14",
-      "nordsternCode": "14",
-      "disabled": false
-    },
-    "cronos": {
-      "name": "Cronos",
-      "lifiChainId": "25",
-      "nordsternCode": "25",
-      "disabled": false
-    },
-    "rootstock": {
-      "name": "Rootstock",
-      "lifiChainId": "30",
-      "disabled": false
-    },
-    "viction": {
-      "name": "Viction",
-      "lifiChainId": "88",
-      "disabled": false
-    },
-    "gnosis_100": {
-      "name": "Gnosis",
-      "lifiChainId": "100",
-      "nordsternCode": "100",
-      "disabled": false
-    },
-    "fuse": {
-      "name": "FUSE",
-      "lifiChainId": "122",
-      "disabled": false
-    },
-    "monad": {
-      "name": "Monad",
-      "lifiChainId": "143",
-      "nordsternCode": "143",
-      "disabled": false
-    },
-    "opbnb": {
-      "name": "opBNB",
-      "lifiChainId": "204",
-      "nordsternCode": "204",
-      "disabled": false
-    },
-    "lens": {
-      "name": "Lens",
-      "lifiChainId": "232",
-      "disabled": false
-    },
-    "fraxtal": {
-      "name": "Fraxtal",
-      "lifiChainId": "252",
-      "nordsternCode": "252",
-      "disabled": false
-    },
-    "boba": {
-      "name": "Boba",
-      "lifiChainId": "288",
-      "nordsternCode": "288",
-      "disabled": false
-    },
-    "zksync": {
-      "name": "zkSync",
-      "lifiChainId": "324",
-      "disabled": false
-    },
-    "world_chain": {
-      "name": "World Chain",
-      "lifiChainId": "480",
-      "nordsternCode": "480",
-      "disabled": false
-    },
-    "flow": {
-      "name": "Flow",
-      "lifiChainId": "747",
-      "nordsternCode": "747",
-      "disabled": false
-    },
-    "stable": {
-      "name": "Stable",
-      "lifiChainId": "988",
-      "disabled": false
-    },
-    "hyperevm": {
-      "name": "HyperEVM",
-      "lifiChainId": "999",
-      "nordsternCode": "999",
-      "kyberCode": "hyp",
-      "disabled": false
-    },
-    "metis": {
-      "name": "Metis",
-      "lifiChainId": "1088",
-      "nordsternCode": "1088",
-      "disabled": false
-    },
-    "lisk": {
-      "name": "Lisk",
-      "lifiChainId": "1135",
-      "nordsternCode": "1135",
-      "disabled": false
-    },
-    "moonbeam": {
-      "name": "Moonbeam",
-      "lifiChainId": "1284",
-      "disabled": false
-    },
-    "vana": {
-      "name": "Vana",
-      "lifiChainId": "1480",
-      "nordsternCode": "1480",
-      "disabled": false
-    },
-    "gravity": {
-      "name": "Gravity",
-      "lifiChainId": "1625",
-      "nordsternCode": "1625",
-      "disabled": false
-    },
-    "soneium": {
-      "name": "Soneium",
-      "lifiChainId": "1868",
-      "nordsternCode": "1868",
-      "disabled": false
-    },
-    "swellchain": {
-      "name": "Swellchain",
-      "lifiChainId": "1923",
-      "nordsternCode": "1923",
-      "disabled": false
-    },
-    "ronin": {
-      "name": "Ronin",
-      "lifiChainId": "2020",
-      "nordsternCode": "2020",
-      "kyberCode": "ron",
-      "disabled": false
-    },
-    "abstract": {
-      "name": "Abstract",
-      "lifiChainId": "2741",
-      "disabled": false
-    },
-    "kaia": {
-      "name": "Kaia",
-      "lifiChainId": "8217",
-      "nordsternCode": "8217",
-      "disabled": false
-    },
-    "plasma": {
-      "name": "Plasma",
-      "lifiChainId": "9745",
-      "nordsternCode": "9745",
-      "kyberCode": "pla",
-      "disabled": false
-    },
-    "immutable_zkevm": {
-      "name": "Immutable zkEVM",
-      "lifiChainId": "13371",
-      "nordsternCode": "13371",
-      "disabled": false
-    },
-    "apechain": {
-      "name": "Apechain",
-      "lifiChainId": "33139",
-      "nordsternCode": "33139",
-      "disabled": false
-    },
-    "mode": {
-      "name": "Mode",
-      "lifiChainId": "34443",
-      "nordsternCode": "34443",
-      "disabled": false
-    },
-    "celo": {
-      "name": "Celo",
-      "lifiChainId": "42220",
-      "nordsternCode": "42220",
-      "disabled": false
-    },
-    "etherlink": {
-      "name": "Etherlink",
-      "lifiChainId": "42793",
-      "kyberCode": "etl",
-      "disabled": false
-    },
-    "hemi": {
-      "name": "Hemi",
-      "lifiChainId": "43111",
-      "nordsternCode": "43111",
-      "disabled": false
-    },
-    "sophon": {
-      "name": "Sophon",
-      "lifiChainId": "50104",
-      "disabled": false
-    },
-    "superposition": {
-      "name": "Superposition",
-      "lifiChainId": "55244",
-      "nordsternCode": "55244",
-      "disabled": false
-    },
-    "bob": {
-      "name": "BOB",
-      "lifiChainId": "60808",
-      "nordsternCode": "60808",
-      "disabled": false
-    },
-    "blast": {
-      "name": "Blast",
-      "lifiChainId": "81457",
-      "nordsternCode": "81457",
-      "disabled": false
-    },
-    "plume": {
-      "name": "Plume",
-      "lifiChainId": "98866",
-      "disabled": false
-    },
-    "taiko": {
-      "name": "Taiko",
-      "lifiChainId": "167000",
-      "nordsternCode": "167000",
-      "disabled": false
-    },
-    "scroll_534352": {
-      "name": "Scroll",
-      "lifiChainId": "534352",
-      "nordsternCode": "534352",
-      "disabled": false
-    },
-    "katana": {
-      "name": "Katana",
-      "lifiChainId": "747474",
-      "nordsternCode": "747474",
-      "disabled": false
-    },
-    "corn": {
-      "name": "Corn",
-      "lifiChainId": "21000000",
-      "nordsternCode": "21000000",
-      "disabled": false
-    },
-    "songbird": {
-      "name": "songbird",
-      "nordsternCode": "19",
-      "disabled": false
-    },
-    "telos": {
-      "name": "telos",
-      "nordsternCode": "40",
-      "disabled": false
-    },
-    "kub": {
-      "name": "kub",
-      "nordsternCode": "96",
-      "disabled": false
-    },
-    "thundercore": {
-      "name": "thundercore",
-      "nordsternCode": "108",
-      "disabled": false
-    },
-    "shibarium": {
-      "name": "shibarium",
-      "nordsternCode": "109",
-      "disabled": false
-    },
-    "mantapacific": {
-      "name": "mantapacific",
-      "nordsternCode": "169",
-      "disabled": false
-    },
-    "hashkey": {
-      "name": "hashkey",
-      "nordsternCode": "177",
-      "disabled": false
-    },
-    "mint": {
-      "name": "mint",
-      "nordsternCode": "185",
-      "disabled": false
-    },
-    "bittorrent": {
-      "name": "bittorrent",
-      "nordsternCode": "199",
-      "disabled": false
-    },
-    "b2": {
-      "name": "b2",
-      "nordsternCode": "223",
-      "disabled": false
-    },
-    "kroma": {
-      "name": "kroma",
-      "nordsternCode": "255",
-      "disabled": false
-    },
-    "kcc": {
-      "name": "kcc",
-      "nordsternCode": "321",
-      "disabled": false
-    },
-    "shape": {
-      "name": "shape",
-      "nordsternCode": "360",
-      "disabled": false
-    },
-    "appchain": {
-      "name": "appchain",
-      "nordsternCode": "466",
-      "disabled": false
-    },
-    "astar": {
-      "name": "astar",
-      "nordsternCode": "592",
-      "disabled": false
-    },
-    "endurance": {
-      "name": "endurance",
-      "nordsternCode": "648",
-      "disabled": false
-    },
-    "redstone": {
-      "name": "redstone",
-      "nordsternCode": "690",
-      "disabled": false
-    },
-    "matchain": {
-      "name": "matchain",
-      "nordsternCode": "698",
-      "disabled": false
-    },
-    "qitmeer": {
-      "name": "qitmeer",
-      "nordsternCode": "813",
-      "disabled": false
-    },
-    "wanchain": {
-      "name": "wanchain",
-      "nordsternCode": "888",
-      "disabled": false
-    },
-    "wemix": {
-      "name": "wemix",
-      "nordsternCode": "1111",
-      "disabled": false
-    },
-    "core": {
-      "name": "core",
-      "nordsternCode": "1116",
-      "disabled": false
-    },
-    "ultron": {
-      "name": "ultron",
-      "nordsternCode": "1231",
-      "disabled": false
-    },
-    "step": {
-      "name": "step",
-      "nordsternCode": "1234",
-      "disabled": false
-    },
-    "elysium": {
-      "name": "elysium",
-      "nordsternCode": "1339",
-      "disabled": false
-    },
-    "story": {
-      "name": "story",
-      "nordsternCode": "1514",
-      "disabled": false
-    },
-    "reya": {
-      "name": "reya",
-      "nordsternCode": "1729",
-      "disabled": false
-    },
-    "sanko": {
-      "name": "sanko",
-      "nordsternCode": "1996",
-      "disabled": false
-    },
-    "goat": {
-      "name": "goat",
-      "nordsternCode": "2345",
-      "disabled": false
-    },
-    "morphl2": {
-      "name": "morphl2",
-      "nordsternCode": "2818",
-      "disabled": false
-    },
-    "muster": {
-      "name": "muster",
-      "nordsternCode": "4078",
-      "disabled": false
-    },
-    "beam": {
-      "name": "beam",
-      "nordsternCode": "4337",
-      "disabled": false
-    },
-    "superseed": {
-      "name": "superseed",
-      "nordsternCode": "5330",
-      "disabled": false
-    },
-    "duckchain": {
-      "name": "duckchain",
-      "nordsternCode": "5545",
-      "disabled": false
-    },
-    "cyber": {
-      "name": "cyber",
-      "nordsternCode": "7560",
-      "disabled": false
-    },
-    "b3": {
-      "name": "b3",
-      "nordsternCode": "8333",
-      "disabled": false
-    },
-    "rss3vsl": {
-      "name": "rss3vsl",
-      "nordsternCode": "12553",
-      "disabled": false
-    },
-    "genesys": {
-      "name": "genesys",
-      "nordsternCode": "16507",
-      "disabled": false
-    },
-    "mapprotocol": {
-      "name": "mapprotocol",
-      "nordsternCode": "22776",
-      "disabled": false
-    },
-    "bitgert": {
-      "name": "bitgert",
-      "nordsternCode": "32520",
-      "disabled": false
-    },
-    "funki": {
-      "name": "funki",
-      "nordsternCode": "33979",
-      "disabled": false
-    },
-    "qnetwork": {
-      "name": "qnetwork",
-      "nordsternCode": "35441",
-      "disabled": false
-    },
-    "arbitrumnova": {
-      "name": "arbitrumnova",
-      "nordsternCode": "42170",
-      "disabled": false
-    },
-    "zircuit": {
-      "name": "zircuit",
-      "nordsternCode": "48900",
-      "disabled": false
-    },
-    "electroneum": {
-      "name": "electroneum",
-      "nordsternCode": "52014",
-      "disabled": false
-    },
-    "chilizchain": {
-      "name": "chilizchain",
-      "nordsternCode": "88888",
-      "disabled": false
-    },
-    "bitlayer": {
-      "name": "bitlayer",
-      "nordsternCode": "200901",
-      "disabled": false
-    },
-    "platon": {
-      "name": "platon",
-      "nordsternCode": "210425",
-      "disabled": false
-    },
-    "parex": {
-      "name": "parex",
-      "nordsternCode": "322202",
-      "disabled": false
-    },
-    "zora": {
-      "name": "zora",
-      "nordsternCode": "7777777",
-      "disabled": false
-    },
-    "ancient8": {
-      "name": "ancient8",
-      "nordsternCode": "888888888",
-      "disabled": false
-    },
-    "rari": {
-      "name": "rari",
-      "nordsternCode": "1380012617",
-      "disabled": false
-    },
-    "ab_chain": {
-      "name": "AB Chain",
-      "disabled": true
-    },
-    "conflux_espace": {
-      "name": "Conflux eSpace",
-      "disabled": true
-    },
-    "megaeth": {
-      "name": "MegaETH",
-      "disabled": true
-    },
-    "x_layer": {
-      "name": "XLayer",
-      "disabled": true
+    "tac": {
+      "name": "TAC"
     }
   },
   "pairs": {
@@ -704,7 +586,8 @@
       "tokenA": "USDC",
       "tokenB": "USDT",
       "amounts": [
-        50000
+        10000,
+        30000
       ],
       "chains": {
         "ethereum": {
@@ -727,34 +610,13 @@
         },
         "optimism": {
           "addressA": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
-          "addressB": "0x01bFF41798a0BcF287b996046Ca68b395DbC1071",
+          "addressB": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
           "decimalsA": 6,
           "decimalsB": 6
         },
         "unichain": {
           "addressA": "0x078D782b760474a361dDA0AF3839290b0EF57AD6",
           "addressB": "0x9151434b16b9763660705744891fA906F660EcC5",
-          "decimalsA": 6,
-          "decimalsB": 6
-        },
-        "binance": {
-          "cexPairSymbol": "USDCUSDT"
-        },
-        "mexc": {
-          "cexPairSymbol": "USDCUSDT"
-        },
-        "bybit": {
-          "cexPairSymbol": "USDCUSDT"
-        },
-        "gate": {
-          "cexPairSymbol": "USDC_USDT"
-        },
-        "htx": {
-          "cexPairSymbol": "usdcusdt"
-        },
-        "mantle": {
-          "addressA": "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
-          "addressB": "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
           "decimalsA": 6,
           "decimalsB": 6
         },
@@ -773,6 +635,21 @@
         "sui": {
           "addressA": "0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC",
           "addressB": "0x375f70cf2ae4c00bf37117d0c85a2c71545e6ee05c4a5c7d282cd66a4504b068::usdt::USDT",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "binance": {
+          "cexPairSymbol": "USDCUSDT"
+        },
+        "mexc": {
+          "cexPairSymbol": "USDCUSDT"
+        },
+        "bybit": {
+          "cexPairSymbol": "USDCUSDT"
+        },
+        "mantle": {
+          "addressA": "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
+          "addressB": "0x779ded0c9e1022225f8e0630b35a9b54be713736",
           "decimalsA": 6,
           "decimalsB": 6
         },
@@ -826,15 +703,23 @@
         },
         "flare": {
           "addressA": "0xFbDa5F676cB37624f28265A144A48B0d6e87d3b6",
-          "decimalsA": 6
+          "decimalsA": 6,
+          "decimalsB": 6,
+          "addressB": "0xe7cd86e13AC4309349F30B3435a9d337750fC82D",
+          "disabled": true
         },
         "rootstock": {
           "addressA": "0x74c9f2b00581F1B11AA7ff05aa9F608B7389De67",
-          "decimalsA": 6
+          "decimalsA": 6,
+          "decimalsB": 6,
+          "addressB": "0xAf368c91793CB22739386DFCbBb2F1A9e4bCBeBf",
+          "disabled": true
         },
         "stable": {
           "addressA": "0x8a2B28364102Bea189D99A475C494330Ef2bDD0B",
-          "decimalsA": 6
+          "decimalsA": 6,
+          "decimalsB": 6,
+          "addressB": "0x8a2B28364102Bea189D99A475C494330Ef2bDD0B"
         },
         "hyperevm": {
           "addressA": "0xb88339CB7199b77E23DB6E890353E22632Ba630f",
@@ -847,9 +732,150 @@
           "decimalsA": 6,
           "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
           "decimalsB": 6
+        },
+        "etherlink": {
+          "addressA": "0x796Ea11Fa2dD751eD01b53C372fFDB4AAa8f00F9",
+          "addressB": "0x2C03058C8AFC06713be23e58D2febC8337dbfE6A",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "celo": {
+          "addressA": "0xceba9300f2b948710d2653dd7b07f33a8b32118c",
+          "addressB": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "addressB": "0x102d758f688a4C1C5a80b116bD945d4455460282",
+          "decimalsB": 6,
+          "decimalsA": 6
+        },
+        "avalanche": {
+          "addressA": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+          "addressB": "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
+          "decimalsB": 6,
+          "decimalsA": 6
+        },
+        "sonic": {
+          "addressA": "0x29219dd400f2Bf60E5a23d13Be72B486D4038894",
+          "addressB": "0x6047828dc181963ba44974801FF68e538dA5eaF9",
+          "decimalsB": 6,
+          "decimalsA": 6
+        },
+        "berachain": {
+          "addressA": "0x549943e04f40284185054145c6E4e9568C1D3241",
+          "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "decimalsB": 6,
+          "decimalsA": 6
+        },
+        "linea": {
+          "addressA": "0x176211869cA2b568f2A7D4EE941E073a821EE1ff",
+          "addressB": "0xA219439258ca9da29E9Cc4cE5596924745e12B93",
+          "decimalsB": 6,
+          "decimalsA": 6,
+          "disabled": false
+        },
+        "scroll": {
+          "addressA": "0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4",
+          "addressB": "0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df",
+          "decimalsB": 6,
+          "decimalsA": 6
+        },
+        "soneium": {
+          "addressA": "0xbA9986D2381edf1DA03B0B9c1f8b00dc4AacC369",
+          "addressB": "0x102d758f688a4C1C5a80b116bD945d4455460282",
+          "decimalsB": 6,
+          "decimalsA": 6
+        },
+        "hemi": {
+          "addressA": "0xad11a8BEb98bbf61dbb1aa0F6d6F2ECD87b35afA",
+          "addressB": "0xbB0D083fb1be0A9f6157ec484b6C79E0A4e31C2e",
+          "decimalsB": 6,
+          "decimalsA": 6
+        },
+        "zksync_era": {
+          "addressA": "0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4",
+          "addressB": "0x493257fD37EDB34451f62EDf8D2a0C418852bA4C",
+          "decimalsB": 6,
+          "decimalsA": 6
+        },
+        "taiko": {
+          "addressA": "0x19e26B0638bf63aa9fa4d14c6baF8D52eBE86C5C",
+          "addressB": "0x9c2dc7377717603eB92b2655c5f2E7997a4945BD",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "core": {
+          "addressA": "0xa4151B2B3e269645181dCcF2D426cE75fcbDeca9",
+          "addressB": "0x900101d06A7426441Ae63e9AB3B9b0F63Be145F1",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "kaia": {
+          "addressA": "0xE2053BCf56D2030d2470Fb454574237cF9ee3D4B",
+          "addressB": "0x9025095263d1E548dc890A7589A4C78038aC40ab",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "abstract": {
+          "addressA": "0x84A71ccD554Cc1b02749b35d22F684CC8ec987e1",
+          "addressB": "0x0709F39376dEEe2A2dfC94A58EdEb2Eb9DF012bD",
+          "decimalsA": 6,
+          "decimalsB": 6,
+          "disabled": true
+        },
+        "apechain": {
+          "addressA": "0xF1815bd50389c46847f0Bda824eC8da914045D14",
+          "addressB": "0x674843C06FF83502ddb4D37c2E09C01cdA38cbc8",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "plume": {
+          "addressA": "0x78adD880A697070c1e765Ac44D65323a0DcCE913",
+          "addressB": "0xda6087E69C51E7D31b6DBAD276a3c44703DFdCAd",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "goat": {
+          "addressA": "0x3022b87ac063DE95b1570F46f5e470F8B53112D8",
+          "addressB": "0xE1AD845D93853fff44990aE0DcecD8575293681e",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "morphl2": {
+          "addressA": "0xe34c91815d7fc18a9e2148bcd4241d0a5848b693",
+          "addressB": "0xc7d67a9cbb121b3b0b9c053dd9f469523243379a",
+          "decimalsA": 6,
+          "decimalsB": 4
+        },
+        "katana": {
+          "addressA": "0x203a662b0bd271a6ed5a60edfbd04bfce608fd36",
+          "addressB": "0x2dca96907fde857dd3d816880a0df407eeb2d2f2",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "bitget": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USDCUSDT"
+        },
+        "gate": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USDC_USDT"
+        },
+        "htx": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "usdcusdt"
+        },
+        "kraken": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USDCUSDT"
         }
-      },
-      "disabled": false
+      }
     },
     "USDe_USDT": {
       "id": "USDe_USDT",
@@ -857,7 +883,7 @@
       "tokenA": "USDe",
       "tokenB": "USDT",
       "amounts": [
-        10000
+        30000
       ],
       "chains": {
         "ethereum": {
@@ -892,14 +918,15 @@
         },
         "mantle": {
           "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
-          "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "addressB": "0x779ded0c9e1022225f8e0630b35a9b54be713736",
           "decimalsA": 18,
           "decimalsB": 6
         },
         "binance": {
           "addressA": "",
           "addressB": "",
-          "cexPairSymbol": "USDEUSDT"
+          "cexPairSymbol": "USDEUSDT",
+          "disabled": true
         },
         "mexc": {
           "addressA": "",
@@ -911,24 +938,31 @@
           "addressB": "",
           "cexPairSymbol": "USDEUSDT"
         },
-        "gate": {
-          "addressA": "",
-          "addressB": "",
-          "cexPairSymbol": "USDE_USDT"
-        },
-        "htx": {
-          "addressA": "",
-          "addressB": "",
-          "cexPairSymbol": "usdeusdt"
-        },
         "bnb_chain": {
           "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
           "addressB": "0x55d398326f99059fF775485246999027B3197955",
           "decimalsA": 18,
           "decimalsB": 18
+        },
+        "base": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x102d758f688a4C1C5a80b116bD945d4455460282",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "plasma": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "hyperevm": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsA": 18,
+          "decimalsB": 6
         }
-      },
-      "disabled": false
+      }
     },
     "USDe_USDC": {
       "id": "USDe_USDC",
@@ -936,7 +970,7 @@
       "tokenA": "USDe",
       "tokenB": "USDC",
       "amounts": [
-        10000
+        30000
       ],
       "chains": {
         "ethereum": {
@@ -1019,9 +1053,14 @@
           "addressB": "0x2D270e6886d130D724215A266106e6832161EAEd",
           "decimalsA": 18,
           "decimalsB": 6
+        },
+        "berachain": {
+          "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "addressB": "0x549943e04f40284185054145c6E4e9568C1D3241",
+          "decimalsA": 18,
+          "decimalsB": 6
         }
-      },
-      "disabled": false
+      }
     },
     "USD1_USDC": {
       "id": "USD1_USDC",
@@ -1029,7 +1068,7 @@
       "tokenA": "USD1",
       "tokenB": "USDC",
       "amounts": [
-        10000
+        30000
       ],
       "chains": {
         "ethereum": {
@@ -1055,9 +1094,24 @@
           "decimalsA": 6,
           "addressB": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
           "decimalsB": 6
+        },
+        "mexc": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USD1USDC"
+        },
+        "binance": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USD1USDC"
+        },
+        "solana": {
+          "addressA": "USD1ttGY1N17NEEHLmELoaybftRBUSErhqYiQzvEmuB",
+          "addressB": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "decimalsA": 18,
+          "decimalsB": 6
         }
-      },
-      "disabled": false
+      }
     },
     "USD1_USDT": {
       "id": "USD1_USDT",
@@ -1065,7 +1119,7 @@
       "tokenA": "USD1",
       "tokenB": "USDT",
       "amounts": [
-        10000
+        30000
       ],
       "chains": {
         "ethereum": {
@@ -1085,9 +1139,24 @@
           "decimalsA": 18,
           "addressB": "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
           "decimalsB": 6
+        },
+        "mexc": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USD1USDT"
+        },
+        "binance": {
+          "addressA": "",
+          "addressB": "",
+          "cexPairSymbol": "USD1USDT"
+        },
+        "monad": {
+          "addressA": "0x111111d2bf19e43C34263401e0CAd979eD1cdb61",
+          "addressB": "0xe7cd86e13AC4309349F30B3435a9d337750fC82D",
+          "decimalsA": 6,
+          "decimalsB": 6
         }
-      },
-      "disabled": false
+      }
     },
     "USDf_USDC": {
       "id": "USDf_USDC",
@@ -1122,8 +1191,7 @@
           "addressB": "0xfA2958CB79b0491CC627c1557F441eF849Ca8eb1",
           "decimalsB": 6
         }
-      },
-      "disabled": false
+      }
     },
     "USDf_USDT": {
       "id": "USDf_USDT",
@@ -1131,7 +1199,7 @@
       "tokenA": "USDf",
       "tokenB": "USDT",
       "amounts": [
-        10000
+        20000
       ],
       "chains": {
         "ethereum": {
@@ -1158,8 +1226,7 @@
           "addressB": "0xcdA5b77E2E2268D9E09c874c1b9A4c3F07b37555",
           "decimalsB": 6
         }
-      },
-      "disabled": false
+      }
     },
     "USR_USDC": {
       "id": "USR_USDC",
@@ -1167,7 +1234,7 @@
       "tokenA": "USR",
       "tokenB": "USDC",
       "amounts": [
-        10000
+        200
       ],
       "chains": {
         "ethereum": {
@@ -1195,7 +1262,7 @@
           "decimalsB": 18
         }
       },
-      "disabled": false
+      "disabled": true
     },
     "USR_USDT": {
       "id": "USR_USDT",
@@ -1203,7 +1270,7 @@
       "tokenA": "USR",
       "tokenB": "USDT",
       "amounts": [
-        10000
+        30000
       ],
       "chains": {
         "ethereum": {
@@ -1231,7 +1298,7 @@
           "decimalsB": 18
         }
       },
-      "disabled": false
+      "disabled": true
     },
     "sUSDe_USDT": {
       "id": "sUSDe_USDT",
@@ -1239,7 +1306,7 @@
       "tokenA": "sUSDe",
       "tokenB": "USDT",
       "amounts": [
-        10000
+        30000
       ],
       "chains": {
         "bnb_chain": {
@@ -1265,9 +1332,74 @@
           "addressB": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
           "decimalsA": 18,
           "decimalsB": 6
+        },
+        "plasma": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsB": 6
+        },
+        "ink": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0x0200C29006150606B650577BBE7B6248F58470c1",
+          "decimalsB": 6
+        },
+        "avalanche": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "decimalsB": 6
+        },
+        "x_layer": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "decimalsB": 6
+        },
+        "metis": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0xbB06DCA3AE6887fAbF931640f67cab3e3a16F4dC",
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+          "decimalsB": 6
+        },
+        "morphl2": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0xe7cd86e13AC4309349F30B3435a9d337750fC82D",
+          "decimalsB": 6
+        },
+        "berachain": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "decimalsB": 6
+        },
+        "megaeth": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsB": 6
+        },
+        "hyperevm": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsB": 6
         }
-      },
-      "disabled": false
+      }
     },
     "sUSDe_USDC": {
       "id": "sUSDe_USDC",
@@ -1275,7 +1407,7 @@
       "tokenA": "sUSDe",
       "tokenB": "USDC",
       "amounts": [
-        10000
+        30000
       ],
       "chains": {
         "arbitrum": {
@@ -1337,9 +1469,26 @@
           "addressB": "0x176211869cA2b568f2A7D4EE941E073a821EE1ff",
           "decimalsA": 18,
           "decimalsB": 6
+        },
+        "morphl2": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0xCfb1186F4e93D60E60a8bDd997427D1F33bc372B",
+          "decimalsB": 6
+        },
+        "berachain": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0x549943e04f40284185054145c6E4e9568C1D3241",
+          "decimalsB": 6
+        },
+        "hyperevm": {
+          "addressA": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
+          "decimalsA": 18,
+          "addressB": "0xb88339CB7199b77E23DB6E890353E22632Ba630f",
+          "decimalsB": 6
         }
-      },
-      "disabled": false
+      }
     },
     "wstUSR_USDT": {
       "id": "wstUSR_USDT",
@@ -1347,23 +1496,56 @@
       "tokenA": "wstUSR",
       "tokenB": "USDT",
       "amounts": [
-        10000
+        30000
       ],
       "chains": {
         "bnb_chain": {
           "addressA": "0x4254813524695def4163A169e901f3d7a1a55429",
           "addressB": "0x55d398326f99059fF775485246999027B3197955",
           "decimalsA": 18,
-          "decimalsB": 18
+          "decimalsB": 18,
+          "disabled": true
         },
         "ethereum": {
           "addressA": "0x1202F5C7b4B9E47a1A484E8B270be34dbbC75055",
           "addressB": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
           "decimalsA": 18,
           "decimalsB": 6
+        },
+        "soneium": {
+          "addressA": "0x2a52B289bA68bBd02676640aA9F605700c9e5699",
+          "addressB": "0x102d758f688a4C1C5a80b116bD945d4455460282",
+          "decimalsA": 18,
+          "decimalsB": 7
+        },
+        "arbitrum": {
+          "addressA": "0x66CFbD79257dC5217903A36293120282548E2254",
+          "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "hyperevm": {
+          "addressA": "0x46c1c168Ca597B9e5423Aa7081a0DCE782caEAab",
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsA": 18,
+          "decimalsB": 6,
+          "disabled": true
+        },
+        "berachain": {
+          "addressA": "0xCC601605Dc5011616934B6FDAC8A14d51B791A94",
+          "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "decimalsA": 18,
+          "decimalsB": 6,
+          "disabled": true
+        },
+        "plasma": {
+          "addressA": "0x2a52B289bA68bBd02676640aA9F605700c9e5699",
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsA": 18,
+          "decimalsB": 6
         }
       },
-      "disabled": false
+      "disabled": true
     },
     "wstUSR_USDC": {
       "id": "wstUSR_USDC",
@@ -1371,7 +1553,7 @@
       "tokenA": "wstUSR",
       "tokenB": "USDC",
       "amounts": [
-        10000
+        30000
       ],
       "chains": {
         "arbitrum": {
@@ -1399,7 +1581,7 @@
           "decimalsB": 6
         }
       },
-      "disabled": false
+      "disabled": true
     },
     "RLP_USDT": {
       "id": "RLP_USDT",
@@ -1407,7 +1589,7 @@
       "tokenA": "RLP",
       "tokenB": "USDT",
       "amounts": [
-        10000
+        30000
       ],
       "chains": {
         "bnb_chain": {
@@ -1423,7 +1605,7 @@
           "decimalsB": 6
         }
       },
-      "disabled": false
+      "disabled": true
     },
     "RLP_USDC": {
       "id": "RLP_USDC",
@@ -1431,7 +1613,7 @@
       "tokenA": "RLP",
       "tokenB": "USDC",
       "amounts": [
-        10000
+        30000
       ],
       "chains": {
         "arbitrum": {
@@ -1459,7 +1641,7 @@
           "decimalsB": 6
         }
       },
-      "disabled": false
+      "disabled": true
     },
     "YUSD_USDT": {
       "id": "YUSD_USDT",
@@ -1467,7 +1649,7 @@
       "tokenA": "YUSD",
       "tokenB": "USDT",
       "amounts": [
-        10000
+        30000
       ],
       "chains": {
         "bnb_chain": {
@@ -1483,7 +1665,7 @@
           "decimalsB": 6
         }
       },
-      "disabled": false
+      "disabled": true
     },
     "YUSD_USDC": {
       "id": "YUSD_USDC",
@@ -1524,49 +1706,1083 @@
           "decimalsA": 18,
           "decimalsB": 6
         }
-      },
-      "disabled": false
+      }
     },
-    "yUSD_USDT": {
-      "id": "yUSD_USDT",
-      "name": "yUSD/USDT",
-      "tokenA": "yUSD",
-      "tokenB": "USDT",
+    "ws_usdc": {
+      "id": "ws_usdc",
+      "name": "WS/USDC",
+      "tokenA": "WS",
+      "tokenB": "USDC",
       "amounts": [
-        10000
+        3000
       ],
-      "chains": {},
-      "disabled": false
+      "chains": {
+        "base": {
+          "addressA": "0xea9a89b0ca8a321ec04ccbcca4f680461b5bd156",
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "linea": {
+          "addressA": "0xea9a89b0ca8a321ec04ccbcca4f680461b5bd156",
+          "addressB": "0x176211869cA2b568f2A7D4EE941E073a821EE1ff",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "avalanche": {
+          "addressA": "0xea9a89b0ca8a321ec04ccbcca4f680461b5bd156",
+          "addressB": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "sonic": {
+          "addressA": "0xea9a89b0ca8a321ec04ccbcca4f680461b5bd156",
+          "addressB": "0x29219dd400f2Bf60E5a23d13Be72B486D4038894",
+          "decimalsA": 6,
+          "decimalsB": 6
+        },
+        "hyperevm": {
+          "addressA": "0xea9a89b0ca8a321ec04ccbcca4f680461b5bd156",
+          "addressB": "0xb88339CB7199b77E23DB6E890353E22632Ba630f",
+          "decimalsA": 6,
+          "decimalsB": 6
+        }
+      },
+      "disabled": true
     },
-    "yUSD_USDC": {
-      "id": "yUSD_USDC",
-      "name": "yUSD/USDC",
-      "tokenA": "yUSD",
+    "GHO_USDC": {
+      "id": "GHO_USDC",
+      "name": "GHO/USDC",
+      "tokenA": "GHO",
+      "tokenB": "USDC",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f",
+          "decimalsA": 18,
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0x7dfF72693f6A4149b17e7C6314655f6A9F7c8B33",
+          "decimalsA": 18,
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x6Bb7a212910682DCFdbd5BCBb3e28FB4E8da10Ee",
+          "decimalsA": 18,
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsB": 6
+        },
+        "avalanche": {
+          "addressA": "0xfc421aD3C883Bf9E7C4f42dE845C4e4405799e73",
+          "addressB": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "ink": {
+          "addressA": "0xDe6539018B095353A40753Dc54C91C68c9487D4E",
+          "addressB": "0x2D270e6886d130D724215A266106e6832161EAEd",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "mantle": {
+          "addressA": "0xfc421aD3C883Bf9E7C4f42dE845C4e4405799e73",
+          "addressB": "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
+          "decimalsA": 18,
+          "decimalsB": 6
+        }
+      }
+    },
+    "rsETH_ETH": {
+      "id": "rsETH_ETH",
+      "name": "rsETH/ETH",
+      "tokenA": "rsETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "arbitrum": {
+          "addressA": "0x4186BFC76E2E237523CBC30FD220FE055156b41F",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18,
+          "disabled": true
+        },
+        "base": {
+          "addressA": "0xedfa23602d0ec14714057867a78d01e94176bea0",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
+        },
+        "zksync_era": {
+          "addressA": "0xd4169e045bcf9a86cc00101225d9ed61d2f51af2",
+          "addressB": "0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "ink": {
+          "addressA": "0x9f0a74a92287e323eb95c1cd9ecdbeb0e397cae4",
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "linea": {
+          "addressA": "0xd2671165570f41bbb3b0097893300b6eb6101e6c",
+          "addressB": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "unichain": {
+          "addressA": "0xc3eacf0612346366db554c991d7858716db09f58",
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsA": 18,
+          "decimalsB": 18
+        }
+      }
+    },
+    "ezETH_ETH": {
+      "id": "ezETH_ETH",
+      "name": "ezETH/ETH",
+      "tokenA": "ezETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xbf5495Efe5DB9ce00f80364C8B423567e58d2110",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "arbitrum": {
+          "addressA": "0x2416092f143378750bb29b79eD961ab195CcEea5",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18
+        },
+        "base": {
+          "addressA": "0x2416092f143378750bb29b79eD961ab195CcEea5",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
+        },
+        "mode": {
+          "addressA": "0x2416092f143378750bb29b79ed961ab195cceea5",
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "unichain": {
+          "addressA": "0x2416092f143378750bb29b79ed961ab195cceea5",
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18,
+          "decimalsA": 18
+        },
+        "linea": {
+          "addressA": "0x2416092f143378750bb29b79ed961ab195cceea5",
+          "addressB": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "optimism": {
+          "addressA": "0x2416092f143378750bb29b79ed961ab195cceea5",
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsA": 18,
+          "decimalsB": 18
+        }
+      }
+    },
+    "cbBTC_WBTC": {
+      "id": "cbBTC_WBTC",
+      "name": "cbBTC/WBTC",
+      "tokenA": "cbBTC",
+      "tokenB": "WBTC",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+          "decimalsA": 8,
+          "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+          "decimalsB": 8
+        },
+        "base": {
+          "addressA": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+          "decimalsA": 8,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        },
+        "monad": {
+          "addressA": "0xd18b7ec58cdf4876f6afebd3ed1730e4ce10414b",
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsA": 8,
+          "decimalsB": 8
+        },
+        "arbitrum": {
+          "addressA": "0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf",
+          "addressB": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
+          "decimalsA": 8,
+          "decimalsB": 8
+        }
+      }
+    },
+    "LBTC_WBTC": {
+      "id": "LBTC_WBTC",
+      "name": "LBTC/WBTC",
+      "tokenA": "LBTC",
+      "tokenB": "WBTC",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x8236a87084f8B84306f72007F36F2618A5634494",
+          "decimalsA": 8,
+          "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+          "decimalsB": 8
+        },
+        "berachain": {
+          "addressA": "0xecAc9C5F704e954931349Da37F60E39f515c11c1",
+          "decimalsA": 8,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        }
+      }
+    },
+    "tBTC_WBTC": {
+      "id": "tBTC_WBTC",
+      "name": "tBTC/WBTC",
+      "tokenA": "tBTC",
+      "tokenB": "WBTC",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x18084fbA666a33d37592fA2633fD49a74DD93a88",
+          "decimalsA": 18,
+          "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+          "decimalsB": 8
+        },
+        "base": {
+          "addressA": "0x236aa50979D5f3De3Bd1Eeb40E81137F22ab794b",
+          "decimalsA": 18,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        },
+        "bob": {
+          "addressA": "0xBBa2eF945D523C4e2608C9E1214C2Cc64D4fc2e2",
+          "decimalsA": 18,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        }
+      }
+    },
+    "uniBTC_WBTC": {
+      "id": "uniBTC_WBTC",
+      "name": "uniBTC/WBTC",
+      "tokenA": "uniBTC",
+      "tokenB": "WBTC",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x004E9C3EF86bc1ca1f0bB5C7662861Ee93350568",
+          "decimalsA": 8,
+          "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+          "decimalsB": 8
+        },
+        "base": {
+          "addressA": "0x93919784C523f39CACaa98Ee0a9d96c3F32b593e",
+          "decimalsA": 8,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        },
+        "bnb_chain": {
+          "addressA": "0x6B2a01A5f79dEb4c2f3c0eDa7b01DF456FbD726a",
+          "decimalsA": 8,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        },
+        "berachain": {
+          "addressA": "0xC3827A4BC8224ee2D116637023b124CED6db6e90",
+          "decimalsA": 8,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        },
+        "bob": {
+          "addressA": "0x236f8c0a61dA474dB21B693fB2ea7AAB0c803894",
+          "decimalsA": 8,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        },
+        "unichain": {
+          "addressA": "0xd3c8dA379d71a33BfEE8875F87Ac2748bEB1d58d",
+          "decimalsA": 8,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        }
+      }
+    },
+    "SolvBTC_WBTC": {
+      "id": "SolvBTC_WBTC",
+      "name": "SolvBTC/WBTC",
+      "tokenA": "SolvBTC",
+      "tokenB": "WBTC",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x7A56E1C57C7475CCf742a1832B028F0456652F97",
+          "decimalsA": 18,
+          "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+          "decimalsB": 8
+        },
+        "berachain": {
+          "addressA": "0x541FD749419CA806a8bc7da8ac23D346f2dF8B77",
+          "decimalsA": 18,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        }
+      }
+    },
+    "USDG_USDC": {
+      "id": "USDG_USDC",
+      "name": "USDG/USDC",
+      "tokenA": "USDG",
       "tokenB": "USDC",
       "amounts": [
         10000
       ],
       "chains": {
+        "ethereum": {
+          "addressA": "0xe343167631d89B6Ffc58B88d6b7fB0228795491D",
+          "decimalsA": 6,
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsB": 6
+        },
+        "ink": {
+          "addressA": "0xe343167631d89B6Ffc58B88d6b7fB0228795491D",
+          "decimalsA": 6,
+          "addressB": "0x2D270e6886d130D724215A266106e6832161EAEd",
+          "decimalsB": 6
+        },
+        "x_layer": {
+          "addressA": "0x4ae46a509F6b1D9056937BA4500cb143933D2dc8",
+          "decimalsA": 6,
+          "addressB": "0x74AFfbE5E43EA0548C152B4fB7b62B80a0170aE4",
+          "decimalsB": 6
+        }
+      }
+    },
+    "USDG_USDT": {
+      "id": "USDG_USDT",
+      "name": "USDG/USDT",
+      "tokenA": "USDG",
+      "tokenB": "USDT",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xe343167631d89B6Ffc58B88d6b7fB0228795491D",
+          "decimalsA": 6,
+          "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "decimalsB": 6
+        },
+        "ink": {
+          "addressA": "0xe343167631d89B6Ffc58B88d6b7fB0228795491D",
+          "decimalsA": 6,
+          "addressB": "0x0200C29006150606B650577BBE7B6248F58470c1",
+          "decimalsB": 6
+        },
+        "x_layer": {
+          "addressA": "0x4ae46a509F6b1D9056937BA4500cb143933D2dc8",
+          "decimalsA": 6,
+          "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "decimalsB": 6
+        }
+      }
+    },
+    "wstETH_ETH": {
+      "id": "wstETH_ETH",
+      "name": "wstETH/ETH",
+      "tokenA": "wstETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
         "arbitrum": {
-          "addressA": "0x4772D2e014F9fC3a820C444e3313968e9a5C8121",
-          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "addressA": "0x5979D7b546E38E414F7E9822514be443A4800529",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18,
+          "disabled": true
+        },
+        "optimism": {
+          "addressA": "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18,
+          "disabled": true
+        },
+        "base": {
+          "addressA": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18,
+          "disabled": true
+        },
+        "tac": {
+          "addressA": "0xAf368c91793CB22739386DFCbBb2F1A9e4bCBeBf",
+          "addressB": "0x61d66bc21fed820938021b06e9b2291f3fb91945",
+          "decimalsA": 18,
+          "decimalsB": 18
+        }
+      },
+      "disabled": true
+    },
+    "cbETH_ETH": {
+      "id": "cbETH_ETH",
+      "name": "cbETH/ETH",
+      "tokenA": "cbETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "arbitrum": {
+          "addressA": "0xcbB7C0006d0f5416900f12EBF76BCB9691A82F9F",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18
+        },
+        "optimism": {
+          "addressA": "0x2E3D870790dC77A83DD1d18184Acc7439A53f475",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
+        },
+        "base": {
+          "addressA": "0x2Ae3F1Ec7F1F5012CFEab0185bfcb8fA67277bE0",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
+        }
+      },
+      "disabled": true
+    },
+    "rETH_ETH": {
+      "id": "rETH_ETH",
+      "name": "rETH/ETH",
+      "tokenA": "rETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xae78736Cd615f374D3085123A210448E74Fc6393",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "arbitrum": {
+          "addressA": "0xec70Dc2877E0Ef65bCFD309908a601d0B5095cC0",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18
+        },
+        "optimism": {
+          "addressA": "0x9bcef72be871e61ed4fbbc7630889bee758eb81d",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
+        }
+      },
+      "disabled": true
+    },
+    "weETH_ETH": {
+      "id": "weETH_ETH",
+      "name": "weETH/ETH",
+      "tokenA": "weETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "arbitrum": {
+          "addressA": "0x35751007a407ca6FEFfE80b3cB397736D2cf4dbe",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18,
+          "disabled": true
+        },
+        "optimism": {
+          "addressA": "0x35751007a407ca6FEFfE80b3cB397736D2cf4dbe",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
+        },
+        "base": {
+          "addressA": "0x35751007a407ca6FEFfE80b3cB397736D2cf4dbe",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
+        },
+        "monad": {
+          "addressA": "0xA3D68b74bF0528fdD07263c60d6488749044914b",
+          "addressB": "0xEE8c0E9f1BFFb4Eb878d8f15f368A02a35481242",
+          "decimalsB": 18,
+          "decimalsA": 18
+        },
+        "mode": {
+          "addressA": "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "bnb_chain": {
+          "addressA": "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+          "addressB": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "avalanche": {
+          "addressA": "0xA3D68b74bF0528fdD07263c60d6488749044914b",
+          "addressB": "0x49D5c2BdFfac6CE2BFdB6640F4F80f226bc10bAB",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "scroll": {
+          "addressA": "0x01f0a31698C4d065659b9bdC21B3610292a1c506",
+          "addressB": "0x5300000000000000000000000000000000000004",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "ink": {
+          "addressA": "0xa3d68b74bf0528fdd07263c60d6488749044914b",
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "unichain": {
+          "addressA": "0x7dcc39b4d1c53cb31e1abc0e358b43987fef80f7",
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "linea": {
+          "addressA": "0x1bf74c010e6320bab11e2e5a532b5ac15e0b8aa6",
+          "addressB": "0xe5d7c2a44ffddf6b295a15c148167daaaf5cf34f",
+          "decimalsA": 18,
+          "decimalsB": 18
+        }
+      }
+    },
+    "LBTC_BTCb": {
+      "id": "LBTC_BTCb",
+      "name": "LBTC/BTC.b",
+      "tokenA": "LBTC",
+      "tokenB": "BTC.b",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "monad": {
+          "addressA": "0xecAc9C5F704e954931349Da37F60E39f515c11c1",
+          "decimalsA": 8,
+          "addressB": "0x72e9b6D9d4e5cB5890a2E7A5DBA984a1F1D5f6A5",
+          "decimalsB": 8
+        },
+        "stable": {
+          "addressA": "0xecAc9C5F704e954931349Da37F60E39f515c11c1",
+          "decimalsA": 8,
+          "addressB": "0x72e9b6D9d4e5cB5890a2E7A5DBA984a1F1D5f6A5",
+          "decimalsB": 8
+        }
+      }
+    },
+    "USDp_USDC": {
+      "id": "USDp_USDC",
+      "name": "USDp/USDC",
+      "tokenA": "USDp",
+      "tokenB": "USDC",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "avalanche": {
+          "addressA": "0x9ee1963f05553ef838604dd39403be21cef26aa4",
+          "addressB": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+          "decimalsA": 18,
+          "decimalsB": 6
+        },
+        "sonic": {
+          "addressA": "0x08417cdb7F52a5021bB4eb6E0deAf3f295c3f182",
+          "addressB": "0x29219dd400f2Bf60E5a23d13Be72B486D4038894",
           "decimalsA": 18,
           "decimalsB": 6
         },
         "base": {
-          "addressA": "0x4772D2e014F9fC3a820C444e3313968e9a5C8121",
-          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "addressA": "0x76a9a0062ec6712b99b4f63bd2b4270185759dd5",
+          "addressB": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
           "decimalsA": 18,
           "decimalsB": 6
         }
-      },
-      "disabled": false
+      }
+    },
+    "PYUSD_USDC": {
+      "id": "PYUSD_USDC",
+      "name": "PYUSD/USDC",
+      "tokenA": "PYUSD",
+      "tokenB": "USDC",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8",
+          "decimalsA": 6,
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0x46850ad61c2b7d64d08c9c754f45254596696984",
+          "decimalsA": 6,
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsB": 6
+        },
+        "solana": {
+          "addressA": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+          "decimalsA": 6,
+          "addressB": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "decimalsB": 6
+        }
+      }
+    },
+    "PYUSD_USDT": {
+      "id": "PYUSD_USDT",
+      "name": "PYUSD/USDT",
+      "tokenA": "PYUSD",
+      "tokenB": "USDT",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8",
+          "decimalsA": 6,
+          "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0x46850ad61c2b7d64d08c9c754f45254596696984",
+          "decimalsA": 6,
+          "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "decimalsB": 6
+        },
+        "solana": {
+          "addressA": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+          "decimalsA": 6,
+          "addressB": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+          "decimalsB": 6
+        }
+      }
+    },
+    "crvUSD_USDC": {
+      "id": "crvUSD_USDC",
+      "name": "crvUSD/USDC",
+      "tokenA": "crvUSD",
+      "tokenB": "USDC",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E",
+          "decimalsA": 18,
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0x498Bf2b1E120FeD3ad3D42EA2165E9b73f99C1e5",
+          "decimalsA": 18,
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsB": 6
+        }
+      }
+    },
+    "crvUSD_USDT": {
+      "id": "crvUSD_USDT",
+      "name": "crvUSD/USDT",
+      "tokenA": "crvUSD",
+      "tokenB": "USDT",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E",
+          "decimalsA": 18,
+          "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0x498Bf2b1E120FeD3ad3D42EA2165E9b73f99C1e5",
+          "decimalsA": 18,
+          "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "decimalsB": 6
+        }
+      }
+    },
+    "USDtb_USDC": {
+      "id": "USDtb_USDC",
+      "name": "USDtb/USDC",
+      "tokenA": "USDtb",
+      "tokenB": "USDC",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xC139190F447e929f090Edeb554D95AbB8b18aC1C",
+          "decimalsA": 18,
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0xc708B6887DB46005dA033501f8aeBee72d191a5d",
+          "decimalsA": 18,
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0xc708B6887DB46005dA033501f8aeBee72d191a5d",
+          "decimalsA": 18,
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsB": 6
+        }
+      }
+    },
+    "USDtb_USDT": {
+      "id": "USDtb_USDT",
+      "name": "USDtb/USDT",
+      "tokenA": "USDtb",
+      "tokenB": "USDT",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xC139190F447e929f090Edeb554D95AbB8b18aC1C",
+          "decimalsA": 18,
+          "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0xc708B6887DB46005dA033501f8aeBee72d191a5d",
+          "decimalsA": 18,
+          "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0xc708B6887DB46005dA033501f8aeBee72d191a5d",
+          "decimalsA": 18,
+          "addressB": "0x102d758f688a4C1C5a80b116bD945d4455460282",
+          "decimalsB": 6
+        }
+      }
+    },
+    "USDS_USDC": {
+      "id": "USDS_USDC",
+      "name": "USDS/USDC",
+      "tokenA": "USDS",
+      "tokenB": "USDC",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
+          "decimalsA": 18,
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0x6491c05a82219b8d1479057361ff1654749b876b",
+          "decimalsA": 18,
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x820c137fa70c8691f0e44dc420a5e53c168921dc",
+          "decimalsA": 18,
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsB": 6
+        },
+        "optimism": {
+          "addressA": "0x4F13a96Ec5c4cf34e442b46bbd98a0791f20edC3",
+          "decimalsA": 18,
+          "addressB": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+          "decimalsB": 6
+        }
+      }
+    },
+    "USDS_USDT": {
+      "id": "USDS_USDT",
+      "name": "USDS/USDT",
+      "tokenA": "USDS",
+      "tokenB": "USDT",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
+          "decimalsA": 18,
+          "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0x6491c05a82219b8d1479057361ff1654749b876b",
+          "decimalsA": 18,
+          "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x820c137fa70c8691f0e44dc420a5e53c168921dc",
+          "decimalsA": 18,
+          "addressB": "0x102d758f688a4C1C5a80b116bD945d4455460282",
+          "decimalsB": 6
+        },
+        "optimism": {
+          "addressA": "0x4F13a96Ec5c4cf34e442b46bbd98a0791f20edC3",
+          "decimalsA": 18,
+          "addressB": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
+          "decimalsB": 6
+        }
+      }
+    },
+    "USDS_PYUSD": {
+      "id": "USDS_PYUSD",
+      "name": "USDS/PYUSD",
+      "tokenA": "USDS",
+      "tokenB": "PYUSD",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
+          "decimalsA": 18,
+          "addressB": "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8",
+          "decimalsB": 6
+        }
+      }
+    },
+    "sUSDS_USDC": {
+      "id": "sUSDS_USDC",
+      "name": "sUSDS/USDC",
+      "tokenA": "sUSDS",
+      "tokenB": "USDC",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD",
+          "decimalsA": 18,
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsB": 6
+        }
+      }
+    },
+    "sUSDS_USDT": {
+      "id": "sUSDS_USDT",
+      "name": "sUSDS/USDT",
+      "tokenA": "sUSDS",
+      "tokenB": "USDT",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD",
+          "decimalsA": 18,
+          "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "decimalsB": 6
+        }
+      }
+    },
+    "DAI_USDC": {
+      "id": "DAI_USDC",
+      "name": "DAI/USDC",
+      "tokenA": "DAI",
+      "tokenB": "USDC",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x6B175474E89094C44Da98b954EedeAC495271d0f",
+          "decimalsA": 18,
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+          "decimalsA": 18,
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
+          "decimalsA": 18,
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsB": 6
+        },
+        "polygon": {
+          "addressA": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+          "decimalsA": 18,
+          "addressB": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+          "decimalsB": 6
+        },
+        "optimism": {
+          "addressA": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+          "decimalsA": 18,
+          "addressB": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+          "decimalsB": 6
+        },
+        "bnb_chain": {
+          "addressA": "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
+          "decimalsA": 18,
+          "addressB": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "decimalsB": 18
+        },
+        "avalanche": {
+          "addressA": "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70",
+          "decimalsA": 18,
+          "addressB": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+          "decimalsB": 6
+        }
+      }
+    },
+    "DAI_USDT": {
+      "id": "DAI_USDT",
+      "name": "DAI/USDT",
+      "tokenA": "DAI",
+      "tokenB": "USDT",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x6B175474E89094C44Da98b954EedeAC495271d0f",
+          "decimalsA": 18,
+          "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+          "decimalsA": 18,
+          "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "decimalsB": 6
+        },
+        "polygon": {
+          "addressA": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+          "decimalsA": 18,
+          "addressB": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+          "decimalsB": 6
+        },
+        "optimism": {
+          "addressA": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+          "decimalsA": 18,
+          "addressB": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
+          "decimalsB": 6
+        },
+        "bnb_chain": {
+          "addressA": "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
+          "decimalsA": 18,
+          "addressB": "0x55d398326f99059fF775485246999027B3197955",
+          "decimalsB": 18
+        },
+        "avalanche": {
+          "addressA": "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70",
+          "decimalsA": 18,
+          "addressB": "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
+          "decimalsB": 6
+        }
+      }
+    },
+    "EURC_USDC": {
+      "id": "EURC_USDC",
+      "name": "EURC/USDC",
+      "tokenA": "EURC",
+      "tokenB": "USDC",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c",
+          "decimalsA": 6,
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1ADb42",
+          "decimalsA": 6,
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsB": 6
+        },
+        "solana": {
+          "addressA": "HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr",
+          "decimalsA": 6,
+          "addressB": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "decimalsB": 6
+        }
+      }
     }
   },
   "clientRefreshInterval": 20,
   "sources": {
     "kyberswap": true,
-    "nordstern": true,
+    "nordstern": false,
     "lifi": true,
     "cetus": true,
     "jupiter": true,
@@ -1576,8 +2792,8 @@
     "bybit": true,
     "mexc": true,
     "bitget": true,
-    "gate": true,
-    "htx": true,
-    "kraken": true
+    "gate": false,
+    "htx": false,
+    "kraken": false
   }
 }
