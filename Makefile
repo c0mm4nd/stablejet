@@ -1,3 +1,13 @@
+deploy:
+	@set -a; \
+	if [ -f .env ]; then . ./.env; fi; \
+	test -n "$$DEPLOY_HOST" || { echo "DEPLOY_HOST is not set. Add it to .env."; exit 1; }; \
+	test -n "$$DEPLOY_PATH" || { echo "DEPLOY_PATH is not set. Add it to .env."; exit 1; }; \
+	rsync -avz docker-compose.yml \
+	"$${DEPLOY_USER:+$$DEPLOY_USER@}$$DEPLOY_HOST:$$DEPLOY_PATH"; \
+	ssh "$${DEPLOY_USER:+$$DEPLOY_USER@}$$DEPLOY_HOST" \
+	"cd $$DEPLOY_PATH && docker compose up -d"
+
 release:
 	@set -a; \
 	if [ -f .env ]; then . ./.env; fi; \
