@@ -3,7 +3,7 @@ services:
     image: ghcr.io/c0mm4nd/stablejet:latest
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     volumes:
       - ./config.json:/app/lib/config.json:ro
       - ./data:/app/data
