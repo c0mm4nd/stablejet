@@ -12,6 +12,10 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
+.tabular-nums, [class*="tabular-nums"] {
+  font-variant-numeric: tabular-nums;
+}
+
 /* 自定义滚动条 */
 ::-webkit-scrollbar {
   width: 8px;

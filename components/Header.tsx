@@ -163,11 +163,9 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
                   strokeLinecap="round"
                 />
               </svg>
-              {/* 时钟图标 */}
+              {/* 秒数 */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <svg className="w-4 h-4 md:w-5 md:h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <span className="text-[10px] font-bold tabular-nums text-green-700 leading-none">{countdown}</span>
               </div>
             </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
 import { isSourceEnabled } from '@/lib/utils';
@@ -17,9 +17,9 @@ interface ArbOpportunity {
     sellChain: string;
     sellSource: string;
     profitBps: number;
-    buyPrice: number; // Rate A->B
-    sellPrice: number; // Rate B->A
-    path: string; // Description
+    profitUsd: number;
+    buyRate: number;
+    sellRate: number;
 }
 
 export default function RoundTripArbitrage({ history, amount, pairId }: RoundTripArbitrageProps) {
@@ -31,117 +31,125 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
 
     if (history.length === 0) return null;
 
-    // Get latest data
-    const latest = history[history.length - 1]; // Assuming sorted by time
+    const latest = history[history.length - 1];
     const data = latest.data
         .filter(d => d.amount === amount)
         .filter(d => isSourceEnabled(d.dataSource, sources));
 
-    // Strategy: 
-    // 1. Find Best Buy (Maximize Output A->B)
-    // 2. Find Best Sell (Maximize Output B->A)
-    // Note: Buy A->B means we get B. Sell B->A means we give B to get A.
-    // Wait, Round Trip: Start with A -> Buy B (somewhere) -> Sell B for A (somewhere).
-    // Return > Input means profit.
-    // Profit = Final A - Initial A.
+    const opportunities = useMemo((): ArbOpportunity[] => {
+        const buys = data
+            .filter(d => d.tokenAToB?.output && d.tokenAToB.output > 0)
+            .map(d => ({
+                chain: d.chain,
+                source: d.dataSource || 'kyberswap',
+                rate: d.tokenAToB!.output! / (d.tokenAToB!.input || amount),
+            }));
 
-    // Actually, we can just look for ANY combination:
-    // For each Chain1/Source1 (A->B) AND Chain2/Source2 (B->A):
-    // Calculate Profit.
+        const sells = data
+            .filter(d => d.tokenBToA?.output && d.tokenBToA.output > 0)
+            .map(d => ({
+                chain: d.chain,
+                source: d.dataSource || 'kyberswap',
+                rate: d.tokenBToA!.output! / (d.tokenBToA!.input || amount),
+            }));
 
-    // Optimization: Just find Top 3 Buy and Top 3 Sell? 
-    // Or just iterate all ~10-20 * 10-20 = 400 combinations. It's cheap.
-
-    const opportunities = useMemo(() => {
         const opps: ArbOpportunity[] = [];
-
-        // Valid Buy Quotes (A->B)
-        const buys = data.filter(d => d.tokenAToB?.output && d.tokenAToB.output > 0).map(d => ({
-            chain: d.chain,
-            source: d.dataSource || 'kyberswap',
-            output: d.tokenAToB!.output!, // Output B
-            rate: d.tokenAToB!.output! / d.tokenAToB!.input // Rate A->B
-        }));
-
-        // Valid Sell Quotes (B->A)
-        // Here we need to simulate selling the B we got.
-        // Ideally we enter with `amount`. We get `outputB`.
-        // Then we sell `outputB`. 
-        // BUT the data we have is for fixed input `amount` (of B).
-        // Price might slightly differ for `outputB` vs `amount`.
-        // Approximation: Use the Rate of B->A for `amount` input.
-        // Final A = Output A->B * Rate(B->A at `amount`).
-        // Valid if linearity holds (stablecoins usually close enough).
-
-        const sells = data.filter(d => d.tokenBToA?.output && d.tokenBToA.output > 0).map(d => ({
-            chain: d.chain,
-            source: d.dataSource || 'kyberswap',
-            rate: d.tokenBToA!.output! / d.tokenBToA!.input // Rate B->A = Output A / Input B
-        }));
-
         for (const buy of buys) {
             for (const sell of sells) {
-                // Calculate Round Trip
-                // Start 1 Unit A. 
-                // Get `buy.rate` Unit B.
-                // Get `buy.rate * sell.rate` Unit A.
                 const finalRate = buy.rate * sell.rate;
                 const profitBps = (finalRate - 1) * 10000;
-
-                if (profitBps > 0) { // Only show positive or near positive
+                if (profitBps > 0) {
                     opps.push({
                         buyChain: buy.chain,
                         buySource: buy.source,
                         sellChain: sell.chain,
                         sellSource: sell.source,
                         profitBps,
-                        buyPrice: buy.rate,
-                        sellPrice: sell.rate,
-                        path: `${tokenA}→${tokenB} (${buy.chain}) → ${tokenA} (${sell.chain})`
+                        profitUsd: amount * profitBps / 10000,
+                        buyRate: buy.rate,
+                        sellRate: sell.rate,
                     });
                 }
             }
         }
+        return opps.sort((a, b) => b.profitBps - a.profitBps);
+    }, [data, amount]);
 
-        return opps.sort((a, b) => b.profitBps - a.profitBps); // Descending
-    }, [data, tokenA, tokenB]);
+    const top = opportunities.slice(0, 20);
+    const maxProfit = top.length > 0 ? top[0].profitBps : 0;
 
     return (
-        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Round Trip Arbitrage Opportunities</h2>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-gray-50/60">
+                <div className="flex items-center gap-3">
+                    <h2 className="text-sm font-semibold text-gray-800">Round Trip Arbitrage</h2>
+                    <span className="text-xs text-gray-400 bg-gray-100 rounded-md px-2 py-0.5 tabular-nums">
+                        {amount.toLocaleString()} {tokenA}
+                    </span>
+                </div>
+                {opportunities.length > 0 && (
+                    <div className="flex items-center gap-2 text-xs">
+                        <span className="text-gray-400">{opportunities.length} opportunities</span>
+                        <span className="text-emerald-600 font-semibold tabular-nums">
+                            best +{maxProfit.toFixed(2)} bps
+                        </span>
+                    </div>
+                )}
+            </div>
+
             {opportunities.length === 0 ? (
-                <p className="text-gray-500">No profitable opportunities found (&gt;0 bps).</p>
+                <div className="px-4 py-8 text-center text-gray-400 text-sm">
+                    No profitable opportunities (&gt;0 bps)
+                </div>
             ) : (
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead className="bg-gray-50 text-gray-700">
+                    <table className="w-full text-xs">
+                        <thead className="bg-gray-50/40 border-b border-gray-100">
                             <tr>
-                                <th className="px-4 py-2 text-left">Path</th>
-                                <th className="px-4 py-2 text-right">Profit (bps)</th>
-                                <th className="px-4 py-2 text-right">Buy Rate ({tokenA}→{tokenB})</th>
-                                <th className="px-4 py-2 text-right">Sell Rate ({tokenB}→{tokenA})</th>
+                                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wide w-6">#</th>
+                                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Buy ({tokenA}→{tokenB})</th>
+                                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell ({tokenB}→{tokenA})</th>
+                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Buy Rate</th>
+                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell Rate</th>
+                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Profit (bps)</th>
+                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Est. Profit</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {opportunities.slice(0, 20).map((opp, idx) => (
-                                <tr key={idx} className="hover:bg-gray-50">
-                                    <td className="px-4 py-3">
-                                        <div className="font-medium text-gray-900">{opp.path}</div>
-                                        <div className="text-xs text-gray-500">
-                                            Buy: {opp.buyChain} ({opp.buySource}) | Sell: {opp.sellChain} ({opp.sellSource})
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-3 text-right font-bold text-green-600">
-                                        +{opp.profitBps.toFixed(6)}
-                                    </td>
-                                    <td className="px-4 py-3 text-right text-gray-600">
-                                        {opp.buyPrice.toFixed(6)}
-                                    </td>
-                                    <td className="px-4 py-3 text-right text-gray-600">
-                                        {opp.sellPrice.toFixed(6)}
-                                    </td>
-                                </tr>
-                            ))}
+                        <tbody className="divide-y divide-gray-50">
+                            {top.map((opp, idx) => {
+                                const isTop3 = idx < 3;
+                                return (
+                                    <tr key={idx} className={`hover:bg-blue-50/20 transition-colors ${isTop3 ? 'bg-emerald-50/20' : ''}`}>
+                                        <td className="px-3 py-2 text-gray-400 tabular-nums font-mono text-center">
+                                            {idx + 1}
+                                        </td>
+                                        <td className="px-3 py-2 whitespace-nowrap">
+                                            <div className="font-medium text-gray-800">{opp.buyChain}</div>
+                                            <div className="text-[10px] text-gray-400">{opp.buySource}</div>
+                                        </td>
+                                        <td className="px-3 py-2 whitespace-nowrap">
+                                            <div className="font-medium text-gray-800">{opp.sellChain}</div>
+                                            <div className="text-[10px] text-gray-400">{opp.sellSource}</div>
+                                        </td>
+                                        <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
+                                            {opp.buyRate.toFixed(6)}
+                                        </td>
+                                        <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
+                                            {opp.sellRate.toFixed(6)}
+                                        </td>
+                                        <td className="px-3 py-2 text-right tabular-nums">
+                                            <span className="font-mono font-bold text-emerald-600">
+                                                +{opp.profitBps.toFixed(4)}
+                                            </span>
+                                        </td>
+                                        <td className="px-3 py-2 text-right tabular-nums">
+                                            <span className="font-mono text-emerald-700 font-semibold">
+                                                ${opp.profitUsd.toFixed(2)}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
