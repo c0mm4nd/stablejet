@@ -2138,22 +2138,19 @@
           "addressA": "0x5979D7b546E38E414F7E9822514be443A4800529",
           "decimalsA": 18,
           "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
-          "decimalsB": 18,
-          "disabled": true
+          "decimalsB": 18
         },
         "optimism": {
           "addressA": "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb",
           "decimalsA": 18,
           "addressB": "0x4200000000000000000000000000000000000006",
-          "decimalsB": 18,
-          "disabled": true
+          "decimalsB": 18
         },
         "base": {
           "addressA": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
           "decimalsA": 18,
           "addressB": "0x4200000000000000000000000000000000000006",
-          "decimalsB": 18,
-          "disabled": true
+          "decimalsB": 18
         },
         "tac": {
           "addressA": "0xAf368c91793CB22739386DFCbBb2F1A9e4bCBeBf",
@@ -2161,8 +2158,7 @@
           "decimalsA": 18,
           "decimalsB": 18
         }
-      },
-      "disabled": true
+      }
     },
     "cbETH_ETH": {
       "id": "cbETH_ETH",
@@ -2775,6 +2771,307 @@
           "decimalsA": 6,
           "addressB": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
           "decimalsB": 6
+        }
+      }
+    },
+    "tBTC_cbBTC": {
+      "id": "tBTC_cbBTC",
+      "name": "tBTC/cbBTC",
+      "tokenA": "tBTC",
+      "tokenB": "cbBTC",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x18084fbA666a33d37592fA2633fD49a74DD93a88",
+          "decimalsA": 18,
+          "addressB": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+          "decimalsB": 8
+        },
+        "arbitrum": {
+          "addressA": "0x6c84a8f1c29108F47a79964b5Fe888D4f4D0dE40",
+          "decimalsA": 18,
+          "addressB": "0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf",
+          "decimalsB": 8
+        }
+      }
+    },
+    "LBTC_cbBTC": {
+      "id": "LBTC_cbBTC",
+      "name": "LBTC/cbBTC",
+      "tokenA": "LBTC",
+      "tokenB": "cbBTC",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "base": {
+          "addressA": "0xecAc9C5F704e954931349Da37F60E39f515c11c1",
+          "decimalsA": 8,
+          "addressB": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+          "decimalsB": 8
+        }
+      }
+    },
+    "FBTC_WBTC": {
+      "id": "FBTC_WBTC",
+      "name": "FBTC/WBTC",
+      "tokenA": "FBTC",
+      "tokenB": "WBTC",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xC96dE26018A54D51c097160568752c4E3BD6C364",
+          "decimalsA": 8,
+          "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+          "decimalsB": 8
+        }
+      }
+    },
+    "eBTC_WBTC": {
+      "id": "eBTC_WBTC",
+      "name": "eBTC/WBTC",
+      "tokenA": "eBTC",
+      "tokenB": "WBTC",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x657e8C867D8B37dCC18fA4Caead9C45EB088C642",
+          "decimalsA": 8,
+          "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+          "decimalsB": 8
+        }
+      }
+    },
+    "hemiBTC_WBTC": {
+      "id": "hemiBTC_WBTC",
+      "name": "hemiBTC/WBTC",
+      "tokenA": "hemiBTC",
+      "tokenB": "WBTC",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x06ea695B91700071B161A434fED42D1DcbAD9f00",
+          "decimalsA": 8,
+          "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+          "decimalsB": 8
+        }
+      }
+    },
+    "hemiBTC_cbBTC": {
+      "id": "hemiBTC_cbBTC",
+      "name": "hemiBTC/cbBTC",
+      "tokenA": "hemiBTC",
+      "tokenB": "cbBTC",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x06ea695B91700071B161A434fED42D1DcbAD9f00",
+          "decimalsA": 8,
+          "addressB": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+          "decimalsB": 8
+        }
+      }
+    },
+    "SolvBTC_BTCB": {
+      "id": "SolvBTC_BTCB",
+      "name": "SolvBTC/BTCB",
+      "tokenA": "SolvBTC",
+      "tokenB": "BTCB",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "bnb_chain": {
+          "addressA": "0x4aae823a6a0b376De6A78e74eCC5b079d38cBCf7",
+          "decimalsA": 18,
+          "addressB": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
+          "decimalsB": 18
+        }
+      }
+    },
+    "BTCb_WBTC": {
+      "id": "BTCb_WBTC",
+      "name": "BTC.b/WBTC",
+      "tokenA": "BTC.b",
+      "tokenB": "WBTC",
+      "amounts": [
+        0.2
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072",
+          "decimalsA": 8,
+          "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+          "decimalsB": 8
+        },
+        "avalanche": {
+          "addressA": "0x152b9d0FdC40C096757F570A51E494bd4b943E50",
+          "decimalsA": 8,
+          "addressB": "0x50b7545627a5162F82A992c33b87aDc75187B218",
+          "decimalsB": 8
+        }
+      }
+    },
+    "stETH_ETH": {
+      "id": "stETH_ETH",
+      "name": "stETH/ETH",
+      "tokenA": "stETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        }
+      }
+    },
+    "OETH_ETH": {
+      "id": "OETH_ETH",
+      "name": "OETH/ETH",
+      "tokenA": "OETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        }
+      }
+    },
+    "osETH_ETH": {
+      "id": "osETH_ETH",
+      "name": "osETH/ETH",
+      "tokenA": "osETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xf1C9acDc66974dFB6dEcB12aA385b9cD01190E38",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        }
+      }
+    },
+    "frxETH_ETH": {
+      "id": "frxETH_ETH",
+      "name": "frxETH/ETH",
+      "tokenA": "frxETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x5E8422345238F34275888049021821E8E08CAa1f",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        }
+      }
+    },
+    "weETH_wstETH": {
+      "id": "weETH_wstETH",
+      "name": "weETH/wstETH",
+      "tokenA": "weETH",
+      "tokenB": "wstETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
+          "decimalsA": 18,
+          "addressB": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+          "decimalsB": 18
+        }
+      }
+    },
+    "pufETH_wstETH": {
+      "id": "pufETH_wstETH",
+      "name": "pufETH/wstETH",
+      "tokenA": "pufETH",
+      "tokenB": "wstETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xD9A442856C234a39a81a089C06451EBAa4306a72",
+          "decimalsA": 18,
+          "addressB": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+          "decimalsB": 18
+        }
+      }
+    },
+    "mETH_cmETH": {
+      "id": "mETH_cmETH",
+      "name": "mETH/cmETH",
+      "tokenA": "mETH",
+      "tokenB": "cmETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "mantle": {
+          "addressA": "0xcDA86A272531e8640cD7F1a92c01839911B90bb0",
+          "decimalsA": 18,
+          "addressB": "0xE6829d9a7eE3040e1276Fa75293Bde931859e8fA",
+          "decimalsB": 18
+        }
+      }
+    },
+    "weETHbase_ETH": {
+      "id": "weETHbase_ETH",
+      "name": "weETH.base/ETH",
+      "tokenA": "weETH.base",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "base": {
+          "addressA": "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
+        }
+      }
+    },
+    "ETHx_ETH": {
+      "id": "ETHx_ETH",
+      "name": "ETHx/ETH",
+      "tokenA": "ETHx",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
         }
       }
     }
