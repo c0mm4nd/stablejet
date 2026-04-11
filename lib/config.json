@@ -1929,8 +1929,7 @@
           "addressA": "0xd18b7ec58cdf4876f6afebd3ed1730e4ce10414b",
           "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
           "decimalsA": 8,
-          "decimalsB": 8,
-          "disabled": true
+          "decimalsB": 8
         },
         "arbitrum": {
           "addressA": "0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf",
@@ -2159,8 +2158,7 @@
           "addressA": "0xAf368c91793CB22739386DFCbBb2F1A9e4bCBeBf",
           "addressB": "0x61d66bc21fed820938021b06e9b2291f3fb91945",
           "decimalsA": 18,
-          "decimalsB": 18,
-          "disabled": true
+          "decimalsB": 18
         }
       }
     },
@@ -2327,15 +2325,13 @@
           "addressA": "0xecAc9C5F704e954931349Da37F60E39f515c11c1",
           "decimalsA": 8,
           "addressB": "0x72e9b6D9d4e5cB5890a2E7A5DBA984a1F1D5f6A5",
-          "decimalsB": 8,
-          "disabled": true
+          "decimalsB": 8
         },
         "stable": {
           "addressA": "0xecAc9C5F704e954931349Da37F60E39f515c11c1",
           "decimalsA": 8,
           "addressB": "0x72e9b6D9d4e5cB5890a2E7A5DBA984a1F1D5f6A5",
-          "decimalsB": 8,
-          "disabled": true
+          "decimalsB": 8
         }
       }
     },
