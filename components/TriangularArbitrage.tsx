@@ -117,26 +117,31 @@ export default function TriangularArbitrage({ history, amount }: TriangularArbit
                         const thirdEdges = graph[thirdToken][startToken];
 
                         // We have A->B, B->C, C->A.
-                        // Find Best Combination? O(N^3)? Edge lists are small (< 20).
-                        // Just find Best Edge for each leg to simplify?
-                        const bestLeg1 = firstEdges.reduce((prev, curr) => curr.rate > prev.rate ? curr : prev);
-                        const bestLeg2 = secondEdges.reduce((prev, curr) => curr.rate > prev.rate ? curr : prev);
-                        const bestLeg3 = thirdEdges.reduce((prev, curr) => curr.rate > prev.rate ? curr : prev);
-
-                        const totalRate = bestLeg1.rate * bestLeg2.rate * bestLeg3.rate;
-                        const profitBps = (totalRate - 1) * 10000;
-
-                        if (profitBps > 0) {
-                            opps.push({
-                                profitBps,
-                                path: `${startToken} -> ${secondToken} -> ${thirdToken} -> ${startToken}`,
-                                steps: [
-                                    { from: startToken, to: secondToken, chain: bestLeg1.chain, source: bestLeg1.source, rate: bestLeg1.rate },
-                                    { from: secondToken, to: thirdToken, chain: bestLeg2.chain, source: bestLeg2.source, rate: bestLeg2.rate },
-                                    { from: thirdToken, to: startToken, chain: bestLeg3.chain, source: bestLeg3.source, rate: bestLeg3.rate },
-                                ]
-                            });
+                        // Only consider combinations where all 3 legs use at most 2 distinct chains
+                        // (pure same-chain or one cross-chain hop — both are executable).
+                        let best: TriangularOpp | null = null;
+                        for (const e1 of firstEdges) {
+                            for (const e2 of secondEdges) {
+                                for (const e3 of thirdEdges) {
+                                    const chains = new Set([e1.chain, e2.chain, e3.chain]);
+                                    if (chains.size > 2) continue;
+                                    const totalRate = e1.rate * e2.rate * e3.rate;
+                                    const profitBps = (totalRate - 1) * 10000;
+                                    if (profitBps > 0 && (!best || profitBps > best.profitBps)) {
+                                        best = {
+                                            profitBps,
+                                            path: `${startToken} → ${secondToken} → ${thirdToken} → ${startToken}`,
+                                            steps: [
+                                                { from: startToken, to: secondToken, chain: e1.chain, source: e1.source, rate: e1.rate },
+                                                { from: secondToken, to: thirdToken, chain: e2.chain, source: e2.source, rate: e2.rate },
+                                                { from: thirdToken, to: startToken, chain: e3.chain, source: e3.source, rate: e3.rate },
+                                            ]
+                                        };
+                                    }
+                                }
+                            }
                         }
+                        if (best) opps.push(best);
                     }
                 }
             }
