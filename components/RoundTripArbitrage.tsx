@@ -12,14 +12,14 @@ interface RoundTripArbitrageProps {
 }
 
 interface ArbOpportunity {
-    buyChain: string;
-    buySource: string;
-    sellChain: string;
+    sellChain: string;   // 卖出 tokenA（A→B）的链
     sellSource: string;
+    buyChain: string;    // 买回 tokenA（B→A）的链
+    buySource: string;
     profitBps: number;
     profitUsd: number;
-    buyRate: number;
-    sellRate: number;
+    sellRate: number;    // A→B 的汇率（tokenB per tokenA）
+    buyRate: number;     // B→A 的汇率（tokenA per tokenB）
 }
 
 export default function RoundTripArbitrage({ history, amount, pairId }: RoundTripArbitrageProps) {
@@ -37,37 +37,39 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
         .filter(d => isSourceEnabled(d.dataSource, sources));
 
     const opportunities = useMemo((): ArbOpportunity[] => {
-        const buys = data
+        // sells: 用 tokenA 换出 tokenB（A→B），卖出 tokenA 的那一腿
+        const sells = data
             .filter(d => d.tokenAToB?.output && d.tokenAToB.output > 0)
             .map(d => ({
                 chain: d.chain,
                 source: d.dataSource || 'kyberswap',
-                rate: d.tokenAToB!.output! / (d.tokenAToB!.input || amount),
+                rate: d.tokenAToB!.output! / (d.tokenAToB!.input || amount), // tokenB per tokenA
             }));
 
-        const sells = data
+        // buys: 用 tokenB 换回 tokenA（B→A），买回 tokenA 的那一腿
+        const buys = data
             .filter(d => d.tokenBToA?.output && d.tokenBToA.output > 0)
             .map(d => ({
                 chain: d.chain,
                 source: d.dataSource || 'kyberswap',
-                rate: d.tokenBToA!.output! / (d.tokenBToA!.input || amount),
+                rate: d.tokenBToA!.output! / (d.tokenBToA!.input || amount), // tokenA per tokenB
             }));
 
         const opps: ArbOpportunity[] = [];
-        for (const buy of buys) {
-            for (const sell of sells) {
-                const finalRate = buy.rate * sell.rate;
+        for (const sell of sells) {
+            for (const buy of buys) {
+                const finalRate = sell.rate * buy.rate;
                 const profitBps = (finalRate - 1) * 10000;
                 if (profitBps > 0) {
                     opps.push({
-                        buyChain: buy.chain,
-                        buySource: buy.source,
                         sellChain: sell.chain,
                         sellSource: sell.source,
+                        buyChain: buy.chain,
+                        buySource: buy.source,
                         profitBps,
                         profitUsd: amount * profitBps / 10000,
-                        buyRate: buy.rate,
                         sellRate: sell.rate,
+                        buyRate: buy.rate,
                     });
                 }
             }
@@ -107,10 +109,10 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
                         <thead className="bg-gray-50/40 border-b border-gray-100">
                             <tr>
                                 <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wide w-6">#</th>
-                                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Buy ({tokenA}→{tokenB})</th>
-                                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell ({tokenB}→{tokenA})</th>
-                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Buy Rate</th>
+                                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell {tokenA} ({tokenA}→{tokenB})</th>
+                                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Buy {tokenA} ({tokenB}→{tokenA})</th>
                                 <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell Rate</th>
+                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Buy Rate</th>
                                 <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Profit (bps)</th>
                                 <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Est. Profit</th>
                             </tr>
@@ -124,18 +126,18 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
                                             {idx + 1}
                                         </td>
                                         <td className="px-3 py-2 whitespace-nowrap">
-                                            <div className="font-medium text-gray-800">{opp.buyChain}</div>
-                                            <div className="text-[10px] text-gray-400">{opp.buySource}</div>
-                                        </td>
-                                        <td className="px-3 py-2 whitespace-nowrap">
                                             <div className="font-medium text-gray-800">{opp.sellChain}</div>
                                             <div className="text-[10px] text-gray-400">{opp.sellSource}</div>
                                         </td>
-                                        <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
-                                            {opp.buyRate.toFixed(6)}
+                                        <td className="px-3 py-2 whitespace-nowrap">
+                                            <div className="font-medium text-gray-800">{opp.buyChain}</div>
+                                            <div className="text-[10px] text-gray-400">{opp.buySource}</div>
                                         </td>
                                         <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
                                             {opp.sellRate.toFixed(6)}
+                                        </td>
+                                        <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
+                                            {opp.buyRate.toFixed(6)}
                                         </td>
                                         <td className="px-3 py-2 text-right tabular-nums">
                                             <span className="font-mono font-bold text-emerald-600">
