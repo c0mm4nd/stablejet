@@ -37,8 +37,19 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
         .filter(d => isSourceEnabled(d.dataSource, sources));
 
     const opportunities = useMemo((): ArbOpportunity[] => {
+        // Pre-filter: exclude data points where either direction is missing (null),
+        // or the same-chain roundtrip is > 0.1 bps (anomalous / stale quote).
+        const validData = data.filter(d => {
+            const outAtoB = d.tokenAToB?.output;
+            const outBtoA = d.tokenBToA?.output;
+            if (!outAtoB || !outBtoA) return false;
+            const rateAtoB = outAtoB / (d.tokenAToB!.input ?? amount);
+            const rateBtoA = outBtoA / (d.tokenBToA!.input ?? amount);
+            return (rateAtoB * rateBtoA - 1) * 10000 <= 0.1;
+        });
+
         // sells: 用 tokenA 换出 tokenB（A→B），卖出 tokenA 的那一腿
-        const sells = data
+        const sells = validData
             .filter(d => d.tokenAToB?.output && d.tokenAToB.output > 0)
             .map(d => ({
                 chain: d.chain,
@@ -47,7 +58,7 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
             }));
 
         // buys: 用 tokenB 换回 tokenA（B→A），买回 tokenA 的那一腿
-        const buys = data
+        const buys = validData
             .filter(d => d.tokenBToA?.output && d.tokenBToA.output > 0)
             .map(d => ({
                 chain: d.chain,
