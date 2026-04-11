@@ -2915,6 +2915,12 @@
           "decimalsA": 8,
           "addressB": "0x50b7545627a5162F82A992c33b87aDc75187B218",
           "decimalsB": 8
+        },
+        "ethereum": {
+          "addressA": "0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072",
+          "decimalsA": 8,
+          "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+          "decimalsB": 8
         }
       }
     },
