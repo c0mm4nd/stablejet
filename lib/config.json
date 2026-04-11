@@ -91,7 +91,7 @@
     },
     "mantle": {
       "name": "Mantle",
-      "kyberCode": "mantle",
+      "kyberCode": "",
       "nordsternCode": "5000",
       "lifiChainId": "5000"
     },
