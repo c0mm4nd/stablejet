@@ -1929,7 +1929,8 @@
           "addressA": "0xd18b7ec58cdf4876f6afebd3ed1730e4ce10414b",
           "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
           "decimalsA": 8,
-          "decimalsB": 8
+          "decimalsB": 8,
+          "disabled": true
         },
         "arbitrum": {
           "addressA": "0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf",
@@ -1987,7 +1988,8 @@
           "addressA": "0xBBa2eF945D523C4e2608C9E1214C2Cc64D4fc2e2",
           "decimalsA": 18,
           "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
-          "decimalsB": 8
+          "decimalsB": 8,
+          "disabled": true
         }
       }
     },
@@ -2028,7 +2030,8 @@
           "addressA": "0x236f8c0a61dA474dB21B693fB2ea7AAB0c803894",
           "decimalsA": 8,
           "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
-          "decimalsB": 8
+          "decimalsB": 8,
+          "disabled": true
         },
         "unichain": {
           "addressA": "0xd3c8dA379d71a33BfEE8875F87Ac2748bEB1d58d",
@@ -2156,7 +2159,8 @@
           "addressA": "0xAf368c91793CB22739386DFCbBb2F1A9e4bCBeBf",
           "addressB": "0x61d66bc21fed820938021b06e9b2291f3fb91945",
           "decimalsA": 18,
-          "decimalsB": 18
+          "decimalsB": 18,
+          "disabled": true
         }
       }
     },
@@ -2323,13 +2327,15 @@
           "addressA": "0xecAc9C5F704e954931349Da37F60E39f515c11c1",
           "decimalsA": 8,
           "addressB": "0x72e9b6D9d4e5cB5890a2E7A5DBA984a1F1D5f6A5",
-          "decimalsB": 8
+          "decimalsB": 8,
+          "disabled": true
         },
         "stable": {
           "addressA": "0xecAc9C5F704e954931349Da37F60E39f515c11c1",
           "decimalsA": 8,
           "addressB": "0x72e9b6D9d4e5cB5890a2E7A5DBA984a1F1D5f6A5",
-          "decimalsB": 8
+          "decimalsB": 8,
+          "disabled": true
         }
       }
     },
@@ -2908,12 +2914,6 @@
         0.2
       ],
       "chains": {
-        "ethereum": {
-          "addressA": "0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072",
-          "decimalsA": 8,
-          "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-          "decimalsB": 8
-        },
         "avalanche": {
           "addressA": "0x152b9d0FdC40C096757F570A51E494bd4b943E50",
           "decimalsA": 8,
