@@ -2354,24 +2354,63 @@
           "addressA": "0x5979D7b546E38E414F7E9822514be443A4800529",
           "decimalsA": 18,
           "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "disabled": true
         },
         "optimism": {
           "addressA": "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb",
           "decimalsA": 18,
           "addressB": "0x4200000000000000000000000000000000000006",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "disabled": true
         },
         "base": {
           "addressA": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
           "decimalsA": 18,
           "addressB": "0x4200000000000000000000000000000000000006",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "disabled": true
         },
         "tac": {
           "addressA": "0xAf368c91793CB22739386DFCbBb2F1A9e4bCBeBf",
           "addressB": "0x61d66bc21fed820938021b06e9b2291f3fb91945",
           "decimalsA": 18,
+          "decimalsB": 18
+        },
+        "zksync_era": {
+          "addressA": "0x703b52F2b28fEbcB60E1372858AF5b18849FE867",
+          "decimalsA": 18,
+          "addressB": "0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91",
+          "decimalsB": 18
+        },
+        "scroll": {
+          "addressA": "0xf610A9dfB7C89644979b4A0f27063E9e7d7Cda32",
+          "decimalsA": 18,
+          "addressB": "0x5300000000000000000000000000000000000004",
+          "decimalsB": 18
+        },
+        "linea": {
+          "addressA": "0xB5beDd42000b71FddE22D3eE8a79Bd49A568fC8F",
+          "decimalsA": 18,
+          "addressB": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f",
+          "decimalsB": 18
+        },
+        "bnb_chain": {
+          "addressA": "0x26c5e01524d2E6280A48F2c50fF6De7e52E9611C",
+          "decimalsA": 18,
+          "addressB": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
+          "decimalsB": 18
+        },
+        "polygon": {
+          "addressA": "0x03b54A6e9a984069379fae1a4fC4dBAE93B3bCCD",
+          "decimalsA": 18,
+          "addressB": "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
+          "decimalsB": 18
+        },
+        "mantle": {
+          "addressA": "0x458ed78EB972a369799fb278c0243b25e5242A83",
+          "decimalsA": 18,
+          "addressB": "0xdEAddEaDdeadDEadDEADDEAddEADDEAddead1111",
           "decimalsB": 18
         }
       }
