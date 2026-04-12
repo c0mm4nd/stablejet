@@ -3,11 +3,12 @@
 import { useMemo } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
-import { isSourceEnabled } from '@/lib/utils';
+import { isSourceEnabled, getPairCategory, PairCategory } from '@/lib/utils';
 
 interface TriangularArbitrageProps {
     history: HistoryDataPoint[];
     amount: number;
+    pairId?: string;
 }
 
 // Triangular Arb needs 3 tokens: A -> B -> C -> A.
@@ -27,8 +28,13 @@ interface TriangularOpp {
     }[];
 }
 
-export default function TriangularArbitrage({ history, amount }: TriangularArbitrageProps) {
+export default function TriangularArbitrage({ history, amount, pairId }: TriangularArbitrageProps) {
     const { pairs, sources } = useConfig();
+
+    const currentCategory = useMemo((): PairCategory => {
+        const p = pairId ? pairs[pairId] : null;
+        return p ? getPairCategory(p.tokenA, p.tokenB) : 'stable';
+    }, [pairId, pairs]);
     const pairsByLower = useMemo(() => {
         const map = new Map<string, { tokenA: string; tokenB: string }>();
         Object.entries(pairs).forEach(([id, pair]) => {
@@ -150,10 +156,24 @@ export default function TriangularArbitrage({ history, amount }: TriangularArbit
         // Deduplicate? (A->B->C and B->C->A are same cycle).
         // Set of tokens key.
 
-        return opps.sort((a, b) => b.profitBps - a.profitBps); // Filtered/Deduped later if needed
+        return opps.sort((a, b) => b.profitBps - a.profitBps);
     }, [history, amount]);
 
-    if (opportunities.length === 0) {
+    // Re-sort: same-category opportunities first, then by profitBps
+    const sortedOpportunities = useMemo(() => {
+        return [...opportunities].sort((a, b) => {
+            const tokensA = [a.steps[0].from, a.steps[0].to, a.steps[1].to];
+            const tokensB = [b.steps[0].from, b.steps[0].to, b.steps[1].to];
+            const catA = getPairCategory(tokensA[0], tokensA[1]);
+            const catB = getPairCategory(tokensB[0], tokensB[1]);
+            const matchA = catA === currentCategory ? 0 : 1;
+            const matchB = catB === currentCategory ? 0 : 1;
+            if (matchA !== matchB) return matchA - matchB;
+            return b.profitBps - a.profitBps;
+        });
+    }, [opportunities, currentCategory]);
+
+    if (sortedOpportunities.length === 0) {
         return (
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500">
                 No Triangular opportunities found (Requires data for A→B→C→A).
@@ -174,7 +194,7 @@ export default function TriangularArbitrage({ history, amount }: TriangularArbit
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {opportunities.slice(0, 10).map((opp, idx) => (
+                        {sortedOpportunities.slice(0, 10).map((opp, idx) => (
                             <tr key={idx}>
                                 <td className="px-4 py-3 font-medium">{opp.path}</td>
                                 <td className="px-4 py-3 text-right font-bold text-green-600">+{opp.profitBps.toFixed(6)} bps</td>

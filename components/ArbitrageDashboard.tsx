@@ -78,7 +78,7 @@ export default function ArbitrageDashboard({ history, amount, pairId, onModeChan
                   Currently the fetcher may only return the selected pair's data if filtered by API.
                   For full triangular support, ensure API returns all pairs or the dashboard fetches them.
               */}
-                        <TriangularArbitrage history={history} amount={amount} />
+                        <TriangularArbitrage history={history} amount={amount} pairId={pairId} />
                     </>
                 )}
             </div>
