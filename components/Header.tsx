@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useConfig } from '@/contexts/ConfigContext';
+import { getPairCategory, CATEGORY_LABEL, CATEGORY_ORDER, PairCategory } from '@/lib/utils';
 
 interface HeaderProps {
   countdown: number;
@@ -29,6 +30,12 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
       pair.tokenB.toLowerCase().includes(query)
     );
   });
+
+  // 按分类分组
+  const groupedPairs = CATEGORY_ORDER.reduce((acc, cat) => {
+    acc[cat] = filteredPairs.filter(p => getPairCategory(p.tokenA, p.tokenB) === cat);
+    return acc;
+  }, {} as Record<PairCategory, typeof filteredPairs>);
 
   // 点击外部关闭下拉框
   useEffect(() => {
@@ -96,30 +103,37 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50 ml-16">
                   {filteredPairs.length > 0 ? (
                     <div className="max-h-64 overflow-y-auto">
-                      {filteredPairs.map((pair) => (
-                        <button
-                          key={pair.id}
-                          onClick={() => handlePairSelect(pair.id)}
-                          className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between group ${selectedPair === pair.id ? 'bg-blue-50' : ''
-                            }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={`w-2 h-2 rounded-full ${selectedPair === pair.id ? 'bg-blue-600' : 'bg-gray-300'
-                              }`}></div>
-                            <div>
-                              <div className="font-medium text-gray-800">{pair.name}</div>
-                              <div className="text-xs text-gray-500">
-                                {pair.tokenA} ⇄ {pair.tokenB}
-                              </div>
+                      {CATEGORY_ORDER.map(cat => {
+                        const catPairs = groupedPairs[cat];
+                        if (catPairs.length === 0) return null;
+                        return (
+                          <div key={cat}>
+                            <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-50 border-b border-gray-100">
+                              {CATEGORY_LABEL[cat]}
                             </div>
+                            {catPairs.map((pair) => (
+                              <button
+                                key={pair.id}
+                                onClick={() => handlePairSelect(pair.id)}
+                                className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between group ${selectedPair === pair.id ? 'bg-blue-50' : ''}`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-2 h-2 rounded-full ${selectedPair === pair.id ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
+                                  <div>
+                                    <div className="font-medium text-gray-800">{pair.name}</div>
+                                    <div className="text-xs text-gray-500">{pair.tokenA} ⇄ {pair.tokenB}</div>
+                                  </div>
+                                </div>
+                                {selectedPair === pair.id && (
+                                  <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </button>
+                            ))}
                           </div>
-                          {selectedPair === pair.id && (
-                            <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                          )}
-                        </button>
-                      ))}
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="px-4 py-8 text-center text-gray-500 text-sm">

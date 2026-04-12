@@ -70,6 +70,27 @@ export function filterOutliers(value: number | null, allValues: (number | null)[
   return value;
 }
 
+const BTC_TOKENS = new Set(['BTC', 'WBTC', 'cbBTC', 'tBTC', 'LBTC', 'SolvBTC', 'uniBTC', 'eBTC', 'FBTC',
+  'hemiBTC', 'BTCb', 'BTC.b', 'BTCB', 'BTCB.b']);
+const ETH_TOKENS = new Set(['ETH', 'wstETH', 'weETH', 'rsETH', 'ezETH', 'stETH', 'cbETH', 'rETH',
+  'ETHx', 'mETH', 'cmETH', 'osETH', 'frxETH', 'OETH', 'pufETH']);
+
+export type PairCategory = 'stable' | 'eth' | 'btc';
+
+export function getPairCategory(tokenA: string, tokenB: string): PairCategory {
+  if ([tokenA, tokenB].some(t => BTC_TOKENS.has(t))) return 'btc';
+  if ([tokenA, tokenB].some(t => ETH_TOKENS.has(t))) return 'eth';
+  return 'stable';
+}
+
+export const CATEGORY_LABEL: Record<PairCategory, string> = {
+  stable: 'Stablecoin',
+  eth: 'ETH LST/LRT',
+  btc: 'BTC',
+};
+
+export const CATEGORY_ORDER: PairCategory[] = ['stable', 'eth', 'btc'];
+
 export function isSourceEnabled(
   source: string | undefined,
   sources?: Partial<ConfigData['sources']>
