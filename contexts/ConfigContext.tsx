@@ -23,6 +23,34 @@ interface ConfigContextType {
 
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 
+const ADMIN_PASSWORD_KEY = 'stablejet_admin_password';
+
+function getAdminHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const pw = localStorage.getItem(ADMIN_PASSWORD_KEY);
+  return pw ? { 'x-admin-password': pw } : {};
+}
+
+async function configPost(body: object): Promise<Response> {
+  const res = await fetch('/api/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
+    body: JSON.stringify(body),
+  });
+  if (res.status === 401) {
+    const pw = prompt('Admin password required:');
+    if (pw) {
+      localStorage.setItem(ADMIN_PASSWORD_KEY, pw);
+      return fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': pw },
+        body: JSON.stringify(body),
+      });
+    }
+  }
+  return res;
+}
+
 function ConfigProviderInner({ children }: { children: ReactNode }) {
   const [chains, setChains] = useState<Record<string, ChainAppConfig>>({});
   const [pairs, setPairs] = useState<Record<string, TradingPairConfig>>({});
@@ -122,15 +150,7 @@ function ConfigProviderInner({ children }: { children: ReactNode }) {
     try {
       const res = await fetch('/api/config');
       const currentConfig: ConfigData = await res.json();
-
-      await fetch('/api/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...currentConfig,
-          chains: newChains
-        })
-      });
+      await configPost({ ...currentConfig, chains: newChains });
     } catch (err) {
       console.error('Failed to save chains:', err);
       fetchConfig();
@@ -142,15 +162,7 @@ function ConfigProviderInner({ children }: { children: ReactNode }) {
     try {
       const res = await fetch('/api/config');
       const currentConfig: ConfigData = await res.json();
-
-      await fetch('/api/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...currentConfig,
-          pairs: newPairs
-        })
-      });
+      await configPost({ ...currentConfig, pairs: newPairs });
     } catch (err) {
       console.error('Failed to save pairs:', err);
       fetchConfig();
@@ -162,15 +174,7 @@ function ConfigProviderInner({ children }: { children: ReactNode }) {
     try {
       const res = await fetch('/api/config');
       const currentConfig: ConfigData = await res.json();
-
-      await fetch('/api/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...currentConfig,
-          sources: newSources
-        })
-      });
+      await configPost({ ...currentConfig, sources: newSources });
     } catch (err) {
       console.error('Failed to save sources:', err);
       fetchConfig();

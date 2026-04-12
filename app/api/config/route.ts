@@ -15,12 +15,20 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
+        const adminPassword = process.env.ADMIN_PASSWORD;
+        if (adminPassword) {
+            const authHeader = request.headers.get('x-admin-password');
+            if (authHeader !== adminPassword) {
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            }
+        }
+
         const data = await request.json();
 
-    // Basic validation (can be expanded)
-    if (!data.chains || !data.pairs || !data.sources) {
-      return NextResponse.json({ error: 'Invalid config structure' }, { status: 400 });
-    }
+        // Basic validation (can be expanded)
+        if (!data.chains || !data.pairs || !data.sources) {
+            return NextResponse.json({ error: 'Invalid config structure' }, { status: 400 });
+        }
 
         saveConfig(data as ConfigData);
 
