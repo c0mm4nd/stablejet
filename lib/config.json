@@ -214,7 +214,8 @@
     },
     "metis": {
       "name": "Metis",
-      "nordsternCode": "1088"
+      "nordsternCode": "1088",
+      "disabled": true
     },
     "lisk": {
       "name": "Lisk",
@@ -1638,6 +1639,18 @@
           "decimalsA": 6,
           "addressB": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
           "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x0a1a1A107E45b7Ced86833863f482BC5f4ed82EF",
+          "decimalsA": 18,
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsB": 6
+        },
+        "berachain": {
+          "addressA": "0x688e72142674041f8f6af4c808a4045ca1d6ac82",
+          "decimalsA": 6,
+          "addressB": "0x549943e04f40284185054145c6E4e9568C1D3241",
+          "decimalsB": 6
         }
       }
     },
@@ -1664,6 +1677,130 @@
         },
         "solana": {
           "addressA": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+          "decimalsA": 6,
+          "addressB": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x0a1a1A107E45b7Ced86833863f482BC5f4ed82EF",
+          "decimalsA": 18,
+          "addressB": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+          "decimalsB": 6
+        },
+        "plasma": {
+          "addressA": "0x0a1a1A107E45b7Ced86833863f482BC5f4ed82EF",
+          "decimalsA": 18,
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsB": 6
+        },
+        "berachain": {
+          "addressA": "0x688e72142674041f8f6af4c808a4045ca1d6ac82",
+          "decimalsA": 6,
+          "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "decimalsB": 6
+        }
+      }
+    },
+    "AUSD_USDC": {
+      "id": "AUSD_USDC",
+      "name": "AUSD/USDC",
+      "tokenA": "AUSD",
+      "tokenB": "USDC",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+          "decimalsA": 6,
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+          "decimalsA": 6,
+          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+          "decimalsA": 6,
+          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "decimalsB": 6
+        },
+        "polygon": {
+          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+          "decimalsA": 6,
+          "addressB": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+          "decimalsB": 6
+        },
+        "avalanche": {
+          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+          "decimalsA": 6,
+          "addressB": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+          "decimalsB": 6
+        },
+        "mantle": {
+          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+          "decimalsA": 6,
+          "addressB": "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
+          "decimalsB": 6
+        },
+        "solana": {
+          "addressA": "AUSD1jCcCyPLybk1YnvPWsHQSrZ46dxwoMniN4N2UEB9",
+          "decimalsA": 6,
+          "addressB": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "decimalsB": 6
+        }
+      }
+    },
+    "AUSD_USDT": {
+      "id": "AUSD_USDT",
+      "name": "AUSD/USDT",
+      "tokenA": "AUSD",
+      "tokenB": "USDT",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+          "decimalsA": 6,
+          "addressB": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "decimalsB": 6
+        },
+        "arbitrum": {
+          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+          "decimalsA": 6,
+          "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "decimalsB": 6
+        },
+        "base": {
+          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+          "decimalsA": 6,
+          "addressB": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+          "decimalsB": 6
+        },
+        "polygon": {
+          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+          "decimalsA": 6,
+          "addressB": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+          "decimalsB": 6
+        },
+        "avalanche": {
+          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+          "decimalsA": 6,
+          "addressB": "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
+          "decimalsB": 6
+        },
+        "mantle": {
+          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+          "decimalsA": 6,
+          "addressB": "0x779ded0c9e1022225f8e0630b35a9b54be713736",
+          "decimalsB": 6
+        },
+        "solana": {
+          "addressA": "AUSD1jCcCyPLybk1YnvPWsHQSrZ46dxwoMniN4N2UEB9",
           "decimalsA": 6,
           "addressB": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
           "decimalsB": 6
@@ -3422,29 +3559,6 @@
         }
       }
     },
-    "USDai_USDC": {
-      "id": "USDai_USDC",
-      "name": "USDai/USDC",
-      "tokenA": "USDai",
-      "tokenB": "USDC",
-      "amounts": [
-        30000
-      ],
-      "chains": {
-        "arbitrum": {
-          "addressA": "0x0a1a1a107e45b7ced86833863f482bc5f4ed82ef",
-          "decimalsA": 18,
-          "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-          "decimalsB": 6
-        },
-        "base": {
-          "addressA": "0x0a1a1A107E45b7Ced86833863f482BC5f4ed82EF",
-          "decimalsA": 18,
-          "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-          "decimalsB": 6
-        }
-      }
-    },
     "apxUSD_USDC": {
       "id": "apxUSD_USDC",
       "name": "apxUSD/USDC",
@@ -3464,35 +3578,6 @@
           "addressA": "0xD993935E13851dd7517af10687EC7e5022127228",
           "decimalsA": 18,
           "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-          "decimalsB": 6
-        }
-      }
-    },
-    "USDai_USDT": {
-      "id": "USDai_USDT",
-      "name": "USDai/USDT",
-      "tokenA": "USDai",
-      "tokenB": "USDT",
-      "amounts": [
-        30000
-      ],
-      "chains": {
-        "arbitrum": {
-          "addressA": "0x0a1a1A107E45b7Ced86833863f482BC5f4ed82EF",
-          "decimalsA": 18,
-          "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
-          "decimalsB": 6
-        },
-        "base": {
-          "addressA": "0x0a1a1A107E45b7Ced86833863f482BC5f4ed82EF",
-          "decimalsA": 18,
-          "addressB": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
-          "decimalsB": 6
-        },
-        "plasma": {
-          "addressA": "0x0a1a1A107E45b7Ced86833863f482BC5f4ed82EF",
-          "decimalsA": 18,
-          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
           "decimalsB": 6
         }
       }
