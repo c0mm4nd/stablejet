@@ -101,10 +101,6 @@ executionType: 'all'
       || bestRoute?.steps?.[0]?.toolDetails?.name;
 
     if (amountOut) {
-      if (tool && isDeniedTool(tool)) {
-        const rawSteps = JSON.stringify(bestRoute?.steps?.map((s: any) => ({ tool: s?.tool, name: s?.toolDetails?.name })));
-        error(`[LiFi/Jumper] WARN denied tool still in result for ${chainId}: tool=${tool} rawSteps=${rawSteps}`);
-      }
       log(`[LiFi/Jumper] ✓ Success for ${chainId}: ${amountOut} out (${tool || 'unknown tool'})`);
       return {
         success: true,
