@@ -847,7 +847,7 @@
           "addressA": "0xe34c91815d7fc18a9e2148bcd4241d0a5848b693",
           "addressB": "0xc7d67a9cbb121b3b0b9c053dd9f469523243379a",
           "decimalsA": 6,
-          "decimalsB": 4
+          "decimalsB": 6
         },
         "katana": {
           "addressA": "0x203a662b0bd271a6ed5a60edfbd04bfce608fd36",
@@ -2041,7 +2041,7 @@
           "addressA": "0x111111d2bf19e43c34263401e0cad979ed1cdb61",
           "decimalsA": 18,
           "addressB": "0xc7d67a9cbb121b3b0b9c053dd9f469523243379a",
-          "decimalsB": 4
+          "decimalsB": 6
         }
       }
     },
