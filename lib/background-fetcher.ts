@@ -11,6 +11,47 @@ import { getGateRateLimiterStatus } from './gate';
 import { getHtxRateLimiterStatus } from './htx';
 import { getKrakenRateLimiterStatus } from './kraken';
 import { getConfig } from './server-config';
+import { sendBarkNotification } from './bark';
+import { ChainSwapData } from './types';
+
+// cooldown tracker: pairId -> last notification timestamp
+const notifyCooldown = new Map<string, number>();
+
+// price change tracker: `pairId|chain|dataSource|direction` -> last rate
+const lastRates = new Map<string, number>();
+
+function detectBestArb(data: ChainSwapData[], amount: number): { profitBps: number; sellChain: string; buyChain: string } | null {
+  const valid = data.filter(d => {
+    const outAtoB = d.tokenAToB?.output;
+    const outBtoA = d.tokenBToA?.output;
+    if (!outAtoB || !outBtoA) return false;
+    const inputAtoB = (d.tokenAToB!.input > 0) ? d.tokenAToB!.input : amount;
+    const inputBtoA = (d.tokenBToA!.input > 0) ? d.tokenBToA!.input : amount;
+    const rateAtoB = outAtoB / inputAtoB;
+    const rateBtoA = outBtoA / inputBtoA;
+    if (!isFinite(rateAtoB) || !isFinite(rateBtoA) || rateAtoB <= 0 || rateBtoA <= 0) return false;
+    return (rateAtoB * rateBtoA - 1) * 10000 <= 0.1;
+  });
+
+  let best: { profitBps: number; sellChain: string; buyChain: string } | null = null;
+
+  for (const sell of valid) {
+    const sellInput = (sell.tokenAToB!.input > 0) ? sell.tokenAToB!.input : amount;
+    const sellRate = sell.tokenAToB!.output! / sellInput;
+    for (const buy of valid) {
+      const buyInput = (buy.tokenBToA!.input > 0) ? buy.tokenBToA!.input : amount;
+      const buyRate = buy.tokenBToA!.output! / buyInput;
+      const finalRate = sellRate * buyRate;
+      if (!isFinite(finalRate) || finalRate <= 0) continue;
+      const profitBps = (finalRate - 1) * 10000;
+      if (!isFinite(profitBps) || profitBps <= 0 || profitBps > 2000) continue;
+      if (!best || profitBps > best.profitBps) {
+        best = { profitBps, sellChain: sell.chain, buyChain: buy.chain };
+      }
+    }
+  }
+  return best;
+}
 
 type FetcherState = {
   intervalId: NodeJS.Timeout | null;
@@ -151,6 +192,79 @@ class BackgroundFetcher {
             if (data.length > 0) {
               saveDataPoint(data, pairId);
               log(`[BackgroundFetcher] ✓ ${pairId}: Saved ${data.length} data points`);
+
+              // Bark notifications
+              const notifyCfg = config.notifications;
+              if (notifyCfg?.barkEndpoints?.length) {
+                const amounts = pairConfig.amounts;
+                const pairName = config.pairs[pairId]?.name ?? pairId;
+                const cooldownMs = (notifyCfg.cooldownMinutes ?? 30) * 60 * 1000;
+
+                // Arb opportunity alerts
+                if (notifyCfg.minProfitBps > 0) {
+                  for (const amount of amounts) {
+                    const amountData = data.filter(d => d.amount === amount);
+                    const best = detectBestArb(amountData, amount);
+                    if (best && best.profitBps >= notifyCfg.minProfitBps) {
+                      const cooldownKey = `arb|${pairId}|${amount}`;
+                      const lastNotify = notifyCooldown.get(cooldownKey) ?? 0;
+                      if (Date.now() - lastNotify >= cooldownMs) {
+                        notifyCooldown.set(cooldownKey, Date.now());
+                        const title = `Arb: ${pairName}`;
+                        const body = `+${best.profitBps.toFixed(2)} bps | ${best.sellChain} → ${best.buyChain} | ${amount.toLocaleString()}`;
+                        sendBarkNotification(notifyCfg.barkEndpoints, title, body, { group: 'StableJet' });
+                      }
+                    }
+                  }
+                }
+
+                // Price change alerts
+                if (notifyCfg.priceChangeAlertBps > 0) {
+                  for (const item of data) {
+                    const src = item.dataSource ?? 'unknown';
+                    if (item.tokenAToB?.output && item.tokenAToB.output > 0) {
+                      const rate = item.tokenAToB.output / (item.tokenAToB.input ?? pairConfig.amounts[0]);
+                      const rateKey = `price|${pairId}|${item.chain}|${src}|AtoB`;
+                      const prev = lastRates.get(rateKey);
+                      if (prev !== undefined) {
+                        const changeBps = Math.abs(rate - prev) / prev * 10000;
+                        if (changeBps >= notifyCfg.priceChangeAlertBps) {
+                          const cooldownKey = `chg|${rateKey}`;
+                          const lastNotify = notifyCooldown.get(cooldownKey) ?? 0;
+                          if (Date.now() - lastNotify >= cooldownMs) {
+                            notifyCooldown.set(cooldownKey, Date.now());
+                            const dir = rate > prev ? '+' : '';
+                            const title = `Rate: ${pairName}`;
+                            const body = `${item.chain} ${src} ${dir}${((rate - prev) / prev * 10000).toFixed(2)} bps`;
+                            sendBarkNotification(notifyCfg.barkEndpoints, title, body, { group: 'StableJet' });
+                          }
+                        }
+                      }
+                      lastRates.set(rateKey, rate);
+                    }
+                    if (item.tokenBToA?.output && item.tokenBToA.output > 0) {
+                      const rate = item.tokenBToA.output / (item.tokenBToA.input ?? pairConfig.amounts[0]);
+                      const rateKey = `price|${pairId}|${item.chain}|${src}|BtoA`;
+                      const prev = lastRates.get(rateKey);
+                      if (prev !== undefined) {
+                        const changeBps = Math.abs(rate - prev) / prev * 10000;
+                        if (changeBps >= notifyCfg.priceChangeAlertBps) {
+                          const cooldownKey = `chg|${rateKey}`;
+                          const lastNotify = notifyCooldown.get(cooldownKey) ?? 0;
+                          if (Date.now() - lastNotify >= cooldownMs) {
+                            notifyCooldown.set(cooldownKey, Date.now());
+                            const dir = rate > prev ? '+' : '';
+                            const title = `Rate: ${pairName}`;
+                            const body = `${item.chain} ${src} rev ${dir}${((rate - prev) / prev * 10000).toFixed(2)} bps`;
+                            sendBarkNotification(notifyCfg.barkEndpoints, title, body, { group: 'StableJet' });
+                          }
+                        }
+                      }
+                      lastRates.set(rateKey, rate);
+                    }
+                  }
+                }
+              }
             }
 
             // 打印统计信息

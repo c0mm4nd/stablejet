@@ -5,7 +5,8 @@ import { mapLiFiRouteAlternative } from './lifi-route';
 
 const JUMPER_API_BASE = 'https://api.jumper.exchange/pipeline/v1/advanced/routes';
 const JUMPER_FROM_ADDRESS = process.env.LIFI_FROM_ADDRESS || '0x0000000000000000000000000000000000000001';
-const JUMPER_DENY_EXCHANGES = ['fly', 'cowswap', 'nordstern'];
+// client-side tool filter (both tool key and toolDetails.name, lowercased substring match)
+const DENY_TOOL_NAMES = ['cow'];
 
 const axiosInstance = axios.create({
   timeout: 20000,
@@ -66,10 +67,7 @@ export async function getLiFiQuoteByChainId(
       maxPriceImpact: 0.4,
       jitoBundle: true,
       allowSwitchChain: true,
-      exchanges: {
-        deny: JUMPER_DENY_EXCHANGES
-      },
-      executionType: 'all'
+executionType: 'all'
     }
   };
 
@@ -77,7 +75,23 @@ export async function getLiFiQuoteByChainId(
     await rateLimiter.waitForSlot();
     const response = await axiosInstance.post<any>(JUMPER_API_BASE, payload);
     const data = response.data;
-    const routes = Array.isArray(data?.routes) ? data.routes : [];
+    const allRoutes = Array.isArray(data?.routes) ? data.routes : [];
+    // Client-side filter: remove routes where any step or the route itself uses a denied tool
+    function isDeniedTool(toolStr: string): boolean {
+      const lower = toolStr.toLowerCase();
+      for (const denied of DENY_TOOL_NAMES) {
+        if (lower.includes(denied)) return true;
+      }
+      return false;
+    }
+    const routes = allRoutes.filter((route: any) => {
+      if (isDeniedTool(route?.tool || '') || isDeniedTool(route?.toolDetails?.name || '')) return false;
+      const steps: any[] = Array.isArray(route?.steps) ? route.steps : [];
+      for (const step of steps) {
+        if (isDeniedTool(step?.tool || '') || isDeniedTool(step?.toolDetails?.name || '')) return false;
+      }
+      return true;
+    });
     const alternatives = routes.map((route: any) => mapLiFiRouteAlternative(route));
     const bestRoute = routes[0];
     const amountOut = bestRoute?.toAmount;
@@ -87,6 +101,10 @@ export async function getLiFiQuoteByChainId(
       || bestRoute?.steps?.[0]?.toolDetails?.name;
 
     if (amountOut) {
+      if (tool && isDeniedTool(tool)) {
+        const rawSteps = JSON.stringify(bestRoute?.steps?.map((s: any) => ({ tool: s?.tool, name: s?.toolDetails?.name })));
+        error(`[LiFi/Jumper] WARN denied tool still in result for ${chainId}: tool=${tool} rawSteps=${rawSteps}`);
+      }
       log(`[LiFi/Jumper] ✓ Success for ${chainId}: ${amountOut} out (${tool || 'unknown tool'})`);
       return {
         success: true,

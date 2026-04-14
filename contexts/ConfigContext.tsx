@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback, Suspense } from 'react';
-import { ChainAppConfig, TradingPairConfig, ConfigData } from '@/lib/types';
+import { ChainAppConfig, TradingPairConfig, ConfigData, NotificationConfig } from '@/lib/types';
 import { DEFAULT_SOURCES, normalizeSources } from '@/lib/source-metadata';
 
 const DEFAULT_CLIENT_REFRESH_INTERVAL = 10; // 默认客户端刷新间隔10秒
@@ -10,11 +10,13 @@ interface ConfigContextType {
   chains: Record<string, ChainAppConfig>;
   pairs: Record<string, TradingPairConfig>;
   sources: ConfigData['sources'];
+  notifications: NotificationConfig | undefined;
   clientRefreshInterval: number; // 客户端刷新显示的间隔（秒）
   selectedPair: string; // 当前选中的交易对
   updateChains: (chains: Record<string, ChainAppConfig>) => Promise<void>;
   updatePairs: (pairs: Record<string, TradingPairConfig>) => Promise<void>;
   updateSources: (sources: ConfigData['sources']) => Promise<void>;
+  updateNotifications: (notifications: NotificationConfig | undefined) => Promise<void>;
   updateClientRefreshInterval: (interval: number) => void;
   updateSelectedPair: (pairId: string) => void;
   resetToDefaults: () => void;
@@ -58,6 +60,7 @@ function ConfigProviderInner({ children }: { children: ReactNode }) {
     ...DEFAULT_SOURCES
   });
   const [clientRefreshInterval, setClientRefreshInterval] = useState<number>(DEFAULT_CLIENT_REFRESH_INTERVAL);
+  const [notifications, setNotifications] = useState<NotificationConfig | undefined>(undefined);
 
   // Initialize selectedPair from localStorage only (URL params handled by components)
   const [selectedPair, setSelectedPair] = useState<string>(() => {
@@ -83,6 +86,7 @@ function ConfigProviderInner({ children }: { children: ReactNode }) {
         setChains(data.chains);
         setPairs(data.pairs);
         setSources(normalizeSources(data.sources));
+        setNotifications(data.notifications);
 
         // Set initial pair if not already set
         if (!selectedPair) {
@@ -181,6 +185,18 @@ function ConfigProviderInner({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateNotifications = async (newNotifications: NotificationConfig | undefined) => {
+    setNotifications(newNotifications);
+    try {
+      const res = await fetch('/api/config');
+      const currentConfig: ConfigData = await res.json();
+      await configPost({ ...currentConfig, notifications: newNotifications });
+    } catch (err) {
+      console.error('Failed to save notifications:', err);
+      fetchConfig();
+    }
+  };
+
   const updateClientRefreshInterval = (interval: number) => {
     setClientRefreshInterval(interval);
     if (typeof window !== 'undefined') {
@@ -213,11 +229,13 @@ function ConfigProviderInner({ children }: { children: ReactNode }) {
         chains,
         pairs,
         sources,
+        notifications,
         clientRefreshInterval,
         selectedPair,
         updateChains,
         updatePairs,
         updateSources,
+        updateNotifications,
         updateClientRefreshInterval,
         updateSelectedPair,
         resetToDefaults,

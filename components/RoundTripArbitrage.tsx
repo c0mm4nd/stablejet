@@ -37,41 +37,44 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
         .filter(d => isSourceEnabled(d.dataSource, sources));
 
     const opportunities = useMemo((): ArbOpportunity[] => {
-        // Pre-filter: exclude data points where either direction is missing (null),
-        // or the same-chain roundtrip is > 0.1 bps (anomalous / stale quote).
+        // Pre-filter: exclude data points where either direction is missing,
+        // rates are not finite/positive, or the same-source same-chain roundtrip > 0.1 bps.
         const validData = data.filter(d => {
             const outAtoB = d.tokenAToB?.output;
             const outBtoA = d.tokenBToA?.output;
             if (!outAtoB || !outBtoA) return false;
-            const rateAtoB = outAtoB / (d.tokenAToB!.input ?? amount);
-            const rateBtoA = outBtoA / (d.tokenBToA!.input ?? amount);
+            const inputAtoB = (d.tokenAToB!.input > 0) ? d.tokenAToB!.input : amount;
+            const inputBtoA = (d.tokenBToA!.input > 0) ? d.tokenBToA!.input : amount;
+            const rateAtoB = outAtoB / inputAtoB;
+            const rateBtoA = outBtoA / inputBtoA;
+            if (!isFinite(rateAtoB) || !isFinite(rateBtoA) || rateAtoB <= 0 || rateBtoA <= 0) return false;
             return (rateAtoB * rateBtoA - 1) * 10000 <= 0.1;
         });
 
         // sells: 用 tokenA 换出 tokenB（A→B），卖出 tokenA 的那一腿
         const sells = validData
             .filter(d => d.tokenAToB?.output && d.tokenAToB.output > 0)
-            .map(d => ({
-                chain: d.chain,
-                source: d.dataSource || 'kyberswap',
-                rate: d.tokenAToB!.output! / (d.tokenAToB!.input || amount), // tokenB per tokenA
-            }));
+            .map(d => {
+                const input = (d.tokenAToB!.input > 0) ? d.tokenAToB!.input : amount;
+                return { chain: d.chain, source: d.dataSource || 'kyberswap', rate: d.tokenAToB!.output! / input };
+            });
 
         // buys: 用 tokenB 换回 tokenA（B→A），买回 tokenA 的那一腿
         const buys = validData
             .filter(d => d.tokenBToA?.output && d.tokenBToA.output > 0)
-            .map(d => ({
-                chain: d.chain,
-                source: d.dataSource || 'kyberswap',
-                rate: d.tokenBToA!.output! / (d.tokenBToA!.input || amount), // tokenA per tokenB
-            }));
+            .map(d => {
+                const input = (d.tokenBToA!.input > 0) ? d.tokenBToA!.input : amount;
+                return { chain: d.chain, source: d.dataSource || 'kyberswap', rate: d.tokenBToA!.output! / input };
+            });
 
         const opps: ArbOpportunity[] = [];
         for (const sell of sells) {
             for (const buy of buys) {
                 const finalRate = sell.rate * buy.rate;
+                if (!isFinite(finalRate) || finalRate <= 0) continue;
                 const profitBps = (finalRate - 1) * 10000;
-                if (profitBps > 0) {
+                if (!isFinite(profitBps) || profitBps <= 0 || profitBps > 2000) continue;
+                if (true) {
                     opps.push({
                         sellChain: sell.chain,
                         sellSource: sell.source,

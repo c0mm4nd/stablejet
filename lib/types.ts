@@ -214,9 +214,17 @@ export interface TradingPairConfig {
   chains: Record<string, ChainPairConfig>; // chainId -> { addressA, addressB }
 }
 
+export interface NotificationConfig {
+  barkEndpoints: string[];  // e.g. ["https://api.day.app/yourkey"]
+  minProfitBps: number;     // notify only when arb profit exceeds this
+  cooldownMinutes: number;  // min minutes between notifications per pair
+  priceChangeAlertBps: number; // notify when swap rate changes by more than this (0 = disabled)
+}
+
 export interface ConfigData {
   chains: Record<string, ChainAppConfig>; // chainId -> Config
   pairs: Record<string, TradingPairConfig>; // pairId -> Config
   sources: SourceConfig;
   clientRefreshInterval: number;
+  notifications?: NotificationConfig;
 }

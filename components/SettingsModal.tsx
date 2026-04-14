@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useConfig } from '@/contexts/ConfigContext';
-import { ChainAppConfig, TradingPairConfig } from '@/lib/types';
+import { ChainAppConfig, TradingPairConfig, NotificationConfig } from '@/lib/types';
 import { getTokenDecimals } from '@/lib/config';
 import { DEFAULT_SOURCES, normalizeSources } from '@/lib/source-metadata';
 
@@ -12,13 +12,20 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
-  const { chains, pairs, clientRefreshInterval, sources, updateChains, updatePairs, updateSources, updateClientRefreshInterval } = useConfig();
+  const { chains, pairs, clientRefreshInterval, sources, notifications, updateChains, updatePairs, updateSources, updateNotifications, updateClientRefreshInterval } = useConfig();
 
   // Local State for Edit Mode
   const [editingChains, setEditingChains] = useState<Record<string, ChainAppConfig>>({});
   const [editingPairs, setEditingPairs] = useState<Record<string, TradingPairConfig>>({});
   const [editingInterval, setEditingInterval] = useState<number>(10);
   const [editingSources, setEditingSources] = useState(sources);
+  const [editingNotifications, setEditingNotifications] = useState<NotificationConfig>({
+    barkEndpoints: [],
+    minProfitBps: 10,
+    cooldownMinutes: 30,
+    priceChangeAlertBps: 2,
+  });
+  const [newBarkEndpoint, setNewBarkEndpoint] = useState('');
   const [importStatus, setImportStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // UI State: Active Editing Pair ID
@@ -65,8 +72,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       setEditingPairs(normalizedPairs);
       setEditingInterval(clientRefreshInterval);
       setEditingSources(normalizeSources(sources));
+      setEditingNotifications(notifications ?? { barkEndpoints: [], minProfitBps: 10, cooldownMinutes: 30, priceChangeAlertBps: 2 });
     }
-  }, [isOpen, chains, pairs, clientRefreshInterval, sources]);
+  }, [isOpen, chains, pairs, clientRefreshInterval, sources, notifications]);
 
   if (!isOpen) return null;
 
@@ -95,6 +103,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     ]);
     setEditingPairs(normalizedPairs);
     await updateSources(editingSources);
+    await updateNotifications(editingNotifications);
     updateClientRefreshInterval(editingInterval);
     onClose();
   };
@@ -321,6 +330,13 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               >
                 Chains & Sources
               </button>
+              <button
+                onClick={() => setActivePairId('__notifications__')}
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activePairId === '__notifications__' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+              >
+                Notifications
+              </button>
             </div>
 
             <div className="p-4 flex-1">
@@ -363,7 +379,106 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
           {/* Main Content */}
           <div className="flex-1 overflow-y-auto p-8">
-            {activePairId === null ? (
+            {activePairId === '__notifications__' ? (
+              <div className="max-w-2xl mx-auto">
+                <h3 className="text-xl font-bold text-gray-800 mb-6">Bark Push Notifications</h3>
+
+                {/* Bark Endpoints */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+                  <h4 className="text-sm font-semibold text-gray-800 mb-3">Bark Endpoints</h4>
+                  <p className="text-xs text-gray-500 mb-4">Enter your Bark server URLs (e.g. <code className="bg-gray-100 px-1 rounded">https://api.day.app/yourkey</code>)</p>
+                  <div className="space-y-2 mb-3">
+                    {editingNotifications.barkEndpoints.map((ep, i) => (
+                      <div key={i} className="flex gap-2">
+                        <input
+                          className="flex-1 text-sm font-mono border border-gray-200 rounded px-3 py-2 bg-gray-50 focus:bg-white focus:outline-none"
+                          value={ep}
+                          onChange={e => {
+                            const next = [...editingNotifications.barkEndpoints];
+                            next[i] = e.target.value;
+                            setEditingNotifications({ ...editingNotifications, barkEndpoints: next });
+                          }}
+                          placeholder="https://api.day.app/yourkey"
+                        />
+                        <button
+                          onClick={() => {
+                            const next = editingNotifications.barkEndpoints.filter((_, j) => j !== i);
+                            setEditingNotifications({ ...editingNotifications, barkEndpoints: next });
+                          }}
+                          className="text-red-400 hover:text-red-600 px-2 text-lg font-bold"
+                        >×</button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      className="flex-1 text-sm font-mono border border-gray-200 rounded px-3 py-2"
+                      value={newBarkEndpoint}
+                      onChange={e => setNewBarkEndpoint(e.target.value)}
+                      placeholder="https://api.day.app/yourkey"
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && newBarkEndpoint.trim()) {
+                          setEditingNotifications({ ...editingNotifications, barkEndpoints: [...editingNotifications.barkEndpoints, newBarkEndpoint.trim()] });
+                          setNewBarkEndpoint('');
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => {
+                        if (newBarkEndpoint.trim()) {
+                          setEditingNotifications({ ...editingNotifications, barkEndpoints: [...editingNotifications.barkEndpoints, newBarkEndpoint.trim()] });
+                          setNewBarkEndpoint('');
+                        }
+                      }}
+                      className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-blue-700"
+                    >Add</button>
+                  </div>
+                </div>
+
+                {/* Thresholds */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+                  <h4 className="text-sm font-semibold text-gray-800 mb-4">Alert Thresholds</h4>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <label className="text-sm text-gray-700 w-48">Min Profit (bps)</label>
+                      <input
+                        type="number"
+                        min={0}
+                        step={1}
+                        className="border border-gray-200 rounded px-3 py-2 w-32 text-sm"
+                        value={editingNotifications.minProfitBps}
+                        onChange={e => setEditingNotifications({ ...editingNotifications, minProfitBps: parseFloat(e.target.value) || 0 })}
+                      />
+                      <span className="text-xs text-gray-500">bps (0 = disabled)</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <label className="text-sm text-gray-700 w-48">Cooldown (minutes)</label>
+                      <input
+                        type="number"
+                        min={1}
+                        step={1}
+                        className="border border-gray-200 rounded px-3 py-2 w-32 text-sm"
+                        value={editingNotifications.cooldownMinutes}
+                        onChange={e => setEditingNotifications({ ...editingNotifications, cooldownMinutes: parseInt(e.target.value) || 1 })}
+                      />
+                      <span className="text-xs text-gray-500">min between alerts per pair</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <label className="text-sm text-gray-700 w-48">Price Change Alert (bps)</label>
+                      <input
+                        type="number"
+                        min={0}
+                        step={0.5}
+                        className="border border-gray-200 rounded px-3 py-2 w-32 text-sm"
+                        value={editingNotifications.priceChangeAlertBps}
+                        onChange={e => setEditingNotifications({ ...editingNotifications, priceChangeAlertBps: parseFloat(e.target.value) || 0 })}
+                      />
+                      <span className="text-xs text-gray-500">alert when rate shifts by ≥ N bps (0 = disabled)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : activePairId === null ? (
               // Chains View
               <div className="max-w-3xl mx-auto">
                 <h3 className="text-xl font-bold text-gray-800 mb-6">Chains & Data Sources</h3>

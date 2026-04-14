@@ -97,7 +97,7 @@ export default function BottomPairSelector({ selectedPair, onPairChange }: Botto
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="搜索交易对..."
-                    className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-xl text-[16px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     autoFocus
                   />
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
