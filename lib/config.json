@@ -3797,6 +3797,7 @@
     "wbETH_ETH": {
       "id": "wbETH_ETH",
       "name": "wbETH/ETH",
+      "disabled": true,
       "tokenA": "wbETH",
       "tokenB": "ETH",
       "amounts": [
@@ -3831,6 +3832,30 @@
           "decimalsA": 18,
           "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
           "decimalsB": 18
+        },
+        "arbitrum": {
+          "addressA": "0xb1fe27b32ffb5ce54e272c096547f1e86c19e72f",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18
+        },
+        "scroll": {
+          "addressA": "0x89f17ab70cafb1468d633056161573efefea0713",
+          "decimalsA": 18,
+          "addressB": "0x5300000000000000000000000000000000000004",
+          "decimalsB": 18
+        },
+        "swellchain": {
+          "addressA": "0x18d33689ae5d02649a859a1cf16c9f0563975258",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
+        },
+        "zircuit": {
+          "addressA": "0xd8b29106d4cebad087c30b10c0e41baa3a9ea703",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
         }
       }
     },
@@ -3853,6 +3878,12 @@
           "addressA": "0xd09ACb80c1E8F2291862c4978a008791C9167003",
           "decimalsA": 18,
           "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18
+        },
+        "base": {
+          "addressA": "0xd09ACb80c1E8F2291862c4978a008791C9167003",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
           "decimalsB": 18
         }
       }
@@ -3901,6 +3932,24 @@
           "decimalsA": 18,
           "addressB": "0x4200000000000000000000000000000000000006",
           "decimalsB": 18
+        },
+        "bnb_chain": {
+          "addressA": "0x80137510979822322193FC997d400D5A6C747bf7",
+          "decimalsA": 18,
+          "addressB": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
+          "decimalsB": 18
+        },
+        "mantle": {
+          "addressA": "0x2Fde62942759d7C0aaf25952Da4098423bC1264C",
+          "decimalsA": 18,
+          "addressB": "0xdEAddEaDdeadDEadDEADDEAddEADDEAddead1111",
+          "decimalsB": 18
+        },
+        "mode": {
+          "addressA": "0x80137510979822322193FC997d400D5A6C747bf7",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
         }
       }
     },
@@ -3934,6 +3983,24 @@
           "addressA": "0xe1B4d34E8754600962Cd944B535180Bd758E6c2e",
           "decimalsA": 18,
           "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "arbitrum": {
+          "addressA": "0xF1A88250532a4A66A2420a8cbB434Da82E1E2cA1",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18
+        },
+        "linea": {
+          "addressA": "0x2a4f1dcc79b83608f9e3BC1F3F55fBEfCBFaE885",
+          "decimalsA": 18,
+          "addressB": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f",
+          "decimalsB": 18
+        },
+        "scroll": {
+          "addressA": "0xd44605d3E5eF9A73379Ce5258B06e4383c6FF32a",
+          "decimalsA": 18,
+          "addressB": "0x5300000000000000000000000000000000000004",
           "decimalsB": 18
         }
       }
