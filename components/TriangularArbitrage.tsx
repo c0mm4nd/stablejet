@@ -79,7 +79,7 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
         }
 
         recentData.forEach(item => {
-            // Need Token Names from pairId? 
+            // Need Token Names from pairId?
             // item.pairId is required. If missing, we can't link.
             if (!item.pairId) return;
             const pair = pairs[item.pairId] || pairsByLower.get(item.pairId.toLowerCase());
@@ -89,6 +89,17 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
 
             const tokenAToB = item.tokenAToB;
             const tokenBToA = item.tokenBToA;
+
+            // Exclude data points where same-chain round-trip profit > 0.1 bps —
+            // these indicate spurious quotes (pool imbalance, stale data, etc.)
+            // and would artificially inflate triangular profit calculations.
+            if (tokenAToB?.output && tokenAToB.output > 0 && tokenBToA?.output && tokenBToA.output > 0) {
+                const inputAtoB = tokenAToB.input > 0 ? tokenAToB.input : 1;
+                const inputBtoA = tokenBToA.input > 0 ? tokenBToA.input : 1;
+                const rateAtoB = tokenAToB.output / inputAtoB;
+                const rateBtoA = tokenBToA.output / inputBtoA;
+                if ((rateAtoB * rateBtoA - 1) * 10000 > 0.1) return;
+            }
 
             // A -> B
             if (tokenAToB?.output && tokenAToB.output > 0) {
