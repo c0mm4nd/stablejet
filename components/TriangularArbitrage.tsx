@@ -211,14 +211,17 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
     if (sortedOpportunities.length === 0) {
         return (
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500">
-                No Triangular opportunities found (Requires data for A→B→C→A).
+                No Triangular opportunities found for amount {amount.toLocaleString()} (Requires data for A→B→C→A).
             </div>
         );
     }
 
     return (
         <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Triangular Arbitrage Opportunities</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                Triangular Arbitrage
+                <span className="ml-2 text-sm font-normal text-gray-400">Amount: {amount.toLocaleString()}</span>
+            </h2>
             <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                     <thead className="bg-gray-50">
@@ -250,7 +253,7 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
                                     <td className="px-4 py-3 text-right">
                                         <div className="font-bold text-green-600">+{opp.profitBps.toFixed(4)} bps</div>
                                         <div className="text-xs text-green-700">+{fmt(profitAmt)} {opp.steps[0].from}</div>
-                                        <div className="text-xs text-gray-400">on {fmt(opp.startAmount)}</div>
+                                        <div className="text-xs text-gray-400">on {fmt(amount)} {opp.steps[0].from}</div>
                                     </td>
                                     <td className="px-4 py-3 text-xs text-gray-600 font-mono">
                                         {opp.steps.map((s, i) => (
