@@ -123,6 +123,25 @@ export function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_swap_quote_timestamp ON chain_swaps(quote_timestamp);
   `);
 
+  // 创建通知历史表
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS notifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+      type TEXT NOT NULL,
+      title TEXT NOT NULL,
+      body TEXT NOT NULL,
+      pair_id TEXT,
+      pair_name TEXT,
+      profit_bps REAL,
+      sell_chain TEXT,
+      buy_chain TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_notif_created_at ON notifications(created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_notif_type ON notifications(type);
+    CREATE INDEX IF NOT EXISTS idx_notif_pair_id ON notifications(pair_id);
+  `);
+
   // 轻量迁移：如果旧表缺少 data_source 列，则补齐
   try {
     const cols = db.prepare(`PRAGMA table_info(chain_data)`).all() as Array<{ name: string }>;
@@ -175,6 +194,62 @@ export function initDatabase() {
   }
 
   log('Database initialized successfully');
+}
+
+export interface NotificationRecord {
+  id?: number;
+  created_at?: number;
+  type: string;        // 'arb' | 'price_change'
+  title: string;
+  body: string;
+  pair_id?: string;
+  pair_name?: string;
+  profit_bps?: number;
+  sell_chain?: string;
+  buy_chain?: string;
+}
+
+export function saveNotification(record: NotificationRecord): void {
+  try {
+    const db = getDatabase();
+    db.prepare(`
+      INSERT INTO notifications (type, title, body, pair_id, pair_name, profit_bps, sell_chain, buy_chain)
+      VALUES (@type, @title, @body, @pair_id, @pair_name, @profit_bps, @sell_chain, @buy_chain)
+    `).run({
+      type: record.type,
+      title: record.title,
+      body: record.body,
+      pair_id: record.pair_id ?? null,
+      pair_name: record.pair_name ?? null,
+      profit_bps: record.profit_bps ?? null,
+      sell_chain: record.sell_chain ?? null,
+      buy_chain: record.buy_chain ?? null,
+    });
+  } catch (err) {
+    warn('Failed to save notification:', err);
+  }
+}
+
+export function getNotifications(opts: {
+  limit?: number;
+  offset?: number;
+  type?: string;
+  pair_id?: string;
+}): { rows: NotificationRecord[]; total: number } {
+  const db = getDatabase();
+  const { limit = 50, offset = 0, type, pair_id } = opts;
+
+  const conditions: string[] = [];
+  const params: Record<string, unknown> = {};
+  if (type) { conditions.push('type = @type'); params.type = type; }
+  if (pair_id) { conditions.push('pair_id = @pair_id'); params.pair_id = pair_id; }
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
+  const total = (db.prepare(`SELECT COUNT(*) as cnt FROM notifications ${where}`).get(params) as { cnt: number }).cnt;
+  const rows = db.prepare(`SELECT * FROM notifications ${where} ORDER BY created_at DESC LIMIT @limit OFFSET @offset`)
+    .all({ ...params, limit, offset }) as NotificationRecord[];
+
+  return { rows, total };
 }
 
 // 关闭数据库连接

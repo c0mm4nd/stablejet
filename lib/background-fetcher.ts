@@ -12,6 +12,7 @@ import { getHtxRateLimiterStatus } from './htx';
 import { getKrakenRateLimiterStatus } from './kraken';
 import { getConfig } from './server-config';
 import { sendBarkNotification } from './bark';
+import { saveNotification } from './db';
 import { ChainSwapData } from './types';
 
 // cooldown tracker: pairId -> last notification timestamp
@@ -213,6 +214,16 @@ class BackgroundFetcher {
                         const title = `Arb: ${pairName}`;
                         const body = `+${best.profitBps.toFixed(2)} bps | ${best.sellChain} → ${best.buyChain} | ${amount.toLocaleString()}`;
                         sendBarkNotification(notifyCfg.barkEndpoints, title, body, { group: 'StableJet' });
+                        saveNotification({
+                          type: 'arb',
+                          title,
+                          body,
+                          pair_id: pairId,
+                          pair_name: pairName,
+                          profit_bps: best.profitBps,
+                          sell_chain: best.sellChain,
+                          buy_chain: best.buyChain,
+                        });
                       }
                     }
                   }
@@ -237,6 +248,13 @@ class BackgroundFetcher {
                             const title = `Rate: ${pairName}`;
                             const body = `${item.chain} ${src} ${dir}${((rate - prev) / prev * 10000).toFixed(2)} bps`;
                             sendBarkNotification(notifyCfg.barkEndpoints, title, body, { group: 'StableJet' });
+                            saveNotification({
+                              type: 'price_change',
+                              title,
+                              body,
+                              pair_id: pairId,
+                              pair_name: pairName,
+                            });
                           }
                         }
                       }
@@ -257,6 +275,13 @@ class BackgroundFetcher {
                             const title = `Rate: ${pairName}`;
                             const body = `${item.chain} ${src} rev ${dir}${((rate - prev) / prev * 10000).toFixed(2)} bps`;
                             sendBarkNotification(notifyCfg.barkEndpoints, title, body, { group: 'StableJet' });
+                            saveNotification({
+                              type: 'price_change',
+                              title,
+                              body,
+                              pair_id: pairId,
+                              pair_name: pairName,
+                            });
                           }
                         }
                       }
