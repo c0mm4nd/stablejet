@@ -19,6 +19,7 @@ interface TriangularArbitrageProps {
 interface TriangularOpp {
     path: string;
     profitBps: number;
+    isCrossChain: boolean;
     steps: {
         from: string;
         to: string;
@@ -147,6 +148,7 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
                                     if (profitBps > 0 && (!best || profitBps > best.profitBps)) {
                                         best = {
                                             profitBps,
+                                            isCrossChain: chains.size > 1,
                                             path: `${startToken} → ${secondToken} → ${thirdToken} → ${startToken}`,
                                             steps: [
                                                 { from: startToken, to: secondToken, chain: e1.chain, source: e1.source, rate: e1.rate },
@@ -164,13 +166,21 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
             }
         }
 
-        // Deduplicate? (A->B->C and B->C->A are same cycle).
-        // Set of tokens key.
+        // Deduplicate rotated cycles: A→B→C→A, B→C→A→B, C→A→B→C are the same triangle.
+        // Use sorted token set as key; keep only the best (highest profit) rotation.
+        const seen = new Map<string, TriangularOpp>();
+        for (const opp of opps) {
+            const key = [opp.steps[0].from, opp.steps[1].from, opp.steps[2].from].sort().join('|');
+            const existing = seen.get(key);
+            if (!existing || opp.profitBps > existing.profitBps) {
+                seen.set(key, opp);
+            }
+        }
 
-        return opps.sort((a, b) => b.profitBps - a.profitBps);
+        return [...seen.values()].sort((a, b) => b.profitBps - a.profitBps);
     }, [history, amount]);
 
-    // Re-sort: same-category opportunities first, then by profitBps
+    // Re-sort: same-category first, then same-chain before cross-chain, then by profitBps
     const sortedOpportunities = useMemo(() => {
         return [...opportunities].sort((a, b) => {
             const tokensA = [a.steps[0].from, a.steps[0].to, a.steps[1].to];
@@ -180,6 +190,10 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
             const matchA = catA === currentCategory ? 0 : 1;
             const matchB = catB === currentCategory ? 0 : 1;
             if (matchA !== matchB) return matchA - matchB;
+            // Prefer same-chain over cross-chain within same category
+            const crossA = a.isCrossChain ? 1 : 0;
+            const crossB = b.isCrossChain ? 1 : 0;
+            if (crossA !== crossB) return crossA - crossB;
             return b.profitBps - a.profitBps;
         });
     }, [opportunities, currentCategory]);
@@ -201,14 +215,19 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
                         <tr>
                             <th className="px-4 py-2 text-left">Path</th>
                             <th className="px-4 py-2 text-right">Profit</th>
-                            <th className="px-4 py-2 text-left">Strategy</th>
+                            <th className="px-4 py-2 text-left">Steps</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {sortedOpportunities.slice(0, 10).map((opp, idx) => (
-                            <tr key={idx}>
-                                <td className="px-4 py-3 font-medium">{opp.path}</td>
-                                <td className="px-4 py-3 text-right font-bold text-green-600">+{opp.profitBps.toFixed(6)} bps</td>
+                        {sortedOpportunities.slice(0, 15).map((opp, idx) => (
+                            <tr key={idx} className={opp.isCrossChain ? 'bg-yellow-50/40' : ''}>
+                                <td className="px-4 py-3 font-medium">
+                                    <div>{opp.path}</div>
+                                    {opp.isCrossChain && (
+                                        <span className="text-xs font-normal text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded">cross-chain</span>
+                                    )}
+                                </td>
+                                <td className="px-4 py-3 text-right font-bold text-green-600">+{opp.profitBps.toFixed(4)} bps</td>
                                 <td className="px-4 py-3 text-xs text-gray-600">
                                     {opp.steps.map((s, i) => (
                                         <div key={i}>
