@@ -94,15 +94,17 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
             const tokenAToB = item.tokenAToB;
             const tokenBToA = item.tokenBToA;
 
-            // Exclude data points where same-chain round-trip profit > 0.1 bps —
-            // these indicate spurious quotes (pool imbalance, stale data, etc.)
-            // and would artificially inflate triangular profit calculations.
+            // Exclude data points where both directions are quoted but the round-trip is bad:
+            // (a) profit > 0.1 bps: spurious quote (pool imbalance, stale data)
+            // (b) product < 0.9: >10% round-trip loss means wrong token address or zero liquidity
             if (tokenAToB?.output && tokenAToB.output > 0 && tokenBToA?.output && tokenBToA.output > 0) {
                 const inputAtoB = tokenAToB.input > 0 ? tokenAToB.input : 1;
                 const inputBtoA = tokenBToA.input > 0 ? tokenBToA.input : 1;
                 const rateAtoB = tokenAToB.output / inputAtoB;
                 const rateBtoA = tokenBToA.output / inputBtoA;
-                if ((rateAtoB * rateBtoA - 1) * 10000 > 0.1) return;
+                const product = rateAtoB * rateBtoA;
+                if ((product - 1) * 10000 > 0.1) return; // spurious profit
+                if (product < 0.9) return;                // wrong token / bad liquidity
             }
 
             // A -> B
