@@ -74,7 +74,8 @@ const BTC_TOKENS = new Set(['BTC', 'WBTC', 'cbBTC', 'tBTC', 'LBTC', 'SolvBTC', '
   'hemiBTC', 'BTCb', 'BTC.b', 'BTCB', 'BTCB.b']);
 const ETH_TOKENS = new Set(['ETH', 'wstETH', 'weETH', 'rsETH', 'ezETH', 'stETH', 'cbETH', 'rETH',
   'ETHx', 'mETH', 'cmETH', 'osETH', 'frxETH', 'sfrxETH', 'OETH', 'pufETH',
-  'wbETH', 'rswETH', 'tETH', 'STONE', 'pzETH', 'agETH']);
+  'wbETH', 'rswETH', 'tETH', 'STONE', 'pzETH', 'agETH',
+  'uniETH', 'pxETH']);
 
 export type PairCategory = 'stable' | 'eth' | 'btc';
 

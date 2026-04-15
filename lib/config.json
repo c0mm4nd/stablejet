@@ -2648,6 +2648,12 @@
           "decimalsA": 18,
           "addressB": "0xdEAddEaDdeadDEadDEADDEAddEADDEAddead1111",
           "decimalsB": 18
+        },
+        "mode": {
+          "addressA": "0x98f96A4B34D03a2E6f225B28b8f8Cb1279562d81",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
         }
       }
     },
@@ -2877,7 +2883,8 @@
         }
       }
     },
-    "rETH_ETH": {
+    "rETH_ETH":
+ {
       "id": "rETH_ETH",
       "name": "rETH/ETH",
       "tokenA": "rETH",
@@ -3745,22 +3752,11 @@
           "decimalsA": 18,
           "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
           "decimalsB": 18
-        }
-      }
-    },
-    "pufETH_ETH": {
-      "id": "pufETH_ETH",
-      "name": "pufETH/ETH",
-      "tokenA": "pufETH",
-      "tokenB": "ETH",
-      "amounts": [
-        6
-      ],
-      "chains": {
-        "ethereum": {
-          "addressA": "0xD9A442856C234a39a81a089C06451EBAa4306a72",
+        },
+        "optimism": {
+          "addressA": "0xc54B43eaF921A5194c7973A4d65E055E5a1453c2",
           "decimalsA": 18,
-          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "addressB": "0x4200000000000000000000000000000000000006",
           "decimalsB": 18
         }
       }
@@ -3790,6 +3786,12 @@
           "addressA": "0x484c2D6e3cDd945a8B2DF735e079178C1036578c",
           "decimalsA": 18,
           "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
+        },
+        "bnb_chain": {
+          "addressA": "0x3Cd55356433C89E50DC51aB07EE0fa0A95623D53",
+          "decimalsA": 18,
+          "addressB": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
           "decimalsB": 18
         }
       }
@@ -3953,23 +3955,6 @@
         }
       }
     },
-    "pzETH_ETH": {
-      "id": "pzETH_ETH",
-      "name": "pzETH/ETH",
-      "tokenA": "pzETH",
-      "tokenB": "ETH",
-      "amounts": [
-        6
-      ],
-      "chains": {
-        "ethereum": {
-          "addressA": "0x8c9532a60e0e7c6bbd2b2c1303f63ace1c3e9811",
-          "decimalsA": 18,
-          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-          "decimalsB": 18
-        }
-      }
-    },
     "agETH_ETH": {
       "id": "agETH_ETH",
       "name": "agETH/ETH",
@@ -4001,6 +3986,105 @@
           "addressA": "0xd44605d3E5eF9A73379Ce5258B06e4383c6FF32a",
           "decimalsA": 18,
           "addressB": "0x5300000000000000000000000000000000000004",
+          "decimalsB": 18
+        }
+      }
+    },
+    "frxETH_ETH": {
+      "id": "frxETH_ETH",
+      "name": "frxETH/ETH",
+      "tokenA": "frxETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x5E8422345238F34275888049021821E8E08CAA1f",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "arbitrum": {
+          "addressA": "0x178412e79c25968a32e89b11f63B33F733770c2A",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18
+        },
+        "optimism": {
+          "addressA": "0x6806411765Af15Bddd26f8f544A34cC40cb9838b",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
+        },
+        "bnb_chain": {
+          "addressA": "0x64048A7eecF3a2F1BA9E144aac3d7dB6e58F555e",
+          "decimalsA": 18,
+          "addressB": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
+          "decimalsB": 18
+        }
+      }
+    },
+    "uniETH_ETH": {
+      "id": "uniETH_ETH",
+      "name": "uniETH/ETH",
+      "tokenA": "uniETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xF1376bceF0f78459C0Ed0ba5ddce976F1ddF51F4",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "arbitrum": {
+          "addressA": "0x3d15fd46ce9e551498328b1c83071d9509e2c3a0",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18
+        },
+        "scroll": {
+          "addressA": "0x15eefe5b297136b8712291b632404b66a8ef4d25",
+          "decimalsA": 18,
+          "addressB": "0x5300000000000000000000000000000000000004",
+          "decimalsB": 18
+        },
+        "linea": {
+          "addressA": "0x15EEfE5B297136b8712291B632404B66A8eF4D25",
+          "decimalsA": 18,
+          "addressB": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f",
+          "decimalsB": 18
+        }
+      }
+    },
+    "pxETH_ETH": {
+      "id": "pxETH_ETH",
+      "name": "pxETH/ETH",
+      "tokenA": "pxETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x04C154b66CB340F3Ae24111CC767e0184Ed00Cc6",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "arbitrum": {
+          "addressA": "0x300d2c875c6fb8ce4bf5480b4d34b7c9ea8a33a4",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18
+        },
+        "base": {
+          "addressA": "0x58adE43A276ddF3e101941571eDe398a32492Ed7",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
           "decimalsB": 18
         }
       }
