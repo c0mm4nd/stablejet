@@ -902,7 +902,8 @@
           "addressA": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
           "decimalsA": 18,
           "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "disabled": true
         },
         "base": {
           "addressA": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
@@ -921,7 +922,8 @@
           "addressA": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
           "decimalsA": 18,
           "addressB": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "disabled": true
         },
         "bnb_chain": {
           "addressA": "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
@@ -934,7 +936,8 @@
           "addressA": "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70",
           "decimalsA": 18,
           "addressB": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "disabled": true
         },
         "linea": {
           "addressA": "0x4af15ec2a0bd43db75dd04e62faa3b8ef36b00d5",
@@ -975,7 +978,8 @@
           "addressA": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
           "decimalsA": 18,
           "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "disabled": true
         },
         "polygon": {
           "addressA": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
@@ -987,7 +991,8 @@
           "addressA": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
           "decimalsA": 18,
           "addressB": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "disabled": true
         },
         "bnb_chain": {
           "addressA": "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
@@ -1000,7 +1005,8 @@
           "addressA": "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70",
           "decimalsA": 18,
           "addressB": "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "disabled": true
         },
         "linea": {
           "addressA": "0x4af15ec2a0bd43db75dd04e62faa3b8ef36b00d5",
