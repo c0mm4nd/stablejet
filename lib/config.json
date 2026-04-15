@@ -1750,7 +1750,8 @@
           "addressA": "AUSD1jCcCyPLybk1YnvPWsHQSrZ46dxwoMniN4N2UEB9",
           "decimalsA": 6,
           "addressB": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "disabled": true
         }
       }
     },
@@ -1803,7 +1804,8 @@
           "addressA": "AUSD1jCcCyPLybk1YnvPWsHQSrZ46dxwoMniN4N2UEB9",
           "decimalsA": 6,
           "addressB": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "disabled": true
         }
       }
     },
