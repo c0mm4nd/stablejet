@@ -927,7 +927,8 @@
           "addressA": "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
           "decimalsA": 18,
           "addressB": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "disabled": true
         },
         "avalanche": {
           "addressA": "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70",
@@ -992,7 +993,8 @@
           "addressA": "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
           "decimalsA": 18,
           "addressB": "0x55d398326f99059fF775485246999027B3197955",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "disabled": true
         },
         "avalanche": {
           "addressA": "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70",
