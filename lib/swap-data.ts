@@ -102,6 +102,30 @@ export async function getSwapDataForPair(
       });
       tasks.push(onchainTask);
     }
+
+    // Same-chain wrappers: fetch quotes using the wrapper address as tokenA
+    for (const wrapper of (chainPairData.wrappers ?? [])) {
+      for (const amount of amounts) {
+        const wrapperChainKey = `${chainKey}@${wrapper.symbol}`;
+        const wrapperChainName = `${appChainConfig.name} (${wrapper.symbol})`;
+        const wrapperTask = getOnchainSwapDataForAmount({
+          pairId,
+          chainKey: wrapperChainKey,
+          chainName: wrapperChainName,
+          amount,
+          tokenAAddress: wrapper.address,
+          tokenBAddress,
+          tokenADecimals: wrapper.decimals,
+          tokenBDecimals,
+          appChainConfig,
+          sources
+        }).catch(err => {
+          error(`[Onchain] Error fetching ${wrapperChainKey} data:`, err);
+          return [];
+        });
+        tasks.push(wrapperTask);
+      }
+    }
   }
 
   const batches = await Promise.all(tasks);

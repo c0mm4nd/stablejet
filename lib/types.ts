@@ -195,6 +195,12 @@ export interface ChainAppConfig {
   disabled?: boolean;
 }
 
+export interface WrapperConfig {
+  symbol: string;   // e.g. "USDat"
+  address: string;  // wrapper token address (replaces tokenA on this chain)
+  decimals: number;
+}
+
 export interface ChainPairConfig {
   addressA?: string;
   addressB?: string;
@@ -202,6 +208,7 @@ export interface ChainPairConfig {
   decimalsB?: number;
   cexPairSymbol?: string; // e.g. "PAIRSYMBOL" for CEX
   disabled?: boolean;
+  wrappers?: WrapperConfig[]; // same-chain wrappers of tokenA
 }
 
 export interface TradingPairConfig {

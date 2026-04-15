@@ -3248,7 +3248,10 @@
           "addressA": "0x437cc33344a0B27A429f795ff6B469C72698B291",
           "decimalsA": 6,
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "wrappers": [
+            { "symbol": "USDat", "address": "0x23238f20b894f29041f48d88ee91131c395aaa71", "decimals": 6 }
+          ]
         },
         "arbitrum": {
           "addressA": "0x437cc33344a0B27A429f795ff6B469C72698B291",
@@ -3271,7 +3274,10 @@
           "addressA": "0x437cc33344a0B27A429f795ff6B469C72698B291",
           "decimalsA": 6,
           "addressB": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "wrappers": [
+            { "symbol": "USDat", "address": "0x23238f20b894f29041f48d88ee91131c395aaa71", "decimals": 6 }
+          ]
         },
         "arbitrum": {
           "addressA": "0x437cc33344a0B27A429f795ff6B469C72698B291",

@@ -16,6 +16,7 @@ export const TOKEN_DECIMALS_BY_SYMBOL: Record<string, number> = {
   BYUSD: 6,
   USDai: 18,
   AUSD: 6,
+  USDat: 6,
   RLUSD: 18,
   GHO: 18,
   USDG: 6,
