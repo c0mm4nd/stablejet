@@ -20,12 +20,14 @@ interface TriangularOpp {
     path: string;
     profitBps: number;
     isCrossChain: boolean;
+    startAmount: number; // actual quoted input amount for leg 1
     steps: {
         from: string;
         to: string;
         chain: string;
         source: string;
         rate: number;
+        quotedInput: number; // the amount this rate was originally quoted for
     }[];
 }
 
@@ -64,19 +66,20 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
             .filter(d => isSourceEnabled(d.dataSource, sources));
 
         // Build a Graph: Token -> Token -> List of Quotes (Edges)
-        // Edge: { chain, source, rate }
+        // Edge: { chain, source, rate, quotedInput } — quotedInput is the actual amount used for the quote
         interface Edge {
             to: string;
             chain: string;
             source: string;
             rate: number;
+            quotedInput: number; // actual input amount used when this quote was obtained
         }
         const graph: Record<string, Record<string, Edge[]>> = {};
 
-        function addEdge(from: string, to: string, rate: number, chain: string, source: string) {
+        function addEdge(from: string, to: string, rate: number, chain: string, source: string, quotedInput: number) {
             if (!graph[from]) graph[from] = {};
             if (!graph[from][to]) graph[from][to] = [];
-            graph[from][to].push({ to, rate, chain, source });
+            graph[from][to].push({ to, rate, chain, source, quotedInput });
         }
 
         recentData.forEach(item => {
@@ -105,12 +108,12 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
             // A -> B
             if (tokenAToB?.output && tokenAToB.output > 0) {
                 const rate = tokenAToB.output / tokenAToB.input;
-                addEdge(tA, tB, rate, item.chain, item.dataSource || 'kyberswap');
+                addEdge(tA, tB, rate, item.chain, item.dataSource || 'kyberswap', tokenAToB.input);
             }
             // B -> A
             if (tokenBToA?.output && tokenBToA.output > 0) {
                 const rate = tokenBToA.output / tokenBToA.input;
-                addEdge(tB, tA, rate, item.chain, item.dataSource || 'kyberswap');
+                addEdge(tB, tA, rate, item.chain, item.dataSource || 'kyberswap', tokenBToA.input);
             }
         });
 
@@ -149,11 +152,12 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
                                         best = {
                                             profitBps,
                                             isCrossChain: chains.size > 1,
+                                            startAmount: e1.quotedInput,
                                             path: `${startToken} → ${secondToken} → ${thirdToken} → ${startToken}`,
                                             steps: [
-                                                { from: startToken, to: secondToken, chain: e1.chain, source: e1.source, rate: e1.rate },
-                                                { from: secondToken, to: thirdToken, chain: e2.chain, source: e2.source, rate: e2.rate },
-                                                { from: thirdToken, to: startToken, chain: e3.chain, source: e3.source, rate: e3.rate },
+                                                { from: startToken, to: secondToken, chain: e1.chain, source: e1.source, rate: e1.rate, quotedInput: e1.quotedInput },
+                                                { from: secondToken, to: thirdToken, chain: e2.chain, source: e2.source, rate: e2.rate, quotedInput: e2.quotedInput },
+                                                { from: thirdToken, to: startToken, chain: e3.chain, source: e3.source, rate: e3.rate, quotedInput: e3.quotedInput },
                                             ]
                                         };
                                     }
@@ -219,24 +223,43 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {sortedOpportunities.slice(0, 15).map((opp, idx) => (
-                            <tr key={idx} className={opp.isCrossChain ? 'bg-yellow-50/40' : ''}>
-                                <td className="px-4 py-3 font-medium">
-                                    <div>{opp.path}</div>
-                                    {opp.isCrossChain && (
-                                        <span className="text-xs font-normal text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded">cross-chain</span>
-                                    )}
-                                </td>
-                                <td className="px-4 py-3 text-right font-bold text-green-600">+{opp.profitBps.toFixed(4)} bps</td>
-                                <td className="px-4 py-3 text-xs text-gray-600">
-                                    {opp.steps.map((s, i) => (
-                                        <div key={i}>
-                                            {i + 1}. {s.from}→{s.to} on {s.chain} ({s.source}) @ {s.rate.toFixed(6)}
-                                        </div>
-                                    ))}
-                                </td>
-                            </tr>
-                        ))}
+                        {sortedOpportunities.slice(0, 15).map((opp, idx) => {
+                            // Compute step-by-step amounts starting from opp.startAmount of the first token
+                            const runningAmounts: number[] = [opp.startAmount];
+                            for (const step of opp.steps) {
+                                runningAmounts.push(runningAmounts[runningAmounts.length - 1] * step.rate);
+                            }
+                            const profitAmt = runningAmounts[3] - runningAmounts[0];
+                            const fmt = (n: number) => n >= 1000
+                                ? n.toLocaleString('en-US', { maximumFractionDigits: 2 })
+                                : n.toFixed(4);
+                            return (
+                                <tr key={idx} className={opp.isCrossChain ? 'bg-yellow-50/40' : ''}>
+                                    <td className="px-4 py-3 font-medium">
+                                        <div>{opp.path}</div>
+                                        {opp.isCrossChain && (
+                                            <span className="text-xs font-normal text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded">cross-chain</span>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                        <div className="font-bold text-green-600">+{opp.profitBps.toFixed(4)} bps</div>
+                                        <div className="text-xs text-green-700">+{fmt(profitAmt)} {opp.steps[0].from}</div>
+                                        <div className="text-xs text-gray-400">on {fmt(opp.startAmount)}</div>
+                                    </td>
+                                    <td className="px-4 py-3 text-xs text-gray-600 font-mono">
+                                        {opp.steps.map((s, i) => (
+                                            <div key={i} className="leading-5">
+                                                {fmt(runningAmounts[i])} {s.from}
+                                                {' → '}
+                                                <span className="text-gray-800 font-semibold">{fmt(runningAmounts[i + 1])} {s.to}</span>
+                                                {' '}
+                                                <span className="text-gray-400">({s.chain}, {s.source}, quoted@{fmt(s.quotedInput)})</span>
+                                            </div>
+                                        ))}
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
