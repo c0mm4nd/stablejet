@@ -73,7 +73,7 @@ export function filterOutliers(value: number | null, allValues: (number | null)[
 const BTC_TOKENS = new Set(['BTC', 'WBTC', 'cbBTC', 'tBTC', 'LBTC', 'SolvBTC', 'uniBTC', 'eBTC', 'FBTC',
   'hemiBTC', 'BTCb', 'BTC.b', 'BTCB', 'BTCB.b']);
 const ETH_TOKENS = new Set(['ETH', 'wstETH', 'weETH', 'rsETH', 'ezETH', 'stETH', 'cbETH', 'rETH',
-  'ETHx', 'mETH', 'cmETH', 'osETH', 'frxETH', 'OETH', 'pufETH']);
+  'ETHx', 'mETH', 'cmETH', 'osETH', 'frxETH', 'sfrxETH', 'OETH', 'pufETH']);
 
 export type PairCategory = 'stable' | 'eth' | 'btc';
 

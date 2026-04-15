@@ -2858,7 +2858,7 @@
           "decimalsB": 18
         },
         "arbitrum": {
-          "addressA": "0xcbB7C0006d0f5416900f12EBF76BCB9691A82F9F",
+          "addressA": "0x1DEBd73E752bEaF79865Fd6446b0c970EaE7732f",
           "decimalsA": 18,
           "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
           "decimalsB": 18
@@ -2870,13 +2870,12 @@
           "decimalsB": 18
         },
         "base": {
-          "addressA": "0x2Ae3F1Ec7F1F5012CFEab0185bfcb8fA67277bE0",
+          "addressA": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
           "decimalsA": 18,
           "addressB": "0x4200000000000000000000000000000000000006",
           "decimalsB": 18
         }
-      },
-      "disabled": true
+      }
     },
     "rETH_ETH": {
       "id": "rETH_ETH",
@@ -2894,7 +2893,7 @@
           "decimalsB": 18
         },
         "arbitrum": {
-          "addressA": "0xec70Dc2877E0Ef65bCFD309908a601d0B5095cC0",
+          "addressA": "0xEC70Dcb4A1EFa46b8F2D97C310C9c4790ba5ffa8",
           "decimalsA": 18,
           "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
           "decimalsB": 18
@@ -2905,8 +2904,7 @@
           "addressB": "0x4200000000000000000000000000000000000006",
           "decimalsB": 18
         }
-      },
-      "disabled": true
+      }
     },
     "USR_USDC": {
       "id": "USR_USDC",
@@ -3260,7 +3258,11 @@
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
           "decimalsB": 6,
           "wrappers": [
-            { "symbol": "USDat", "address": "0x23238f20b894f29041f48d88ee91131c395aaa71", "decimals": 6 }
+            {
+              "symbol": "USDat",
+              "address": "0x23238f20b894f29041f48d88ee91131c395aaa71",
+              "decimals": 6
+            }
           ]
         },
         "arbitrum": {
@@ -3286,7 +3288,11 @@
           "addressB": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
           "decimalsB": 6,
           "wrappers": [
-            { "symbol": "USDat", "address": "0x23238f20b894f29041f48d88ee91131c395aaa71", "decimals": 6 }
+            {
+              "symbol": "USDat",
+              "address": "0x23238f20b894f29041f48d88ee91131c395aaa71",
+              "decimals": 6
+            }
           ]
         },
         "arbitrum": {
@@ -3647,6 +3653,144 @@
           "decimalsA": 18,
           "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
           "decimalsB": 6
+        }
+      }
+    },
+    "mETH_ETH": {
+      "id": "mETH_ETH",
+      "name": "mETH/ETH",
+      "tokenA": "mETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "mantle": {
+          "addressA": "0xcDA86A272531e8640cD7F1a92c01839911B90bb0",
+          "decimalsA": 18,
+          "addressB": "0xdEAddEaDdeadDEadDEADDEAddEADDEAddead1111",
+          "decimalsB": 18
+        }
+      }
+    },
+    "cmETH_ETH": {
+      "id": "cmETH_ETH",
+      "name": "cmETH/ETH",
+      "tokenA": "cmETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xE6829d9a7eE3040e1276Fa75293Bde931859e8fA",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "mantle": {
+          "addressA": "0xE6829d9a7eE3040e1276Fa75293Bde931859e8fA",
+          "decimalsA": 18,
+          "addressB": "0xdEAddEaDdeadDEadDEADDEAddEADDEAddead1111",
+          "decimalsB": 18
+        }
+      }
+    },
+    "osETH_ETH": {
+      "id": "osETH_ETH",
+      "name": "osETH/ETH",
+      "tokenA": "osETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xf1C9acDc66974dFB6dEcB12aA385b9cD01190E38",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "arbitrum": {
+          "addressA": "0xf7d4e7273e5015c96728a6b02f31c505ee184603",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18
+        }
+      }
+    },
+    "ETHx_ETH": {
+      "id": "ETHx_ETH",
+      "name": "ETHx/ETH",
+      "tokenA": "ETHx",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "arbitrum": {
+          "addressA": "0xED65C5085a18Fa160Af0313E60dcc7905E944Dc7",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18
+        }
+      }
+    },
+    "pufETH_ETH": {
+      "id": "pufETH_ETH",
+      "name": "pufETH/ETH",
+      "tokenA": "pufETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xD9A442856C234a39a81a089C06451EBAa4306a72",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        }
+      }
+    },
+    "sfrxETH_ETH": {
+      "id": "sfrxETH_ETH",
+      "name": "sfrxETH/ETH",
+      "tokenA": "sfrxETH",
+      "tokenB": "ETH",
+      "amounts": [
+        6
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xac3E018457B222d93114458476f3E3416Abbe38F",
+          "decimalsA": 18,
+          "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "decimalsB": 18
+        },
+        "arbitrum": {
+          "addressA": "0x95aB45875cFFdba1E5f451B950bC2E42c0053f39",
+          "decimalsA": 18,
+          "addressB": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "decimalsB": 18
+        },
+        "optimism": {
+          "addressA": "0x484c2D6e3cDd945a8B2DF735e079178C1036578c",
+          "decimalsA": 18,
+          "addressB": "0x4200000000000000000000000000000000000006",
+          "decimalsB": 18
         }
       }
     }
