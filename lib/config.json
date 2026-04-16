@@ -1758,12 +1758,6 @@
           "addressB": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
           "decimalsB": 6
         },
-        "mantle": {
-          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
-          "decimalsA": 6,
-          "addressB": "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
-          "decimalsB": 6
-        },
         "solana": {
           "addressA": "AUSD1jCcCyPLybk1YnvPWsHQSrZ46dxwoMniN4N2UEB9",
           "decimalsA": 6,
@@ -1810,12 +1804,6 @@
           "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
           "decimalsA": 6,
           "addressB": "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
-          "decimalsB": 6
-        },
-        "mantle": {
-          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
-          "decimalsA": 6,
-          "addressB": "0x779ded0c9e1022225f8e0630b35a9b54be713736",
           "decimalsB": 6
         },
         "solana": {
