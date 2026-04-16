@@ -58,14 +58,15 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
         const latestTime = history[history.length - 1].timestamp;
         const timeThreshold = new Date(latestTime).getTime() - 5 * 60 * 1000; // Within 5 minutes of latest
 
-        // Flatten all recent data points, filtered to the current amount tier.
-        // Different pairs may be configured with different amounts (e.g. 10000 vs 30000
-        // for stablecoins, 6 for ETH, 0.2 for BTC). Mixing rates from different amounts
-        // produces meaningless chain products due to varying price impact.
+        // Use all recent data regardless of amount tier.
+        // Rates are normalised (output/input), so price-impact differences between
+        // e.g. 10 000 and 30 000 USDC are negligible for stablecoins/LSTs, and
+        // different pairs are often configured with different amount tiers anyway.
+        // The cycle-dedup step at the end keeps only the best (highest-profit) path
+        // per token-set, so having multiple data points per pair is harmless.
         const recentData = history
             .filter(h => new Date(h.timestamp).getTime() > timeThreshold)
             .flatMap(h => h.data)
-            .filter(d => d.amount === amount)
             .filter(d => d.tokenAToB || d.tokenBToA)
             .filter(d => isSourceEnabled(d.dataSource, sources));
 

@@ -39,9 +39,9 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
     const tabParam = searchParams.get('tab');
     return (tabParam === 'arbitrage' || tabParam === 'quotes') ? tabParam : 'quotes';
   });
-  const [arbitrageMode, setArbitrageMode] = useState<'roundtrip' | 'triangular'>(() => {
+  const [arbitrageMode, setArbitrageMode] = useState<'roundtrip' | 'triangular' | 'quadrilateral'>(() => {
     const modeParam = searchParams.get('mode');
-    return (modeParam === 'triangular' || modeParam === 'roundtrip') ? modeParam : 'roundtrip';
+    return (modeParam === 'triangular' || modeParam === 'roundtrip' || modeParam === 'quadrilateral') ? modeParam as 'roundtrip' | 'triangular' | 'quadrilateral' : 'roundtrip';
   });
 
   const currentPairConfig = pairs[pairId];
@@ -87,7 +87,7 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
 
   const fetchData = useCallback(async () => {
     try {
-      const includeAllPairs = activeTab === 'arbitrage' && arbitrageMode === 'triangular';
+      const includeAllPairs = activeTab === 'arbitrage' && (arbitrageMode === 'triangular' || arbitrageMode === 'quadrilateral');
       const historyResponse = await fetch(
         buildApiUrl('/api/history', { hours: 24, pair: includeAllPairs ? undefined : pairId, _ts: Date.now() }),
         { cache: 'no-store' }
@@ -143,13 +143,13 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
     if (tabParam && (tabParam === 'quotes' || tabParam === 'arbitrage') && tabParam !== activeTab) {
       setActiveTab(tabParam);
     }
-    if (modeParam && (modeParam === 'roundtrip' || modeParam === 'triangular') && modeParam !== arbitrageMode) {
+    if (modeParam && (modeParam === 'roundtrip' || modeParam === 'triangular' || modeParam === 'quadrilateral') && modeParam !== arbitrageMode) {
       setArbitrageMode(modeParam);
     }
   }, [searchParams]);
 
   useEffect(() => {
-    const nextActivePair = activeTab === 'arbitrage' && arbitrageMode === 'triangular'
+    const nextActivePair = activeTab === 'arbitrage' && (arbitrageMode === 'triangular' || arbitrageMode === 'quadrilateral')
       ? 'all'
       : pairId;
 

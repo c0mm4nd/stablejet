@@ -5,34 +5,36 @@ import { useSearchParams } from 'next/navigation';
 import { HistoryDataPoint } from '@/lib/history';
 import RoundTripArbitrage from './RoundTripArbitrage';
 import TriangularArbitrage from './TriangularArbitrage';
+import QuadrilateralArbitrage from './QuadrilateralArbitrage';
+
+type ArbMode = 'roundtrip' | 'triangular' | 'quadrilateral';
 
 interface ArbitrageDashboardProps {
     history: HistoryDataPoint[];
     amount: number;
     pairId: string;
-    onModeChange?: (mode: 'roundtrip' | 'triangular') => void;
+    onModeChange?: (mode: ArbMode) => void;
 }
 
 export default function ArbitrageDashboard({ history, amount, pairId, onModeChange }: ArbitrageDashboardProps) {
     const searchParams = useSearchParams();
 
     // Initialize from URL params
-    const [activeTab, setActiveTab] = useState<'roundtrip' | 'triangular'>(() => {
+    const [activeTab, setActiveTab] = useState<ArbMode>(() => {
         const modeParam = searchParams.get('mode');
-        return (modeParam === 'triangular' || modeParam === 'roundtrip') ? modeParam : 'roundtrip';
+        return (modeParam === 'triangular' || modeParam === 'roundtrip' || modeParam === 'quadrilateral') ? modeParam as ArbMode : 'roundtrip';
     });
 
     // Sync with URL params changes (browser back/forward)
     useEffect(() => {
-        const modeParam = searchParams.get('mode');
-        if (modeParam && (modeParam === 'roundtrip' || modeParam === 'triangular') && modeParam !== activeTab) {
+        const modeParam = searchParams.get('mode') as ArbMode | null;
+        if (modeParam && (modeParam === 'roundtrip' || modeParam === 'triangular' || modeParam === 'quadrilateral') && modeParam !== activeTab) {
             setActiveTab(modeParam);
-            // Notify parent to avoid conflicts
             onModeChange?.(modeParam);
         }
     }, [searchParams]);
 
-    const handleTabChange = (mode: 'roundtrip' | 'triangular') => {
+    const handleTabChange = (mode: ArbMode) => {
         setActiveTab(mode);
         onModeChange?.(mode);
     };
@@ -66,6 +68,19 @@ export default function ArbitrageDashboard({ history, amount, pairId, onModeChan
                         <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full" />
                     )}
                 </button>
+                <button
+                    onClick={() => handleTabChange('quadrilateral')}
+                    className={`pb-2 px-3 md:px-4 font-medium transition-colors relative whitespace-nowrap touch-manipulation ${activeTab === 'quadrilateral'
+                            ? 'text-blue-600'
+                            : 'text-gray-500 hover:text-gray-700 active:text-gray-800'
+                        }`}
+                >
+                    <span className="hidden md:inline">Quadrilateral (A→B→C→D→A)</span>
+                    <span className="md:hidden">Quad</span>
+                    {activeTab === 'quadrilateral' && (
+                        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full" />
+                    )}
+                </button>
             </div>
 
             <div>
@@ -73,13 +88,10 @@ export default function ArbitrageDashboard({ history, amount, pairId, onModeChan
                     <RoundTripArbitrage history={history} amount={amount} pairId={pairId} />
                 )}
                 {activeTab === 'triangular' && (
-                    <>
-                        {/* Note: Triangular Arb works best when history contains data for multiple pairs. 
-                  Currently the fetcher may only return the selected pair's data if filtered by API.
-                  For full triangular support, ensure API returns all pairs or the dashboard fetches them.
-              */}
-                        <TriangularArbitrage history={history} amount={amount} pairId={pairId} />
-                    </>
+                    <TriangularArbitrage history={history} amount={amount} pairId={pairId} />
+                )}
+                {activeTab === 'quadrilateral' && (
+                    <QuadrilateralArbitrage history={history} amount={amount} pairId={pairId} />
                 )}
             </div>
         </div>
