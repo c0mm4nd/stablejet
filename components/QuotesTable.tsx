@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
 import RouteDetailsModal from '@/components/RouteDetailsModal';
@@ -63,6 +63,10 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
         routeAtoB?: RouteInfo;
         routeBtoA?: RouteInfo;
     } | null>(null);
+
+    useEffect(() => {
+        setActiveRoute(null);
+    }, [pairId]);
 
     if (history.length === 0) return null;
 

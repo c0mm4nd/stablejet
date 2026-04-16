@@ -242,7 +242,7 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
           </div>
         </div>
 
-        {isLoading && history.length === 0 ? (
+        {isLoading ? (
           <LoadingSpinner />
         ) : error ? (
           <ErrorMessage message={error} />
