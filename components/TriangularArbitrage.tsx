@@ -152,7 +152,7 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
                             for (const e2 of secondEdges) {
                                 for (const e3 of thirdEdges) {
                                     const chains = new Set([e1.chain, e2.chain, e3.chain]);
-                                    if (chains.size > 2) continue;
+                                    // No chain-count limit — cross-chain paths are valid
                                     const totalRate = e1.rate * e2.rate * e3.rate;
                                     const profitBps = (totalRate - 1) * 10000;
                                     if (profitBps > 0 && (!best || profitBps > best.profitBps)) {

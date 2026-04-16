@@ -145,7 +145,7 @@ export default function QuadrilateralArbitrage({ history, amount, pairId }: Quad
                                 for (const e3 of e3List) {
                                     for (const e4 of e4List) {
                                         const chains = new Set([e1.chain, e2.chain, e3.chain, e4.chain]);
-                                        if (chains.size > 3) continue;
+                                        if (chains.size > 2) continue;
                                         const totalRate = e1.rate * e2.rate * e3.rate * e4.rate;
                                         const profitBps = (totalRate - 1) * 10000;
                                         if (profitBps > 0 && (!best || profitBps > best.profitBps)) {
