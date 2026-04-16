@@ -7,6 +7,7 @@ import { getCetusQuote } from './cetus';
 import { getJupiterQuote } from './jupiter';
 import { getPanoraQuote } from './panora';
 import { getAftermathQuote } from './aftermath';
+import { getZeroXQuote } from './zerox';
 import { normalizeSources } from './source-metadata';
 
 type SourceEntry = {
@@ -49,6 +50,8 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
   const enableKyber = normalizedSources.kyberswap !== false && !!appChainConfig.kyberCode;
   const enableNordstern = normalizedSources.nordstern !== false && !!appChainConfig.nordsternCode;
   const enableLiFi = normalizedSources.lifi !== false && !!lifiChainId;
+  const zeroXChainId = appChainConfig.zeroXChainId;
+  const enableZeroX = normalizedSources.zerox !== false && !!zeroXChainId;
   const enableCetus = normalizedSources.cetus !== false && chainKey === 'sui';
   const enableJupiter = normalizedSources.jupiter !== false && chainKey === 'solana';
   const enablePanora = normalizedSources.panora !== false && chainKey === 'aptos';
@@ -102,6 +105,12 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
         .then(bToA => ({ source: 'aftermath' as const, aToB, bToA })))
     : null;
 
+  const zeroXPromise = enableZeroX && zeroXChainId
+    ? getZeroXQuote(zeroXChainId, tokenAAddress, tokenBAddress, amountInAToB)
+      .then(aToB => getZeroXQuote(zeroXChainId, tokenBAddress, tokenAAddress, amountInBToA)
+        .then(bToA => ({ source: 'zerox' as const, aToB, bToA })))
+    : null;
+
   const fetched = await Promise.all([
     ...(kyberPromise ? [kyberPromise] : []),
     ...(nordsternPromise ? [nordsternPromise] : []),
@@ -109,7 +118,8 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
     ...(cetusPromise ? [cetusPromise] : []),
     ...(jupiterPromise ? [jupiterPromise] : []),
     ...(panoraPromise ? [panoraPromise] : []),
-    ...(aftermathPromise ? [aftermathPromise] : [])
+    ...(aftermathPromise ? [aftermathPromise] : []),
+    ...(zeroXPromise ? [zeroXPromise] : [])
   ]);
 
   sourceEntries.push(...fetched);

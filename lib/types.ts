@@ -73,6 +73,7 @@ export type RouteType =
   | 'kyberswap'
   | 'nordstern'
   | 'lifi'
+  | 'zerox'
   | 'cetus'
   | 'jupiter'
   | 'panora'
@@ -84,6 +85,7 @@ export type DataSource =
   | 'kyberswap'
   | 'nordstern'
   | 'lifi'
+  | 'zerox'
   | 'cetus'
   | 'jupiter'
   | 'panora'
@@ -100,6 +102,7 @@ export interface SourceConfig {
   kyberswap: boolean;
   nordstern: boolean;
   lifi: boolean;
+  zerox: boolean;
   cetus: boolean;
   jupiter: boolean;
   panora: boolean;
@@ -192,6 +195,7 @@ export interface ChainAppConfig {
   kyberCode?: string;     // e.g. "ethereum"
   nordsternCode?: string; // e.g. "8118"
   lifiChainId?: string;   // e.g. "1"
+  zeroXChainId?: string;  // e.g. "1" (EVM chain ID for 0x API)
   disabled?: boolean;
 }
 

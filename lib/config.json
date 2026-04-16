@@ -4,43 +4,50 @@
       "name": "Ethereum",
       "kyberCode": "ethereum",
       "nordsternCode": "1",
-      "lifiChainId": "1"
+      "lifiChainId": "1",
+      "zeroXChainId": "1"
     },
     "polygon": {
       "name": "Polygon",
       "kyberCode": "polygon",
       "nordsternCode": "137",
-      "lifiChainId": "137"
+      "lifiChainId": "137",
+      "zeroXChainId": "137"
     },
     "arbitrum": {
       "name": "Arbitrum",
       "kyberCode": "arbitrum",
       "nordsternCode": "42161",
-      "lifiChainId": "42161"
+      "lifiChainId": "42161",
+      "zeroXChainId": "42161"
     },
     "optimism": {
       "name": "Optimism",
       "kyberCode": "optimism",
       "nordsternCode": "10",
-      "lifiChainId": "10"
+      "lifiChainId": "10",
+      "zeroXChainId": "10"
     },
     "base": {
       "name": "Base",
       "kyberCode": "base",
       "nordsternCode": "8453",
-      "lifiChainId": "8453"
+      "lifiChainId": "8453",
+      "zeroXChainId": "8453"
     },
     "bnb_chain": {
       "name": "BNB Chain",
       "kyberCode": "bsc",
       "lifiChainId": "56",
-      "nordsternCode": "56"
+      "nordsternCode": "56",
+      "zeroXChainId": "56"
     },
     "avalanche": {
       "name": "Avalanche",
       "kyberCode": "avalanche",
       "nordsternCode": "43114",
-      "lifiChainId": "43114"
+      "lifiChainId": "43114",
+      "zeroXChainId": "43114"
     },
     "fantom": {
       "name": "Fantom",
@@ -63,13 +70,15 @@
       "name": "Linea",
       "kyberCode": "linea",
       "nordsternCode": "59144",
-      "lifiChainId": "59144"
+      "lifiChainId": "59144",
+      "zeroXChainId": "59144"
     },
     "scroll": {
       "name": "Scroll",
       "kyberCode": "",
       "lifiChainId": "534352",
-      "nordsternCode": "534352"
+      "nordsternCode": "534352",
+      "zeroXChainId": "534352"
     },
     "sonic": {
       "name": "Sonic",
@@ -93,7 +102,8 @@
       "name": "Mantle",
       "kyberCode": "",
       "nordsternCode": "5000",
-      "lifiChainId": "5000"
+      "lifiChainId": "5000",
+      "zeroXChainId": "5000"
     },
     "solana": {
       "name": "Solana",
@@ -4095,6 +4105,7 @@
     "kyberswap": true,
     "nordstern": false,
     "lifi": true,
+    "zerox": true,
     "cetus": true,
     "jupiter": true,
     "panora": true,
