@@ -15,6 +15,29 @@ import { sendBarkNotification } from './bark';
 import { saveNotification } from './db';
 import { ChainSwapData } from './types';
 
+// Concurrency limit for parallel pair fetching
+const PAIR_FETCH_CONCURRENCY = 8;
+
+// Worker-pool: runs up to `limit` tasks concurrently
+async function runWithConcurrency<T>(
+  tasks: Array<() => Promise<T>>,
+  limit: number
+): Promise<T[]> {
+  const results: (T | undefined)[] = new Array(tasks.length);
+  let index = 0;
+
+  async function worker() {
+    while (index < tasks.length) {
+      const current = index++;
+      results[current] = await tasks[current]();
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(limit, tasks.length) }, () => worker());
+  await Promise.all(workers);
+  return results as T[];
+}
+
 // cooldown tracker: pairId -> last notification timestamp
 const notifyCooldown = new Map<string, number>();
 
@@ -146,15 +169,13 @@ class BackgroundFetcher {
 
         const pairIds = Object.keys(config.pairs).filter(pairId => !config.pairs[pairId]?.disabled);
 
-        log(`[BackgroundFetcher] Fetching data for ${pairIds.length} trading pairs: ${pairIds.join(', ')}`);
+        log(`[BackgroundFetcher] Fetching data for ${pairIds.length} trading pairs (concurrency: ${PAIR_FETCH_CONCURRENCY}): ${pairIds.join(', ')}`);
 
-        for (const pairId of pairIds) {
+        const pairTasks = pairIds.map(pairId => async () => {
           try {
             log(`[BackgroundFetcher] === Fetching ${pairId} ===`);
             const pairConfig = config.pairs[pairId];
 
-            // Pass full config to usage logic, or pass relevant parts
-            // getSwapDataForPair will now need to accept TradingPairConfig and the Global Chain Config map
             const data = await getSwapDataForPair(pairConfig, config.chains, config.sources);
 
             // 统计成功和失败
@@ -168,7 +189,6 @@ class BackgroundFetcher {
                 dataSourceStats[source] = { success: 0, failed: 0 };
               }
 
-              // 检查通用字段
               const hasTokenASuccess = item.tokenAToB?.output && item.tokenAToB.output > 0;
               const hasTokenBSuccess = item.tokenBToA?.output && item.tokenBToA.output > 0;
 
@@ -304,7 +324,9 @@ class BackgroundFetcher {
           } catch (err) {
             error(`[BackgroundFetcher] Error fetching ${pairId}:`, err);
           }
-        }
+        });
+
+        await runWithConcurrency(pairTasks, PAIR_FETCH_CONCURRENCY);
 
         log(`${'='.repeat(70)}`);
         log(`[BackgroundFetcher] Data fetch completed for all pairs`);
