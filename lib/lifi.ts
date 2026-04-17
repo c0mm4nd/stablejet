@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { log, error, warn } from './logger';
 import { QuoteResult } from './types';
-import { mapLiFiRouteAlternative } from './lifi-route';
+import { mapLiFiRouteAlternative, mapLiFiRouteStep } from './lifi-route';
 
 const JUMPER_API_BASE = 'https://api.jumper.exchange/pipeline/v1/advanced/routes';
 const JUMPER_FROM_ADDRESS = process.env.LIFI_FROM_ADDRESS || '0x0000000000000000000000000000000000000001';
@@ -53,8 +53,15 @@ export async function getLiFiQuotesByChainId(
   if (!alternatives || alternatives.length === 0) {
     return result.success ? [result] : [];
   }
-  return alternatives.map(alt => {
+  // Raw routes parallel to mapped alternatives (for includedSteps / pool detail)
+  const rawRoutes: any[] = Array.isArray(result.route?.raw?.routes) ? result.route!.raw!.routes : [];
+  return alternatives.map((alt, i) => {
     const tool = alt.toolNames?.join(' / ') || 'unknown';
+    const rawRoute = rawRoutes[i];
+    // Re-map steps from raw route to capture includedSteps (not present in pre-mapped alt)
+    if (rawRoute?.steps && alt.steps) {
+      alt.steps = rawRoute.steps.map((s: any) => mapLiFiRouteStep(s));
+    }
     return {
       success: !!alt.toAmount,
       amountOut: alt.toAmount,
@@ -63,7 +70,6 @@ export async function getLiFiQuotesByChainId(
         type: 'lifi' as const,
         selectedTool: tool,
         alternatives: [alt],
-        note: `tool: ${tool}`
       }
     };
   });

@@ -50,6 +50,7 @@ export interface RouteAlternativeStep {
   fromAmountUSD?: string;
   toAmountUSD?: string;
   executionDuration?: number;
+  includedSteps?: RouteAlternativeStep[]; // sub-steps (pool-level routing within an aggregator)
 }
 
 export interface RouteAlternative {

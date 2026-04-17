@@ -260,10 +260,8 @@ function LiFiAlternativeCard({ alternative, index }: { alternative: RouteAlterna
           {alternative.steps.map((step, stepIndex) => {
             const tokenRoute = [step.fromTokenSymbol, step.toTokenSymbol]
               .filter((value): value is string => Boolean(value))
-              .join(' -> ');
-            const chainRoute = [step.fromChainId, step.toChainId]
-              .filter((value): value is number => value !== undefined)
-              .join(' -> ');
+              .join(' → ');
+            const crossChain = step.fromChainId !== step.toChainId;
 
             return (
               <div key={`${alternative.id || index}-step-${stepIndex}`} className="rounded-xl border border-white/80 bg-white/80 px-3 py-3">
@@ -272,28 +270,68 @@ function LiFiAlternativeCard({ alternative, index }: { alternative: RouteAlterna
                     Step {stepIndex + 1}
                     {step.toolName ? ` · ${step.toolName}` : ''}
                   </div>
-                  {step.type && (
-                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.16em] text-gray-500">
-                      {step.type}
-                    </span>
-                  )}
+                  <div className="flex gap-1.5">
+                    {step.type && (
+                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.16em] text-gray-500">
+                        {step.type}
+                      </span>
+                    )}
+                    {crossChain && (
+                      <span className="rounded-full bg-orange-50 px-2 py-0.5 text-[11px] font-medium text-orange-600">
+                        Chain {step.fromChainId} → {step.toChainId}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-2 text-xs text-gray-600">
                   {tokenRoute && <span className="rounded-full bg-gray-100 px-2 py-1">{tokenRoute}</span>}
-                  {chainRoute && <span className="rounded-full bg-gray-100 px-2 py-1">Chain {chainRoute}</span>}
                   {formatTokenAmount(step.fromAmount, step.fromTokenDecimals, step.fromTokenSymbol) && (
-                    <span className="rounded-full bg-gray-100 px-2 py-1">
+                    <span className="rounded-full bg-blue-50 px-2 py-1 text-blue-700">
                       In {formatTokenAmount(step.fromAmount, step.fromTokenDecimals, step.fromTokenSymbol)}
                     </span>
                   )}
                   {formatTokenAmount(step.toAmount, step.toTokenDecimals, step.toTokenSymbol) && (
-                    <span className="rounded-full bg-gray-100 px-2 py-1">
+                    <span className="rounded-full bg-emerald-50 px-2 py-1 text-emerald-700">
                       Out {formatTokenAmount(step.toAmount, step.toTokenDecimals, step.toTokenSymbol)}
                     </span>
                   )}
-                  {formatUsd(step.toAmountUSD) && <span className="rounded-full bg-gray-100 px-2 py-1">Out {formatUsd(step.toAmountUSD)}</span>}
+                  {formatUsd(step.toAmountUSD) && <span className="rounded-full bg-gray-100 px-2 py-1">{formatUsd(step.toAmountUSD)}</span>}
                   {formatDuration(step.executionDuration) && <span className="rounded-full bg-gray-100 px-2 py-1">ETA {formatDuration(step.executionDuration)}</span>}
                 </div>
+
+                {/* includedSteps: pool-level routing within this DEX step */}
+                {step.includedSteps && step.includedSteps.length > 0 && (
+                  <div className="mt-3">
+                    <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400">
+                      {step.includedSteps.length > 1 ? `Split across ${step.includedSteps.length} routes` : 'Route detail'}
+                    </div>
+                    <div className="space-y-1">
+                      {step.includedSteps.map((sub, si) => {
+                        const subTokenIn = sub.fromTokenSymbol || '?';
+                        const subTokenOut = sub.toTokenSymbol || '?';
+                        const toolLabel = sub.toolName || sub.tool;
+                        return (
+                          <div key={si} className="flex flex-wrap items-center gap-2 rounded-lg border border-gray-100 bg-white px-2.5 py-1.5 text-xs">
+                            <span className="rounded-full bg-blue-50 px-1.5 py-0.5 font-mono font-semibold text-blue-700">{subTokenIn}</span>
+                            <span className="text-gray-300">→</span>
+                            {toolLabel && (
+                              <>
+                                <span className="rounded-full border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-gray-600">{toolLabel}</span>
+                                <span className="text-gray-300">→</span>
+                              </>
+                            )}
+                            <span className="rounded-full bg-emerald-50 px-1.5 py-0.5 font-mono font-semibold text-emerald-700">{subTokenOut}</span>
+                            {formatTokenAmount(sub.fromAmount, sub.fromTokenDecimals) && (
+                              <span className="ml-auto text-gray-400 tabular-nums">
+                                {formatTokenAmount(sub.fromAmount, sub.fromTokenDecimals)} → {formatTokenAmount(sub.toAmount, sub.toTokenDecimals) ?? '?'}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}

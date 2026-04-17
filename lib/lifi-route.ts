@@ -12,6 +12,10 @@ export function mapLiFiRouteStep(step: any): RouteAlternativeStep {
   const action = step?.action ?? {};
   const estimate = step?.estimate ?? {};
 
+  const includedSteps = Array.isArray(step?.includedSteps) && step.includedSteps.length > 0
+    ? step.includedSteps.map((s: any) => mapLiFiRouteStep(s))
+    : undefined;
+
   return {
     type: asString(step?.type),
     tool: asString(step?.tool),
@@ -26,7 +30,8 @@ export function mapLiFiRouteStep(step: any): RouteAlternativeStep {
     toAmount: asString(estimate?.toAmount) || asString(action?.toAmount),
     fromAmountUSD: asString(estimate?.fromAmountUSD),
     toAmountUSD: asString(estimate?.toAmountUSD),
-    executionDuration: asNumber(estimate?.executionDuration) ?? asNumber(step?.executionDuration)
+    executionDuration: asNumber(estimate?.executionDuration) ?? asNumber(step?.executionDuration),
+    includedSteps
   };
 }
 
