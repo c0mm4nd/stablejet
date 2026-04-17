@@ -4,7 +4,6 @@ import { useMemo, useState, useEffect } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
 import RouteDetailsModal from '@/components/RouteDetailsModal';
-import { extractLiFiAlternatives } from '@/lib/lifi-route';
 import { getSourceInfo } from '@/lib/source-metadata';
 import { RouteInfo } from '@/lib/types';
 import { isSourceEnabled } from '@/lib/utils';
@@ -227,12 +226,6 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
                             const isBestAtoB = bestRateAtoB !== null && row.rateAtoB === bestRateAtoB;
                             const isBestBtoA = bestRateBtoA !== null && row.rateBtoA === bestRateBtoA;
                             const isBestRoundtrip = bestRoundtrip !== null && row.roundtripBps === bestRoundtrip && bestRoundtrip > 0;
-                            const lifiRouteCounts = row.dataSource === 'lifi'
-                                ? {
-                                    aToB: extractLiFiAlternatives(row.routeAtoB).length,
-                                    bToA: extractLiFiAlternatives(row.routeBtoA).length,
-                                }
-                                : null;
                             const rowTime = new Date(row.timestamp);
                             const rowTimeStr = rowTime.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                             return (
@@ -250,11 +243,6 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
                                             onClick={() => setActiveRoute({ chain: row.chain, source: src.name, routeAtoB: row.routeAtoB, routeBtoA: row.routeBtoA })}
                                         >
                                             <span className={`font-semibold ${src.color} group-hover/btn:underline`}>{src.name}</span>
-                                            {lifiRouteCounts && (lifiRouteCounts.aToB > 0 || lifiRouteCounts.bToA > 0) && (
-                                                <span className="rounded bg-teal-50 px-1.5 py-0.5 text-[10px] font-semibold text-teal-700">
-                                                    {lifiRouteCounts.aToB}/{lifiRouteCounts.bToA}
-                                                </span>
-                                            )}
                                             <span className="text-gray-300 group-hover/btn:text-gray-500 text-[10px]">ⓘ</span>
                                         </button>
                                     </td>

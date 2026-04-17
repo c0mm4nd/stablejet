@@ -42,6 +42,33 @@ const GLOBAL_RATE_LIMITER_KEY = Symbol.for('stablejet.lifi.ratelimiter');
 const rateLimiter = (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] || new LiFiRateLimiter();
 if (process.env.NODE_ENV !== 'production') (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] = rateLimiter;
 
+export async function getLiFiQuotesByChainId(
+  chainId: string,
+  fromToken: string,
+  toToken: string,
+  amountDecimals: string
+): Promise<QuoteResult[]> {
+  const result = await getLiFiQuoteByChainId(chainId, fromToken, toToken, amountDecimals);
+  const alternatives = result.route?.alternatives;
+  if (!alternatives || alternatives.length === 0) {
+    return result.success ? [result] : [];
+  }
+  return alternatives.map(alt => {
+    const tool = alt.toolNames?.join(' / ') || 'unknown';
+    return {
+      success: !!alt.toAmount,
+      amountOut: alt.toAmount,
+      amountOutUsd: alt.toAmountUSD,
+      route: {
+        type: 'lifi' as const,
+        selectedTool: tool,
+        alternatives: [alt],
+        note: `tool: ${tool}`
+      }
+    };
+  });
+}
+
 export async function getLiFiQuoteByChainId(
   chainId: string,
   fromToken: string,

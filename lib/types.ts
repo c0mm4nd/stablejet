@@ -132,7 +132,7 @@ export interface ChainSwapData {
   chainKey: string;
   amount: number;
   pairId?: string; // Trading pair identifier
-  dataSource?: DataSource; // 数据来源
+  dataSource?: string; // DataSource or 'lifi/ToolName' for split LiFi results
   quoteTimestamp?: string; // ISO timestamp for this specific quote
   // Generic swap results for any pair
   tokenAToB?: SwapResult; // tokenA -> tokenB

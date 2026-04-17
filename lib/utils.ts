@@ -99,8 +99,10 @@ export function isSourceEnabled(
 ): boolean {
   const normalized = (source || 'kyberswap').toLowerCase();
   if (!sources) return true;
-  if (normalized in sources) {
-    return sources[normalized as keyof ConfigData['sources']] !== false;
+  // 'lifi/ToolName' → check sources.lifi
+  const baseSource = normalized.startsWith('lifi/') ? 'lifi' : normalized;
+  if (baseSource in sources) {
+    return sources[baseSource as keyof ConfigData['sources']] !== false;
   }
   return true;
 }

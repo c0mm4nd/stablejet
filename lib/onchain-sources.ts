@@ -2,7 +2,7 @@ import { fromWei, toWei } from './config';
 import { ChainAppConfig, ChainSwapData, QuoteResult, ConfigData } from './types';
 import { getQuote } from './kyberswap';
 import { getNordsternQuoteByChainKey } from './nordstern';
-import { getLiFiQuoteByChainId } from './lifi';
+import { getLiFiQuotesByChainId } from './lifi';
 import { getCetusQuote } from './cetus';
 import { getJupiterQuote } from './jupiter';
 import { getPanoraQuote } from './panora';
@@ -11,7 +11,7 @@ import { getZeroXQuote } from './zerox';
 import { normalizeSources } from './source-metadata';
 
 type SourceEntry = {
-  source: NonNullable<ChainSwapData['dataSource']>;
+  source: string;
   aToB: QuoteResult;
   bToA: QuoteResult;
 };
@@ -76,9 +76,10 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
     : null;
 
   const lifiPromise = enableLiFi && lifiChainId
-    ? getLiFiQuoteByChainId(String(lifiChainId), tokenAAddress, tokenBAddress, amountInAToB)
-      .then(aToB => getLiFiQuoteByChainId(String(lifiChainId), tokenBAddress, tokenAAddress, amountInBToA)
-        .then(bToA => ({ source: 'lifi' as const, aToB, bToA })))
+    ? Promise.all([
+        getLiFiQuotesByChainId(String(lifiChainId), tokenAAddress, tokenBAddress, amountInAToB),
+        getLiFiQuotesByChainId(String(lifiChainId), tokenBAddress, tokenAAddress, amountInBToA)
+      ])
     : null;
 
   const cetusPromise = enableCetus
@@ -111,18 +112,35 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
         .then(bToA => ({ source: 'zerox' as const, aToB, bToA })))
     : null;
 
-  const fetched = await Promise.all([
-    ...(kyberPromise ? [kyberPromise] : []),
-    ...(nordsternPromise ? [nordsternPromise] : []),
-    ...(lifiPromise ? [lifiPromise] : []),
-    ...(cetusPromise ? [cetusPromise] : []),
-    ...(jupiterPromise ? [jupiterPromise] : []),
-    ...(panoraPromise ? [panoraPromise] : []),
-    ...(aftermathPromise ? [aftermathPromise] : []),
-    ...(zeroXPromise ? [zeroXPromise] : [])
+  const [fetched, lifiPair] = await Promise.all([
+    Promise.all([
+      ...(kyberPromise ? [kyberPromise] : []),
+      ...(nordsternPromise ? [nordsternPromise] : []),
+      ...(cetusPromise ? [cetusPromise] : []),
+      ...(jupiterPromise ? [jupiterPromise] : []),
+      ...(panoraPromise ? [panoraPromise] : []),
+      ...(aftermathPromise ? [aftermathPromise] : []),
+      ...(zeroXPromise ? [zeroXPromise] : [])
+    ]),
+    lifiPromise ?? Promise.resolve(null)
   ]);
 
   sourceEntries.push(...fetched);
+
+  // Expand LiFi results: pair A→B and B→A alternatives by tool name
+  if (lifiPair) {
+    const [atoBResults, btoAResults] = lifiPair;
+    const btoAByTool = new Map<string, QuoteResult>();
+    for (const r of btoAResults) {
+      const tool = r.route?.selectedTool || '';
+      btoAByTool.set(tool, r);
+    }
+    for (const aToBResult of atoBResults) {
+      const tool = aToBResult.route?.selectedTool || '';
+      const bToAResult = btoAByTool.get(tool) ?? { success: false };
+      sourceEntries.push({ source: `lifi/${tool}`, aToB: aToBResult, bToA: bToAResult });
+    }
+  }
 
   const results: ChainSwapData[] = [];
 

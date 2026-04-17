@@ -46,6 +46,14 @@ export function normalizeSources(
 }
 
 export function getSourceInfo(source?: string) {
+  if (source?.startsWith('lifi/')) {
+    const toolName = source.slice(5);
+    return {
+      name: toolName,
+      color: 'text-teal-600',
+      shortName: toolName.slice(0, 2).toUpperCase()
+    };
+  }
   const normalized = (source || 'kyberswap').toLowerCase() as DataSource;
   return SOURCE_INFO[normalized] || {
     name: source || 'kyberswap',

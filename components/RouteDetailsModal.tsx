@@ -404,7 +404,9 @@ function RouteDirectionPanel({
           <div>
             <div className="text-base font-semibold text-gray-900">{title}</div>
             <div className="mt-1 text-sm text-gray-500">
-              Li.Fi returned {lifiAlternatives.length} quote source{lifiAlternatives.length > 1 ? 's' : ''}
+              {lifiAlternatives.length > 1
+                ? `Li.Fi returned ${lifiAlternatives.length} quote sources`
+                : `via Li.Fi · ${getLiFiPrimaryToolLabel(route) || 'unknown tool'}`}
             </div>
           </div>
           {getLiFiPrimaryToolLabel(route) && (
