@@ -1,13 +1,11 @@
 import { fromWei, toWei } from './config';
 import { ChainAppConfig, ChainSwapData, QuoteResult, ConfigData } from './types';
-import { getQuote } from './kyberswap';
 import { getNordsternQuoteByChainKey } from './nordstern';
 import { getLiFiQuotesByChainId } from './lifi';
 import { getCetusQuote } from './cetus';
 import { getJupiterQuote } from './jupiter';
 import { getPanoraQuote } from './panora';
 import { getAftermathQuote } from './aftermath';
-import { getZeroXQuote } from './zerox';
 import { normalizeSources } from './source-metadata';
 
 type SourceEntry = {
@@ -44,14 +42,10 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
   } = params;
   const normalizedSources = normalizeSources(sources);
 
-  const kyberChainParam = appChainConfig.kyberCode || chainKey;
   const nordsternChainParam = appChainConfig.nordsternCode || chainKey;
   const lifiChainId = appChainConfig.lifiChainId || appChainConfig.nordsternCode;
-  const enableKyber = normalizedSources.kyberswap !== false && !!appChainConfig.kyberCode;
   const enableNordstern = normalizedSources.nordstern !== false && !!appChainConfig.nordsternCode;
   const enableLiFi = normalizedSources.lifi !== false && !!lifiChainId;
-  const zeroXChainId = appChainConfig.zeroXChainId;
-  const enableZeroX = normalizedSources.zerox !== false && !!zeroXChainId;
   const enableCetus = normalizedSources.cetus !== false && chainKey === 'sui';
   const enableJupiter = normalizedSources.jupiter !== false && chainKey === 'solana';
   const enablePanora = normalizedSources.panora !== false && chainKey === 'aptos';
@@ -62,12 +56,6 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
   const humanAmount = String(amount);
 
   const sourceEntries: SourceEntry[] = [];
-
-  const kyberPromise = enableKyber
-    ? getQuote(kyberChainParam, tokenAAddress, tokenBAddress, amountInAToB)
-      .then(aToB => getQuote(kyberChainParam, tokenBAddress, tokenAAddress, amountInBToA)
-        .then(bToA => ({ source: 'kyberswap' as const, aToB, bToA })))
-    : null;
 
   const nordsternPromise = enableNordstern
     ? getNordsternQuoteByChainKey(nordsternChainParam, tokenAAddress, tokenBAddress, amountInAToB)
@@ -106,21 +94,13 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
         .then(bToA => ({ source: 'aftermath' as const, aToB, bToA })))
     : null;
 
-  const zeroXPromise = enableZeroX && zeroXChainId
-    ? getZeroXQuote(zeroXChainId, tokenAAddress, tokenBAddress, amountInAToB)
-      .then(aToB => getZeroXQuote(zeroXChainId, tokenBAddress, tokenAAddress, amountInBToA)
-        .then(bToA => ({ source: 'zerox' as const, aToB, bToA })))
-    : null;
-
   const [fetched, lifiPair] = await Promise.all([
     Promise.all([
-      ...(kyberPromise ? [kyberPromise] : []),
       ...(nordsternPromise ? [nordsternPromise] : []),
       ...(cetusPromise ? [cetusPromise] : []),
       ...(jupiterPromise ? [jupiterPromise] : []),
       ...(panoraPromise ? [panoraPromise] : []),
-      ...(aftermathPromise ? [aftermathPromise] : []),
-      ...(zeroXPromise ? [zeroXPromise] : [])
+      ...(aftermathPromise ? [aftermathPromise] : [])
     ]),
     lifiPromise ?? Promise.resolve(null)
   ]);

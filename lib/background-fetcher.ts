@@ -1,5 +1,4 @@
 import { log, error } from './logger';
-import { getKyberSwapRateLimiterStatus } from './kyberswap';
 import { getSwapDataForPair } from './swap-data';
 import { saveDataPoint } from './history';
 import { getNordsternRateLimiterStatus } from './nordstern';
@@ -184,7 +183,7 @@ class BackgroundFetcher {
             const dataSourceStats: Record<string, { success: number; failed: number }> = {};
 
             for (const item of data) {
-              const source = item.dataSource || 'kyberswap';
+              const source = item.dataSource || 'unknown';
               if (!dataSourceStats[source]) {
                 dataSourceStats[source] = { success: 0, failed: 0 };
               }
@@ -334,11 +333,6 @@ class BackgroundFetcher {
 
         // 显示速率限制器状态
         log('\n[BackgroundFetcher] Rate limiters:');
-        try {
-          const kyberStatus = getKyberSwapRateLimiterStatus();
-          log(`  KyberSwap: ${kyberStatus.current}/${kyberStatus.max} @ ${kyberStatus.rate}`);
-        } catch (e) { /* ignore */ }
-
         try {
           const nordsternStatus = getNordsternRateLimiterStatus();
           log(`  Nordstern: ${nordsternStatus.current}/${nordsternStatus.max} @ ${nordsternStatus.rate}`);

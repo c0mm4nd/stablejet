@@ -56,7 +56,7 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
             .filter(d => d.tokenAToB?.output && d.tokenAToB.output > 0)
             .map(d => {
                 const input = (d.tokenAToB!.input > 0) ? d.tokenAToB!.input : amount;
-                return { chain: d.chain, source: d.dataSource || 'kyberswap', rate: d.tokenAToB!.output! / input };
+                return { chain: d.chain, source: d.dataSource || 'unknown', rate: d.tokenAToB!.output! / input };
             });
 
         // buys: 用 tokenB 换回 tokenA（B→A），买回 tokenA 的那一腿
@@ -64,7 +64,7 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
             .filter(d => d.tokenBToA?.output && d.tokenBToA.output > 0)
             .map(d => {
                 const input = (d.tokenBToA!.input > 0) ? d.tokenBToA!.input : amount;
-                return { chain: d.chain, source: d.dataSource || 'kyberswap', rate: d.tokenBToA!.output! / input };
+                return { chain: d.chain, source: d.dataSource || 'unknown', rate: d.tokenBToA!.output! / input };
             });
 
         const opps: ArbOpportunity[] = [];

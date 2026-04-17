@@ -53,7 +53,7 @@ export function initDatabase() {
       history_point_id INTEGER NOT NULL,
       chain TEXT NOT NULL,
       chain_key TEXT NOT NULL,
-      data_source TEXT NOT NULL DEFAULT 'kyberswap',
+      data_source TEXT NOT NULL DEFAULT 'unknown',
       pair_id TEXT NOT NULL DEFAULT '',
       amount INTEGER NOT NULL,
 
@@ -96,7 +96,7 @@ export function initDatabase() {
       history_point_id INTEGER NOT NULL,
       chain TEXT NOT NULL,
       chain_key TEXT NOT NULL,
-      data_source TEXT NOT NULL DEFAULT 'kyberswap',
+      data_source TEXT NOT NULL DEFAULT 'unknown',
       pair_id TEXT NOT NULL DEFAULT '',
       amount INTEGER NOT NULL,
       quote_timestamp TEXT,
@@ -152,7 +152,7 @@ export function initDatabase() {
 
     if (!hasDataSource) {
       db.exec(`ALTER TABLE chain_data ADD COLUMN data_source TEXT`);
-      db.exec(`UPDATE chain_data SET data_source = 'kyberswap' WHERE data_source IS NULL`);
+      db.exec(`UPDATE chain_data SET data_source = 'unknown' WHERE data_source IS NULL`);
       log('Database migrated: added chain_data.data_source');
     }
 

@@ -131,7 +131,7 @@ interface ArbitrageDetail {
 
 export default function CrossChainArbitrageChart({ history, amount, pairId }: CrossChainArbitrageChartProps) {
   const { pairs, sources } = useConfig();
-  const itemLabel = (item: any) => `${item.chain} [${getSourceSuffix(item.dataSource || 'kyberswap')}]`;
+  const itemLabel = (item: any) => `${item.chain} [${getSourceSuffix(item.dataSource || 'unknown')}]`;
 
   const pair = pairs[pairId];
   if (!pair) {

@@ -35,7 +35,6 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   // Chain
   const [newChainId, setNewChainId] = useState('');
   const [newChainName, setNewChainName] = useState('');
-  const [newKyberCode, setNewKyberCode] = useState('');
   const [newNordsternCode, setNewNordsternCode] = useState('');
   const [newLiFiChainId, setNewLiFiChainId] = useState('');
 
@@ -168,12 +167,11 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       ...editingChains,
       [newChainId]: {
         name: newChainName,
-        kyberCode: newKyberCode || undefined,
         nordsternCode: newNordsternCode || undefined,
         lifiChainId: newLiFiChainId || undefined
       }
     });
-    setNewChainId(''); setNewChainName(''); setNewKyberCode(''); setNewNordsternCode(''); setNewLiFiChainId('');
+    setNewChainId(''); setNewChainName(''); setNewNordsternCode(''); setNewLiFiChainId('');
   };
 
   const handleRemoveChain = (id: string) => {
@@ -488,14 +486,6 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
                       <input
                         type="checkbox"
-                        checked={!!editingSources.kyberswap}
-                        onChange={e => setEditingSources({ ...editingSources, kyberswap: e.target.checked })}
-                      />
-                      <span className="font-medium text-gray-700">KyberSwap</span>
-                    </label>
-                    <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
-                      <input
-                        type="checkbox"
                         checked={!!editingSources.nordstern}
                         onChange={e => setEditingSources({ ...editingSources, nordstern: e.target.checked })}
                       />
@@ -621,16 +611,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-6 p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <label className="block text-xs font-medium text-gray-500 mb-1">KyberSwap Slug</label>
-                          <input
-                            className="w-full text-sm border border-gray-200 rounded px-3 py-2"
-                            placeholder={id}
-                            value={config.kyberCode || ''}
-                            onChange={e => handleUpdateChain(id, 'kyberCode', e.target.value)}
-                          />
-                        </div>
+                      <div className="grid grid-cols-2 gap-6 p-4 bg-gray-50 rounded-lg">
                         <div>
                           <label className="block text-xs font-medium text-gray-500 mb-1">Nordstern Chain ID</label>
                           <input
@@ -656,13 +637,12 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   {/* Add Chain */}
                   <div className="bg-blue-50/50 p-6 rounded-xl border border-blue-100 border-dashed">
                     <h4 className="text-sm font-bold text-blue-800 mb-3">Add New Chain</h4>
-                    <div className="grid grid-cols-5 gap-4">
+                    <div className="grid grid-cols-4 gap-4">
                       <input placeholder="ID (e.g. base)" value={newChainId} onChange={e => setNewChainId(e.target.value)} className="border rounded px-3 py-2 text-sm" />
                       <input placeholder="Name (e.g. Base)" value={newChainName} onChange={e => setNewChainName(e.target.value)} className="border rounded px-3 py-2 text-sm" />
-                      <input placeholder="Kyber Code" value={newKyberCode} onChange={e => setNewKyberCode(e.target.value)} className="border rounded px-3 py-2 text-sm" />
                       <input placeholder="Nordstern Chain ID" value={newNordsternCode} onChange={e => setNewNordsternCode(e.target.value)} className="border rounded px-3 py-2 text-sm" />
                       <input placeholder="Li.Fi Chain ID" value={newLiFiChainId} onChange={e => setNewLiFiChainId(e.target.value)} className="border rounded px-3 py-2 text-sm" />
-                      <button onClick={handleAddChain} className="bg-blue-600 text-white rounded px-4 py-2 text-sm font-semibold col-span-5 hover:bg-blue-700">Add Chain Configuration</button>
+                      <button onClick={handleAddChain} className="bg-blue-600 text-white rounded px-4 py-2 text-sm font-semibold col-span-4 hover:bg-blue-700">Add Chain Configuration</button>
                     </div>
                   </div>
                 </div>

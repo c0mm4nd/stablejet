@@ -98,10 +98,10 @@ export default function QuadrilateralArbitrage({ history, amount, pairId }: Quad
             }
 
             if (tokenAToB?.output && tokenAToB.output > 0) {
-                addEdge(tA, tB, tokenAToB.output / tokenAToB.input, item.chain, item.dataSource || 'kyberswap', tokenAToB.input);
+                addEdge(tA, tB, tokenAToB.output / tokenAToB.input, item.chain, item.dataSource || 'unknown', tokenAToB.input);
             }
             if (tokenBToA?.output && tokenBToA.output > 0) {
-                addEdge(tB, tA, tokenBToA.output / tokenBToA.input, item.chain, item.dataSource || 'kyberswap', tokenBToA.input);
+                addEdge(tB, tA, tokenBToA.output / tokenBToA.input, item.chain, item.dataSource || 'unknown', tokenBToA.input);
             }
         });
 

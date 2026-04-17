@@ -115,12 +115,12 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
             // A -> B
             if (tokenAToB?.output && tokenAToB.output > 0) {
                 const rate = tokenAToB.output / tokenAToB.input;
-                addEdge(tA, tB, rate, item.chain, item.dataSource || 'kyberswap', tokenAToB.input);
+                addEdge(tA, tB, rate, item.chain, item.dataSource || 'unknown', tokenAToB.input);
             }
             // B -> A
             if (tokenBToA?.output && tokenBToA.output > 0) {
                 const rate = tokenBToA.output / tokenBToA.input;
-                addEdge(tB, tA, rate, item.chain, item.dataSource || 'kyberswap', tokenBToA.input);
+                addEdge(tB, tA, rate, item.chain, item.dataSource || 'unknown', tokenBToA.input);
             }
         });
 

@@ -1,10 +1,8 @@
 import { ConfigData, DataSource } from './types';
 
 export const DEFAULT_SOURCES: ConfigData['sources'] = {
-  kyberswap: true,
   nordstern: true,
   lifi: true,
-  zerox: true,
   cetus: true,
   jupiter: true,
   panora: true,
@@ -19,10 +17,8 @@ export const DEFAULT_SOURCES: ConfigData['sources'] = {
 };
 
 export const SOURCE_INFO: Record<DataSource, { name: string; color: string; shortName: string }> = {
-  kyberswap: { name: 'KyberSwap', color: 'text-blue-600', shortName: 'KS' },
   nordstern: { name: 'Nordstern', color: 'text-cyan-600', shortName: 'NS' },
   lifi: { name: 'Li.Fi', color: 'text-teal-600', shortName: 'LF' },
-  zerox: { name: '0x', color: 'text-purple-600', shortName: '0X' },
   cetus: { name: 'Cetus', color: 'text-sky-700', shortName: 'CT' },
   jupiter: { name: 'Jupiter', color: 'text-fuchsia-600', shortName: 'JP' },
   panora: { name: 'Panora', color: 'text-violet-600', shortName: 'PN' },
@@ -54,11 +50,11 @@ export function getSourceInfo(source?: string) {
       shortName: toolName.slice(0, 2).toUpperCase()
     };
   }
-  const normalized = (source || 'kyberswap').toLowerCase() as DataSource;
+  const normalized = (source || 'unknown').toLowerCase() as DataSource;
   return SOURCE_INFO[normalized] || {
-    name: source || 'kyberswap',
+    name: source || 'unknown',
     color: 'text-gray-600',
-    shortName: (source || 'kyberswap').slice(0, 2).toUpperCase()
+    shortName: (source || '??').slice(0, 2).toUpperCase()
   };
 }
 

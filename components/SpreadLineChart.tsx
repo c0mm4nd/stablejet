@@ -190,13 +190,13 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
         .flatMap(point => point.data)
         .filter(item => item.amount === amount)
         .filter(item => isSourceEnabled(item.dataSource, sources))
-        .map(item => `${item.chainKey}@${item.dataSource || 'kyberswap'}`)
+        .map(item => `${item.chainKey}@${item.dataSource || 'unknown'}`)
     )
   ).sort();
 
   const splitBase = (base: string) => {
     const [chainKey, dataSource] = base.split('@');
-    return { chainKey, dataSource: dataSource || 'kyberswap' };
+    return { chainKey, dataSource: dataSource || 'unknown' };
   };
 
   // 首先收集所有价差值用于计算中位数
@@ -212,7 +212,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
       .filter(item => item.amount === amount)
       .filter(item => isSourceEnabled(item.dataSource, sources))
       .forEach(item => {
-        const base = `${item.chainKey}@${item.dataSource || 'kyberswap'}`;
+        const base = `${item.chainKey}@${item.dataSource || 'unknown'}`;
         const tokenAToB = item.tokenAToB;
         const tokenBToA = item.tokenBToA;
 
@@ -249,7 +249,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
     point.data
       .filter(item => item.amount === amount)
       .forEach(item => {
-        const base = `${item.chainKey}@${item.dataSource || 'kyberswap'}`;
+        const base = `${item.chainKey}@${item.dataSource || 'unknown'}`;
 
         const tokenAToB = item.tokenAToB;
         const tokenBToA = item.tokenBToA;

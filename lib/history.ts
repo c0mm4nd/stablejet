@@ -52,7 +52,7 @@ export function saveDataPoint(data: ChainSwapData[], pairId: string) {
           historyPointId,
           item.chain,
           item.chainKey,
-          item.dataSource || 'kyberswap',
+          item.dataSource || 'unknown',
           item.pairId || pairId,
           item.amount,
           quoteTimestamp,
@@ -127,7 +127,7 @@ export function getHistoryInRange(hours: number = 24, pairId?: string): HistoryD
       const data: ChainSwapData[] = chainDataRows.map(row => ({
         chain: row.chain,
         chainKey: row.chain_key,
-        dataSource: (row.data_source || 'kyberswap'),
+        dataSource: (row.data_source || 'unknown'),
         pairId: row.pair_id || undefined,
         amount: row.amount,
         quoteTimestamp: row.quote_timestamp || point.timestamp,

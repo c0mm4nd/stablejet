@@ -84,7 +84,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
       .filter(item => item.amount === amount)
       .filter(item => isSourceEnabled(item.dataSource, sources))
       .map(item => {
-        const source = item.dataSource || 'kyberswap';
+        const source = item.dataSource || 'unknown';
         const tokenAToB = item.tokenAToB;
         const tokenBToA = item.tokenBToA;
 

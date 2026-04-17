@@ -85,7 +85,7 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
             .filter(item => item.amount === amount)
             .filter(item => isSourceEnabled(item.dataSource, sources))
             .map(item => {
-                const source = item.dataSource || 'kyberswap';
+                const source = item.dataSource || 'unknown';
                 const tokenAToB = item.tokenAToB;
                 const tokenBToA = item.tokenBToA;
                 const outputAtoB = tokenAToB?.output ?? null;

@@ -70,10 +70,8 @@ export interface RouteAlternative {
 }
 
 export type RouteType =
-  | 'kyberswap'
   | 'nordstern'
   | 'lifi'
-  | 'zerox'
   | 'cetus'
   | 'jupiter'
   | 'panora'
@@ -82,10 +80,8 @@ export type RouteType =
   | 'unknown';
 
 export type DataSource =
-  | 'kyberswap'
   | 'nordstern'
   | 'lifi'
-  | 'zerox'
   | 'cetus'
   | 'jupiter'
   | 'panora'
@@ -99,10 +95,8 @@ export type DataSource =
   | 'kraken';
 
 export interface SourceConfig {
-  kyberswap: boolean;
   nordstern: boolean;
   lifi: boolean;
-  zerox: boolean;
   cetus: boolean;
   jupiter: boolean;
   panora: boolean;
@@ -146,25 +140,6 @@ export interface SwapDataResponse {
   error?: string;
 }
 
-export interface KyberSwapQuoteResponse {
-  code: number;
-  message?: string;
-  data?: {
-    routeSummary?: {
-      amountOut: string;
-      amountOutUsd: string;
-      tokenIn: string;
-      tokenOut: string;
-      route: Array<Array<{
-        pool: string;
-        tokenIn: string;
-        tokenOut: string;
-        swapAmount: string;
-      }>>;
-    };
-  };
-}
-
 export interface QuoteResult {
   success: boolean;
   amountOut?: string;
@@ -192,10 +167,8 @@ export interface NordsternQuoteResponse {
 export interface ChainAppConfig {
   name: string;
   // API identifiers for aggregators
-  kyberCode?: string;     // e.g. "ethereum"
   nordsternCode?: string; // e.g. "8118"
   lifiChainId?: string;   // e.g. "1"
-  zeroXChainId?: string;  // e.g. "1" (EVM chain ID for 0x API)
   disabled?: boolean;
 }
 
