@@ -53,13 +53,24 @@ export async function getLiFiQuotesByChainId(
   if (!alternatives || alternatives.length === 0) {
     return result.success ? [result] : [];
   }
-  // Raw routes parallel to mapped alternatives (for includedSteps / pool detail)
-  const rawRoutes: any[] = Array.isArray(result.route?.raw?.routes) ? result.route!.raw!.routes : [];
-  return alternatives.map((alt, i) => {
+  // Build a map from tool key → raw route for correct matching after deny-filter
+  const rawRouteByTool = new Map<string, any>();
+  const allRawRoutes: any[] = Array.isArray(result.route?.raw?.routes) ? result.route!.raw!.routes : [];
+  for (const rawRoute of allRawRoutes) {
+    const steps: any[] = Array.isArray(rawRoute?.steps) ? rawRoute.steps : [];
+    const toolKey = steps.map((s: any) => s?.tool || '').join('/') || rawRoute?.tool || '';
+    if (toolKey && !rawRouteByTool.has(toolKey)) rawRouteByTool.set(toolKey, rawRoute);
+  }
+
+  return alternatives.map((alt) => {
     const tool = alt.toolNames?.join(' / ') || 'unknown';
-    const rawRoute = rawRoutes[i];
-    // Re-map steps from raw route to capture includedSteps (not present in pre-mapped alt)
-    if (rawRoute?.steps && alt.steps) {
+    // Match raw route by tool key for includedSteps and pool detail
+    const toolKey = (alt.steps ?? []).map(s => s.tool || '').join('/') || tool.toLowerCase();
+    const rawRoute = rawRouteByTool.get(toolKey) ?? allRawRoutes.find(r =>
+      (r?.steps?.[0]?.tool || '').toLowerCase() === tool.split(' / ')[0].toLowerCase()
+    );
+    // Re-map steps from raw to capture includedSteps
+    if (rawRoute?.steps) {
       alt.steps = rawRoute.steps.map((s: any) => mapLiFiRouteStep(s));
     }
     return {
