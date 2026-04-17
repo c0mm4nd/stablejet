@@ -1,7 +1,7 @@
 'use client';
 
 import { extractLiFiAlternatives, getLiFiPrimaryToolLabel } from '@/lib/lifi-route';
-import { RouteAlternative, RouteInfo } from '@/lib/types';
+import { RouteAlternative, RouteHop, RouteInfo } from '@/lib/types';
 
 interface ActiveRouteState {
   chain: string;
@@ -120,18 +120,79 @@ function formatTokenLabel(token?: string, fallback?: string): string {
   return token.toUpperCase();
 }
 
-function formatRouteBlocks(route?: RouteInfo): string[] {
-  if (!route) return [];
-  if (route.note) {
-    return [route.note];
-  }
-  if (Array.isArray(route.swaps)) {
-    return [JSON.stringify(route.swaps, null, 2)];
-  }
-  if (route.raw || route.tx) {
-    return [JSON.stringify({ raw: route.raw, tx: route.tx }, null, 2)];
-  }
-  return [JSON.stringify(route, null, 2)];
+function extractTokenSymbol(addr?: string): string {
+  if (!addr) return '?';
+  // Sui/Aptos format: 0xabc...::module::TYPE
+  const parts = addr.split('::');
+  if (parts.length >= 3) return parts[parts.length - 1];
+  // Long hex address → truncate
+  if (addr.startsWith('0x') && addr.length > 16) return compactHash(addr) || addr;
+  return addr;
+}
+
+function PathHopRow({
+  hop,
+  splitPct,
+}: {
+  hop: RouteHop;
+  splitPct?: string;
+}) {
+  const tokenIn = extractTokenSymbol(hop.tokenIn);
+  const tokenOut = extractTokenSymbol(hop.tokenOut);
+  const poolLabel = hop.exchange || (hop.pool ? compactHash(hop.pool) : null);
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-lg bg-white px-3 py-2 border border-gray-100 text-xs">
+      {splitPct && (
+        <span className="w-10 shrink-0 font-semibold text-gray-400">{splitPct}%</span>
+      )}
+      <span className="rounded-full bg-blue-50 px-2 py-0.5 font-mono font-semibold text-blue-700">{tokenIn}</span>
+      <span className="text-gray-300">→</span>
+      {poolLabel && (
+        <>
+          <span className="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-gray-600">{poolLabel}</span>
+          <span className="text-gray-300">→</span>
+        </>
+      )}
+      <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-mono font-semibold text-emerald-700">{tokenOut}</span>
+      {hop.amountOut && (
+        <span className="ml-auto text-gray-400 tabular-nums">{Number(hop.amountOut).toLocaleString()}</span>
+      )}
+    </div>
+  );
+}
+
+function PathsPanel({ paths }: { paths: RouteHop[][] }) {
+  return (
+    <div className="mt-4 space-y-3">
+      {paths.map((path, pi) => {
+        // Check for split route: all hops share the same tokenIn
+        const firstTokenIn = path[0]?.tokenIn;
+        const isSplit = path.length > 1 && path.every(h => h.tokenIn === firstTokenIn);
+        const totalAmount = isSplit
+          ? path.reduce((sum, h) => sum + Number(h.swapAmount || 0), 0)
+          : 0;
+
+        return (
+          <div key={pi}>
+            {path.length > 1 && (
+              <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400">
+                {isSplit ? `Split across ${path.length} pools` : `Route ${pi + 1}`}
+              </div>
+            )}
+            <div className="space-y-1">
+              {path.map((hop, hi) => {
+                const pct = isSplit && totalAmount > 0
+                  ? ((Number(hop.swapAmount || 0) / totalAmount) * 100).toFixed(1)
+                  : undefined;
+                return <PathHopRow key={hi} hop={hop} splitPct={pct} />;
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 function renderMetric(label: string, value: string | number | null) {
@@ -257,23 +318,20 @@ function RouteDirectionPanel({
     return null;
   }
 
+  // ── LiFi routes ──────────────────────────────────────────────────────────
   const lifiAlternatives = extractLiFiAlternatives(route);
-
   if (lifiAlternatives.length > 0) {
+    const toolLabel = getLiFiPrimaryToolLabel(route);
     return (
       <section className="rounded-2xl border border-gray-200 bg-white/90 p-4">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 pb-3">
           <div>
             <div className="text-base font-semibold text-gray-900">{title}</div>
-            <div className="mt-1 text-sm text-gray-500">
-              {lifiAlternatives.length > 1
-                ? `Li.Fi returned ${lifiAlternatives.length} quote sources`
-                : `via Li.Fi · ${getLiFiPrimaryToolLabel(route) || 'unknown tool'}`}
-            </div>
+            {toolLabel && <div className="mt-1 text-sm text-gray-500">via Li.Fi · {toolLabel}</div>}
           </div>
-          {getLiFiPrimaryToolLabel(route) && (
+          {toolLabel && (
             <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
-              Best source: {getLiFiPrimaryToolLabel(route)}
+              {toolLabel}
             </span>
           )}
         </div>
@@ -290,24 +348,61 @@ function RouteDirectionPanel({
     );
   }
 
-  const routeLines = formatRouteBlocks(route);
-  if (routeLines.length === 0) {
-    return null;
+  // ── CEX routes ────────────────────────────────────────────────────────────
+  if (route.type === 'cex') {
+    return (
+      <section className="rounded-2xl border border-gray-200 bg-white/90 p-4">
+        <div className="border-b border-gray-100 pb-3">
+          <div className="text-base font-semibold text-gray-900">{title}</div>
+          <div className="mt-1 text-sm text-gray-500">Order book simulation — no on-chain route</div>
+        </div>
+      </section>
+    );
   }
+
+  // ── On-chain DEX routes with paths (Cetus / Jupiter / Panora / Aftermath) ─
+  const paths = Array.isArray(route.paths) ? route.paths : [];
+  if (paths.length > 0) {
+    const sourceLabel = route.type
+      ? route.type.charAt(0).toUpperCase() + route.type.slice(1)
+      : 'DEX';
+    return (
+      <section className="rounded-2xl border border-gray-200 bg-white/90 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 pb-3">
+          <div>
+            <div className="text-base font-semibold text-gray-900">{title}</div>
+            <div className="mt-1 text-sm text-gray-500">via {sourceLabel}</div>
+          </div>
+          <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+            {sourceLabel}
+          </span>
+        </div>
+        <PathsPanel paths={paths} />
+      </section>
+    );
+  }
+
+  // ── Fallback: show note or raw JSON ───────────────────────────────────────
+  const note = route.note;
+  const rawDisplay = !note
+    ? JSON.stringify(
+        route.swaps ?? (route.raw ? { raw: route.raw } : route),
+        null,
+        2
+      )
+    : null;
+
+  if (!note && !rawDisplay) return null;
 
   return (
     <section className="rounded-2xl border border-gray-200 bg-white/90 p-4">
-      <div className="flex flex-wrap items-center gap-2 border-b border-gray-100 pb-3">
-        <div className="text-base font-semibold text-gray-900">{title}</div>
-        {getLiFiPrimaryToolLabel(route) && (
-          <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
-            {getLiFiPrimaryToolLabel(route)}
-          </span>
-        )}
-      </div>
-      <pre className="mt-4 whitespace-pre-wrap rounded-xl bg-gray-50 p-3 text-xs text-gray-700">
-        {routeLines.join('\n')}
-      </pre>
+      <div className="border-b border-gray-100 pb-3 text-base font-semibold text-gray-900">{title}</div>
+      {note && <p className="mt-3 text-sm text-gray-600">{note}</p>}
+      {rawDisplay && (
+        <pre className="mt-4 max-h-72 overflow-y-auto whitespace-pre-wrap rounded-xl bg-gray-50 p-3 text-xs text-gray-700">
+          {rawDisplay}
+        </pre>
+      )}
     </section>
   );
 }
