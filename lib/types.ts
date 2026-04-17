@@ -70,7 +70,6 @@ export interface RouteAlternative {
 }
 
 export type RouteType =
-  | 'nordstern'
   | 'lifi'
   | 'cetus'
   | 'jupiter'
@@ -80,7 +79,6 @@ export type RouteType =
   | 'unknown';
 
 export type DataSource =
-  | 'nordstern'
   | 'lifi'
   | 'cetus'
   | 'jupiter'
@@ -95,7 +93,6 @@ export type DataSource =
   | 'kraken';
 
 export interface SourceConfig {
-  nordstern: boolean;
   lifi: boolean;
   cetus: boolean;
   jupiter: boolean;
@@ -148,26 +145,10 @@ export interface QuoteResult {
   route?: RouteInfo;
 }
 
-export interface NordsternQuoteResponse {
-  src: string;
-  dst: string;
-  fromAmount: string;
-  toAmount: string;
-  swaps?: any[];
-  tx?: {
-    data: string;
-    from: string;
-    to: string;
-    value: string;
-  };
-}
-
 // --- Config V2 Types ---
 
 export interface ChainAppConfig {
   name: string;
-  // API identifiers for aggregators
-  nordsternCode?: string; // e.g. "8118"
   lifiChainId?: string;   // e.g. "1"
   disabled?: boolean;
 }

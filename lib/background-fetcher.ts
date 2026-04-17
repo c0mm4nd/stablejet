@@ -1,7 +1,6 @@
 import { log, error } from './logger';
 import { getSwapDataForPair } from './swap-data';
 import { saveDataPoint } from './history';
-import { getNordsternRateLimiterStatus } from './nordstern';
 import { getBinanceRateLimiterStatus } from './binance';
 import { getBybitRateLimiterStatus } from './bybit';
 import { getMexcRateLimiterStatus } from './mexc';
@@ -333,10 +332,6 @@ class BackgroundFetcher {
 
         // 显示速率限制器状态
         log('\n[BackgroundFetcher] Rate limiters:');
-        try {
-          const nordsternStatus = getNordsternRateLimiterStatus();
-          log(`  Nordstern: ${nordsternStatus.current}/${nordsternStatus.max} @ ${nordsternStatus.rate}`);
-        } catch (e) { /* ignore */ }
 
         try {
           const binanceStatus = getBinanceRateLimiterStatus();

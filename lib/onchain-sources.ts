@@ -1,6 +1,5 @@
 import { fromWei, toWei } from './config';
 import { ChainAppConfig, ChainSwapData, QuoteResult, ConfigData } from './types';
-import { getNordsternQuoteByChainKey } from './nordstern';
 import { getLiFiQuotesByChainId } from './lifi';
 import { getCetusQuote } from './cetus';
 import { getJupiterQuote } from './jupiter';
@@ -42,9 +41,7 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
   } = params;
   const normalizedSources = normalizeSources(sources);
 
-  const nordsternChainParam = appChainConfig.nordsternCode || chainKey;
-  const lifiChainId = appChainConfig.lifiChainId || appChainConfig.nordsternCode;
-  const enableNordstern = normalizedSources.nordstern !== false && !!appChainConfig.nordsternCode;
+  const lifiChainId = appChainConfig.lifiChainId;
   const enableLiFi = normalizedSources.lifi !== false && !!lifiChainId;
   const enableCetus = normalizedSources.cetus !== false && chainKey === 'sui';
   const enableJupiter = normalizedSources.jupiter !== false && chainKey === 'solana';
@@ -56,12 +53,6 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
   const humanAmount = String(amount);
 
   const sourceEntries: SourceEntry[] = [];
-
-  const nordsternPromise = enableNordstern
-    ? getNordsternQuoteByChainKey(nordsternChainParam, tokenAAddress, tokenBAddress, amountInAToB)
-      .then(aToB => getNordsternQuoteByChainKey(nordsternChainParam, tokenBAddress, tokenAAddress, amountInBToA)
-        .then(bToA => ({ source: 'nordstern' as const, aToB, bToA })))
-    : null;
 
   const lifiPromise = enableLiFi && lifiChainId
     ? Promise.all([
@@ -96,7 +87,6 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
 
   const [fetched, lifiPair] = await Promise.all([
     Promise.all([
-      ...(nordsternPromise ? [nordsternPromise] : []),
       ...(cetusPromise ? [cetusPromise] : []),
       ...(jupiterPromise ? [jupiterPromise] : []),
       ...(panoraPromise ? [panoraPromise] : []),

@@ -1,7 +1,6 @@
 import { ConfigData, DataSource } from './types';
 
 export const DEFAULT_SOURCES: ConfigData['sources'] = {
-  nordstern: true,
   lifi: true,
   cetus: true,
   jupiter: true,
@@ -17,7 +16,6 @@ export const DEFAULT_SOURCES: ConfigData['sources'] = {
 };
 
 export const SOURCE_INFO: Record<DataSource, { name: string; color: string; shortName: string }> = {
-  nordstern: { name: 'Nordstern', color: 'text-cyan-600', shortName: 'NS' },
   lifi: { name: 'Li.Fi', color: 'text-teal-600', shortName: 'LF' },
   cetus: { name: 'Cetus', color: 'text-sky-700', shortName: 'CT' },
   jupiter: { name: 'Jupiter', color: 'text-fuchsia-600', shortName: 'JP' },
