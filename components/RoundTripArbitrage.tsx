@@ -123,10 +123,10 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
                         <thead className="bg-gray-50/40 border-b border-gray-100">
                             <tr>
                                 <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wide w-6">#</th>
-                                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell {tokenA} ({tokenA}→{tokenB})</th>
                                 <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Buy {tokenA} ({tokenB}→{tokenA})</th>
-                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell Rate</th>
+                                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell {tokenA} ({tokenA}→{tokenB})</th>
                                 <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Buy Rate</th>
+                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell Rate</th>
                                 <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Profit (bps)</th>
                                 <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Est. Profit</th>
                             </tr>
@@ -140,18 +140,18 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
                                             {idx + 1}
                                         </td>
                                         <td className="px-3 py-2 whitespace-nowrap">
-                                            <div className="font-medium text-gray-800">{opp.sellChain}</div>
-                                            <div className="text-[10px] text-gray-400">{opp.sellSource}</div>
-                                        </td>
-                                        <td className="px-3 py-2 whitespace-nowrap">
                                             <div className="font-medium text-gray-800">{opp.buyChain}</div>
                                             <div className="text-[10px] text-gray-400">{opp.buySource}</div>
                                         </td>
-                                        <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
-                                            {opp.sellRate.toFixed(6)}
+                                        <td className="px-3 py-2 whitespace-nowrap">
+                                            <div className="font-medium text-gray-800">{opp.sellChain}</div>
+                                            <div className="text-[10px] text-gray-400">{opp.sellSource}</div>
                                         </td>
                                         <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
                                             {opp.buyRate.toFixed(6)}
+                                        </td>
+                                        <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
+                                            {opp.sellRate.toFixed(6)}
                                         </td>
                                         <td className="px-3 py-2 text-right tabular-nums">
                                             <span className="font-mono font-bold text-emerald-600">

@@ -63,6 +63,7 @@ export default function QuadrilateralArbitrage({ history, amount, pairId }: Quad
             .filter(d => isSourceEnabled(d.dataSource, sources));
 
         // Build graph: token -> token -> Edge[]
+        // Deduplicated: one best-rate edge per (from, to, chain) to keep E^4 manageable.
         interface Edge {
             to: string;
             chain: string;
@@ -70,12 +71,16 @@ export default function QuadrilateralArbitrage({ history, amount, pairId }: Quad
             rate: number;
             quotedInput: number;
         }
-        const graph: Record<string, Record<string, Edge[]>> = {};
+        // bestEdge[from][to][chain] = best edge seen so far
+        const bestEdge: Record<string, Record<string, Record<string, Edge>>> = {};
 
         function addEdge(from: string, to: string, rate: number, chain: string, source: string, quotedInput: number) {
-            if (!graph[from]) graph[from] = {};
-            if (!graph[from][to]) graph[from][to] = [];
-            graph[from][to].push({ to, rate, chain, source, quotedInput });
+            if (!bestEdge[from]) bestEdge[from] = {};
+            if (!bestEdge[from][to]) bestEdge[from][to] = {};
+            const existing = bestEdge[from][to][chain];
+            if (!existing || rate > existing.rate) {
+                bestEdge[from][to][chain] = { to, rate, chain, source, quotedInput };
+            }
         }
 
         recentData.forEach(item => {
@@ -105,16 +110,22 @@ export default function QuadrilateralArbitrage({ history, amount, pairId }: Quad
             }
         });
 
+        // Flatten bestEdge into graph: token -> token -> Edge[]
+        // After dedup, at most one edge per chain per directed pair → E is small
+        const graph: Record<string, Record<string, Edge[]>> = {};
+        for (const from of Object.keys(bestEdge)) {
+            graph[from] = {};
+            for (const to of Object.keys(bestEdge[from])) {
+                graph[from][to] = Object.values(bestEdge[from][to]);
+            }
+        }
+
         // 4-hop cycle search: T0 → T1 → T2 → T3 → T0
         // Rules:
-        //   - T1 ≠ T0 (no self-loop)
-        //   - T2 ≠ T1 (no immediate backtrack)
-        //   - T2 may equal T0 (hub-spoke: allows ETH→LST→ETH→LST→ETH)
-        //   - T3 ≠ T2 (no immediate backtrack)
-        //   - T3 ≠ T0 (otherwise reduces to 3-hop already covered by triangular arb)
-        //   - T3 ≠ T1 when T2 === T0 (avoids degenerate T0→T1→T0→T1→T0)
-        //   - graph[T3][T0] must exist (closing edge)
-        //   - At most 3 distinct chains across the 4 legs
+        //   - T1 ≠ T0, T2 ≠ T1, T3 ≠ T2, T3 ≠ T0
+        //   - T2 may equal T0 (hub-spoke: ETH→LST→ETH→LST→ETH)
+        //   - T3 ≠ T1 when T2 === T0 (avoids degenerate loop)
+        //   - At most 2 distinct chains across the 4 legs
 
         const opps: QuadOpp[] = [];
         const tokens = Object.keys(graph);
@@ -142,16 +153,30 @@ export default function QuadrilateralArbitrage({ history, amount, pairId }: Quad
 
                         for (const e1 of e1List) {
                             for (const e2 of e2List) {
+                                // Early prune: after 2 hops, if accumulated rate is already
+                                // too low to recover, skip remaining combinations
+                                const rate12 = e1.rate * e2.rate;
+                                if (rate12 < 0.9) continue;
+                                // Determine allowed chains (at most 2 total)
+                                const chainSet12 = e1.chain === e2.chain
+                                    ? new Set([e1.chain])
+                                    : new Set([e1.chain, e2.chain]);
+                                if (chainSet12.size > 2) continue;
+
                                 for (const e3 of e3List) {
+                                    if (chainSet12.size === 2 && !chainSet12.has(e3.chain)) continue;
+                                    const rate123 = rate12 * e3.rate;
+                                    if (rate123 < 0.88) continue;
+
                                     for (const e4 of e4List) {
-                                        const chains = new Set([e1.chain, e2.chain, e3.chain, e4.chain]);
-                                        if (chains.size > 2) continue;
-                                        const totalRate = e1.rate * e2.rate * e3.rate * e4.rate;
+                                        const chainSet = new Set([e1.chain, e2.chain, e3.chain, e4.chain]);
+                                        if (chainSet.size > 2) continue;
+                                        const totalRate = rate123 * e4.rate;
                                         const profitBps = (totalRate - 1) * 10000;
-                                        if (profitBps > 0 && (!best || profitBps > best.profitBps)) {
+                                        if (profitBps > 0 && profitBps <= 2000 && (!best || profitBps > best.profitBps)) {
                                             best = {
                                                 profitBps,
-                                                isCrossChain: chains.size > 1,
+                                                isCrossChain: chainSet.size > 1,
                                                 startAmount: e1.quotedInput,
                                                 path: `${T0} → ${T1} → ${T2} → ${T3} → ${T0}`,
                                                 steps: [
