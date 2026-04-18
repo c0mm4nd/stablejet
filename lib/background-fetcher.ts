@@ -8,6 +8,7 @@ import { getBitgetRateLimiterStatus } from './bitget';
 import { getGateRateLimiterStatus } from './gate';
 import { getHtxRateLimiterStatus } from './htx';
 import { getKrakenRateLimiterStatus } from './kraken';
+import { getOkxRateLimiterStatus } from './okx';
 import { getConfig } from './server-config';
 import { sendBarkNotification } from './bark';
 import { saveNotification } from './db';
@@ -366,6 +367,11 @@ class BackgroundFetcher {
         try {
           const krakenStatus = getKrakenRateLimiterStatus();
           log(`  Kraken: ${krakenStatus.rate}`);
+        } catch (e) { /* ignore */ }
+
+        try {
+          const okxStatus = getOkxRateLimiterStatus();
+          log(`  OKX: ${okxStatus.rate}`);
         } catch (e) { /* ignore */ }
 
       } catch (err) {

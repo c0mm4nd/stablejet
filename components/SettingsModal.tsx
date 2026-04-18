@@ -55,7 +55,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         const defaultB = getTokenDecimals(pair.tokenB);
         const nextChains: TradingPairConfig['chains'] = {};
         for (const [chainId, cfg] of Object.entries(pair.chains || {})) {
-          if (['binance', 'mexc', 'bybit', 'bitget', 'gate', 'htx', 'kraken'].includes(chainId)) {
+          if (['binance', 'mexc', 'bybit', 'bitget', 'gate', 'htx', 'kraken', 'okx'].includes(chainId)) {
             nextChains[chainId] = cfg;
             continue;
           }
@@ -83,7 +83,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       const defaultB = getTokenDecimals(pair.tokenB);
       const nextChains: TradingPairConfig['chains'] = {};
       for (const [chainId, cfg] of Object.entries(pair.chains || {})) {
-        if (['binance', 'mexc', 'bybit', 'bitget', 'gate', 'htx', 'kraken'].includes(chainId)) {
+        if (['binance', 'mexc', 'bybit', 'bitget', 'gate', 'htx', 'kraken', 'okx'].includes(chainId)) {
           nextChains[chainId] = cfg;
           continue;
         }
@@ -577,6 +577,14 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       />
                       <span className="font-medium text-gray-700">Kraken</span>
                     </label>
+                    <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
+                      <input
+                        type="checkbox"
+                        checked={!!editingSources.okx}
+                        onChange={e => setEditingSources({ ...editingSources, okx: e.target.checked })}
+                      />
+                      <span className="font-medium text-gray-700">OKX</span>
+                    </label>
                   </div>
                 </div>
 
@@ -709,7 +717,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         {Object.keys(editingChains).filter(id => !editingChains[id].disabled).map(chainId => {
                           const isConfigured = !!editingPairs[activePairId].chains[chainId];
                           const config = editingPairs[activePairId].chains[chainId] || { addressA: '', addressB: '' };
-                          const isCex = ['binance', 'mexc', 'bybit', 'bitget', 'gate', 'htx', 'kraken'].includes(chainId);
+                          const isCex = ['binance', 'mexc', 'bybit', 'bitget', 'gate', 'htx', 'kraken', 'okx'].includes(chainId);
 
                           return (
                             <div key={chainId} className={`p-4 rounded-xl border transition-all ${isConfigured ? 'bg-white border-blue-200 shadow-sm' : 'bg-gray-50 border-gray-200 opacity-70 hover:opacity-100'}`}>

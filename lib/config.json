@@ -585,6 +585,9 @@
       "name": "Kraken",
       "disabled": false
     },
+    "okx": {
+      "name": "OKX"
+    },
     "tac": {
       "name": "TAC"
     }
@@ -885,6 +888,9 @@
           "addressB": "",
           "cexPairSymbol": "USDCUSDT"
         },
+        "okx": {
+          "cexPairSymbol": "USDC-USDT"
+        },
         "metis": {
           "addressA": "0xea32a96608495e54156ae48931a7c20f0dcc1a21",
           "decimalsA": 6,
@@ -966,6 +972,9 @@
           "decimalsA": 18,
           "addressB": "0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4",
           "decimalsB": 6
+        },
+        "okx": {
+          "cexPairSymbol": "DAI-USDC"
         }
       }
     },
@@ -1035,6 +1044,9 @@
           "decimalsA": 18,
           "addressB": "0x493257fD37EDB34451f62EDf8D2a0C418852bA4C",
           "decimalsB": 6
+        },
+        "okx": {
+          "cexPairSymbol": "DAI-USDT"
         }
       }
     },
@@ -1076,6 +1088,9 @@
           "decimalsA": 6,
           "addressB": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
           "decimalsB": 6
+        },
+        "okx": {
+          "cexPairSymbol": "USDS-USDC"
         }
       }
     },
@@ -1117,6 +1132,9 @@
           "decimalsA": 6,
           "addressB": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
           "decimalsB": 6
+        },
+        "okx": {
+          "cexPairSymbol": "USDS-USDT"
         }
       }
     },
@@ -1227,6 +1245,9 @@
           "decimalsA": 18,
           "addressB": "0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4",
           "decimalsB": 6
+        },
+        "okx": {
+          "cexPairSymbol": "USDE-USDC"
         }
       }
     },
@@ -1344,6 +1365,9 @@
           "decimalsA": 18,
           "addressB": "0x493257fD37EDB34451f62EDf8D2a0C418852bA4C",
           "decimalsB": 6
+        },
+        "okx": {
+          "cexPairSymbol": "USDE-USDT"
         }
       }
     },
@@ -1716,6 +1740,9 @@
           "decimalsA": 6,
           "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
           "decimalsB": 6
+        },
+        "okx": {
+          "cexPairSymbol": "PYUSD-USDT"
         }
       }
     },
@@ -2008,6 +2035,9 @@
           "decimalsA": 6,
           "addressB": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
           "decimalsB": 6
+        },
+        "okx": {
+          "cexPairSymbol": "EURC-USDC"
         }
       }
     },
@@ -2037,6 +2067,9 @@
           "decimalsA": 6,
           "addressB": "0x74AFfbE5E43EA0548C152B4fB7b62B80a0170aE4",
           "decimalsB": 6
+        },
+        "okx": {
+          "cexPairSymbol": "USDG-USDC"
         }
       }
     },
@@ -2066,6 +2099,9 @@
           "decimalsA": 6,
           "addressB": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
           "decimalsB": 6
+        },
+        "okx": {
+          "cexPairSymbol": "USDG-USDT"
         }
       }
     },
@@ -2881,8 +2917,7 @@
         }
       }
     },
-    "rETH_ETH":
- {
+    "rETH_ETH": {
       "id": "rETH_ETH",
       "name": "rETH/ETH",
       "tokenA": "rETH",
@@ -4104,6 +4139,7 @@
     "bitget": true,
     "gate": false,
     "htx": false,
-    "kraken": false
+    "kraken": false,
+    "okx": true
   }
 }

@@ -12,7 +12,8 @@ export const DEFAULT_SOURCES: ConfigData['sources'] = {
   bitget: true,
   gate: true,
   htx: true,
-  kraken: true
+  kraken: true,
+  okx: true
 };
 
 export const SOURCE_INFO: Record<DataSource, { name: string; color: string; shortName: string }> = {
@@ -27,7 +28,8 @@ export const SOURCE_INFO: Record<DataSource, { name: string; color: string; shor
   bitget: { name: 'Bitget', color: 'text-sky-600', shortName: 'BG' },
   gate: { name: 'Gate.io', color: 'text-indigo-600', shortName: 'GT' },
   htx: { name: 'HTX', color: 'text-rose-600', shortName: 'HX' },
-  kraken: { name: 'Kraken', color: 'text-slate-600', shortName: 'KR' }
+  kraken: { name: 'Kraken', color: 'text-slate-600', shortName: 'KR' },
+  okx: { name: 'OKX', color: 'text-gray-900', shortName: 'OX' }
 };
 
 export function normalizeSources(

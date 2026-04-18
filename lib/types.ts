@@ -91,7 +91,8 @@ export type DataSource =
   | 'bitget'
   | 'gate'
   | 'htx'
-  | 'kraken';
+  | 'kraken'
+  | 'okx';
 
 export interface SourceConfig {
   lifi: boolean;
@@ -106,6 +107,7 @@ export interface SourceConfig {
   gate: boolean;
   htx: boolean;
   kraken: boolean;
+  okx: boolean;
 }
 
 export interface RouteInfo {

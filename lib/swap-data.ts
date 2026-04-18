@@ -8,6 +8,7 @@ import { getBitgetSwapData } from './bitget';
 import { getGateSwapData } from './gate';
 import { getHtxSwapData } from './htx';
 import { getKrakenSwapData } from './kraken';
+import { getOkxSwapData } from './okx';
 import { ChainAppConfig, ChainSwapData, TradingPairConfig, ConfigData } from './types';
 
 export async function getSwapDataForPair(
@@ -37,7 +38,7 @@ export async function getSwapDataForPair(
     const tokenBDecimals = chainPairData.decimalsB ?? defaultTokenBDecimals;
 
     // CEX Logic: Fetch if configured in the pair's chain map
-    if (['binance', 'mexc', 'bybit', 'bitget', 'gate', 'htx', 'kraken'].includes(chainKey)) {
+    if (['binance', 'mexc', 'bybit', 'bitget', 'gate', 'htx', 'kraken', 'okx'].includes(chainKey)) {
       if (sources) {
         if (chainKey === 'binance' && sources.binance === false) continue;
         if (chainKey === 'mexc' && sources.mexc === false) continue;
@@ -46,6 +47,7 @@ export async function getSwapDataForPair(
         if (chainKey === 'gate' && sources.gate === false) continue;
         if (chainKey === 'htx' && sources.htx === false) continue;
         if (chainKey === 'kraken' && sources.kraken === false) continue;
+        if (chainKey === 'okx' && sources.okx === false) continue;
       }
       const symbol = chainPairData.cexPairSymbol;
       if (!symbol) continue;
@@ -67,6 +69,8 @@ export async function getSwapDataForPair(
             cexData = await getHtxSwapData(amounts, symbol);
           } else if (chainKey === 'kraken') {
             cexData = await getKrakenSwapData(amounts, symbol);
+          } else if (chainKey === 'okx') {
+            cexData = await getOkxSwapData(amounts, symbol);
           }
           return cexData.map(d => ({ ...d, pairId }));
         } catch (err) {
