@@ -20,6 +20,15 @@ interface ArbOpportunity {
     profitUsd: number;
     sellRate: number;    // A→B 的汇率（tokenB per tokenA）
     buyRate: number;     // B→A 的汇率（tokenA per tokenB）
+    sellInput: number;
+    sellOutput: number;
+    buyInput: number;
+    buyOutput: number;
+}
+
+function formatQuoteAmount(value: number): string {
+    if (!Number.isFinite(value)) return 'N/A';
+    return value.toLocaleString('en-US', { maximumFractionDigits: 6 });
 }
 
 export default function RoundTripArbitrage({ history, amount, pairId }: RoundTripArbitrageProps) {
@@ -56,7 +65,8 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
             .filter(d => d.tokenAToB?.output && d.tokenAToB.output > 0)
             .map(d => {
                 const input = (d.tokenAToB!.input > 0) ? d.tokenAToB!.input : amount;
-                return { chain: d.chain, source: d.dataSource || 'unknown', rate: d.tokenAToB!.output! / input };
+                const output = d.tokenAToB!.output!;
+                return { chain: d.chain, source: d.dataSource || 'unknown', rate: output / input, input, output };
             });
 
         // buys: 用 tokenB 换回 tokenA（B→A），买回 tokenA 的那一腿
@@ -64,7 +74,8 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
             .filter(d => d.tokenBToA?.output && d.tokenBToA.output > 0)
             .map(d => {
                 const input = (d.tokenBToA!.input > 0) ? d.tokenBToA!.input : amount;
-                return { chain: d.chain, source: d.dataSource || 'unknown', rate: d.tokenBToA!.output! / input };
+                const output = d.tokenBToA!.output!;
+                return { chain: d.chain, source: d.dataSource || 'unknown', rate: output / input, input, output };
             });
 
         const opps: ArbOpportunity[] = [];
@@ -84,6 +95,10 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
                         profitUsd: amount * profitBps / 10000,
                         sellRate: sell.rate,
                         buyRate: buy.rate,
+                        sellInput: sell.input,
+                        sellOutput: sell.output,
+                        buyInput: buy.input,
+                        buyOutput: buy.output,
                     });
                 }
             }
@@ -148,10 +163,16 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
                                             <div className="text-[10px] text-gray-400">{opp.sellSource}</div>
                                         </td>
                                         <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
-                                            {opp.buyRate.toFixed(6)}
+                                            <div>{opp.buyRate.toFixed(6)}</div>
+                                            <div className="mt-0.5 text-[10px] font-sans text-gray-400 whitespace-nowrap">
+                                                {formatQuoteAmount(opp.buyInput)} {tokenB} → {formatQuoteAmount(opp.buyOutput)} {tokenA}
+                                            </div>
                                         </td>
                                         <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
-                                            {opp.sellRate.toFixed(6)}
+                                            <div>{opp.sellRate.toFixed(6)}</div>
+                                            <div className="mt-0.5 text-[10px] font-sans text-gray-400 whitespace-nowrap">
+                                                {formatQuoteAmount(opp.sellInput)} {tokenA} → {formatQuoteAmount(opp.sellOutput)} {tokenB}
+                                            </div>
                                         </td>
                                         <td className="px-3 py-2 text-right tabular-nums">
                                             <span className="font-mono font-bold text-emerald-600">
