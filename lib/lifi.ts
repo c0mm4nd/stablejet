@@ -3,7 +3,11 @@ import { log, error, warn } from './logger';
 import { QuoteResult } from './types';
 import { mapLiFiRouteAlternative, mapLiFiRouteStep } from './lifi-route';
 
-const JUMPER_API_BASE = 'https://api.jumper.exchange/pipeline/v1/advanced/routes';
+// Jumper migrated its domain exchange -> xyz; api.jumper.exchange no longer resolves (NXDOMAIN).
+// This is the same pipeline proxy the jumper.xyz frontend uses. Keep options.integrator
+// as 'jumper.exchange' (the LiFi-registered 0-fee integrator id) — using li.quest direct or
+// integrator 'jumper.xyz' silently adds a 0.25% "LIFI Fixed Fee". Override with LIFI_API_BASE.
+const JUMPER_API_BASE = process.env.LIFI_API_BASE || 'https://api.jumper.xyz/pipeline/v1/advanced/routes';
 const JUMPER_FROM_ADDRESS = process.env.LIFI_FROM_ADDRESS || '0x0000000000000000000000000000000000000001';
 // client-side tool filter (both tool key and toolDetails.name, lowercased substring match)
 const DENY_TOOL_NAMES = ['cow'];
@@ -13,9 +17,10 @@ const axiosInstance = axios.create({
   headers: {
     Accept: '*/*',
     'Content-Type': 'application/json',
-    Origin: 'https://jumper.exchange',
-    Referer: 'https://jumper.exchange/',
+    Origin: 'https://jumper.xyz',
+    Referer: 'https://jumper.xyz/',
     'User-Agent': 'stablejet-monitor/1.0',
+    // NOTE: integrator id stays 'jumper.exchange' (the LiFi-registered 0-fee id), NOT jumper.xyz
     'x-lifi-integrator': 'jumper.exchange',
     'x-lifi-sdk': '3.15.1',
     'x-lifi-widget': '3.40.1'
