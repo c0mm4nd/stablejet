@@ -1,0 +1,14 @@
+.git
+.next
+node_modules
+playwright-report
+test-results
+data
+*.db
+*.db-shm
+*.db-wal
+*.log
+.env
+.env.*
+.DS_Store
+tsconfig.tsbuildinfo
