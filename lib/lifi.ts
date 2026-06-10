@@ -29,23 +29,60 @@ const axiosInstance = axios.create({
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Slot-reservation limiter: each caller atomically claims the next time slot
+// BEFORE awaiting, so concurrent callers serialize instead of all firing at once.
+// (The old "read lastRequestTime, await, then write" design let every concurrent
+// call read the same timestamp and stampede — that produced the 429s.)
 class LiFiRateLimiter {
-  private lastRequestTime = 0;
-  private readonly minInterval = 100; // 10 RPS
+  private nextSlot = 0;
+  private readonly minInterval = Number(process.env.LIFI_MIN_INTERVAL_MS) || 200; // ~5 RPS
 
   async waitForSlot(): Promise<void> {
     const now = Date.now();
-    const timeSinceLastRequest = now - this.lastRequestTime;
-    if (timeSinceLastRequest < this.minInterval) {
-      await delay(this.minInterval - timeSinceLastRequest);
-    }
-    this.lastRequestTime = Date.now();
+    const slot = Math.max(now, this.nextSlot);
+    this.nextSlot = slot + this.minInterval; // reserve synchronously
+    const wait = slot - now;
+    if (wait > 0) await delay(wait);
   }
 }
 
 const GLOBAL_RATE_LIMITER_KEY = Symbol.for('stablejet.lifi.ratelimiter');
-const rateLimiter = (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] || new LiFiRateLimiter();
-if (process.env.NODE_ENV !== 'production') (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] = rateLimiter;
+const rateLimiter: LiFiRateLimiter = (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] || new LiFiRateLimiter();
+(globalThis as any)[GLOBAL_RATE_LIMITER_KEY] = rateLimiter;
+
+const MAX_RETRIES = Number(process.env.LIFI_MAX_RETRIES) || 3;
+
+// POST to Jumper with: rate limiting, 429 backoff (honoring Retry-After), and a
+// one-shot fallback to li.quest direct if Cloudflare blocks the proxy with 403.
+async function postWithRetry(payload: unknown): Promise<{ data: any }> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    await rateLimiter.waitForSlot();
+    try {
+      return await axiosInstance.post<any>(JUMPER_API_BASE, payload);
+    } catch (err) {
+      lastErr = err;
+      if (!axios.isAxiosError(err)) throw err;
+      const status = err.response?.status;
+      if (status === 403) {
+        warn('[LiFi/Jumper] Jumper API returned 403, falling back to li.quest direct');
+        await rateLimiter.waitForSlot();
+        return await axiosInstance.post<any>(LIFI_DIRECT_API, payload);
+      }
+      if (status === 429 && attempt < MAX_RETRIES) {
+        const retryAfter = Number(err.response?.headers?.['retry-after']);
+        const backoff = Number.isFinite(retryAfter) && retryAfter > 0
+          ? retryAfter * 1000
+          : Math.min(500 * 2 ** attempt, 8000);
+        warn(`[LiFi/Jumper] 429 rate limited, retrying in ${backoff}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        await delay(backoff);
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastErr;
+}
 
 export async function getLiFiQuotesByChainId(
   chainId: string,
@@ -121,19 +158,7 @@ executionType: 'all'
   };
 
   try {
-    await rateLimiter.waitForSlot();
-    let response;
-    try {
-      response = await axiosInstance.post<any>(JUMPER_API_BASE, payload);
-    } catch (primaryErr) {
-      if (axios.isAxiosError(primaryErr) && primaryErr.response?.status === 403) {
-        warn('[LiFi/Jumper] Jumper API returned 403, falling back to li.quest direct');
-        await rateLimiter.waitForSlot();
-        response = await axiosInstance.post<any>(LIFI_DIRECT_API, payload);
-      } else {
-        throw primaryErr;
-      }
-    }
+    const response = await postWithRetry(payload);
     const data = response.data;
     const allRoutes = Array.isArray(data?.routes) ? data.routes : [];
     // Client-side filter: remove routes where any step or the route itself uses a denied tool
