@@ -35,14 +35,24 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 // call read the same timestamp and stampede — that produced the 429s.)
 class LiFiRateLimiter {
   private nextSlot = 0;
-  private readonly minInterval = Number(process.env.LIFI_MIN_INTERVAL_MS) || 200; // ~5 RPS
+  private cooldownUntil = 0;
+  private readonly minInterval = Number(process.env.LIFI_MIN_INTERVAL_MS) || 500; // ~2 RPS
 
   async waitForSlot(): Promise<void> {
-    const now = Date.now();
-    const slot = Math.max(now, this.nextSlot);
-    this.nextSlot = slot + this.minInterval; // reserve synchronously
-    const wait = slot - now;
-    if (wait > 0) await delay(wait);
+    // A whole background sweep reserves its slots up front in one synchronous
+    // burst (req1@T, req2@T+interval, ...). So a cooldown applied mid-sweep can't
+    // be seen by already-reserved requests just by bumping nextSlot. Re-check the
+    // cooldown AFTER waiting: if we wake inside a cooldown window, re-reserve a
+    // fresh (later, re-spaced) slot — this both waits out the penalty and avoids a
+    // thundering herd when the window lifts.
+    for (;;) {
+      const now = Date.now();
+      const slot = Math.max(now, this.nextSlot);
+      this.nextSlot = slot + this.minInterval; // reserve synchronously
+      const wait = slot - now;
+      if (wait > 0) await delay(wait);
+      if (Date.now() >= this.cooldownUntil) return;
+    }
   }
 
   // Global cooldown: when one request hits 429, push every queued slot past the
@@ -50,6 +60,7 @@ class LiFiRateLimiter {
   // each request independently hammering into the same quota.
   penalize(ms: number): void {
     const until = Date.now() + ms;
+    if (until > this.cooldownUntil) this.cooldownUntil = until;
     if (until > this.nextSlot) this.nextSlot = until;
   }
 }
