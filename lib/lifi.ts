@@ -44,6 +44,14 @@ class LiFiRateLimiter {
     const wait = slot - now;
     if (wait > 0) await delay(wait);
   }
+
+  // Global cooldown: when one request hits 429, push every queued slot past the
+  // server's Retry-After window so the whole fleet backs off together instead of
+  // each request independently hammering into the same quota.
+  penalize(ms: number): void {
+    const until = Date.now() + ms;
+    if (until > this.nextSlot) this.nextSlot = until;
+  }
 }
 
 const GLOBAL_RATE_LIMITER_KEY = Symbol.for('stablejet.lifi.ratelimiter');
@@ -74,6 +82,8 @@ async function postWithRetry(payload: unknown): Promise<{ data: any }> {
         const backoff = Number.isFinite(retryAfter) && retryAfter > 0
           ? retryAfter * 1000
           : Math.min(500 * 2 ** attempt, 8000);
+        // Back the whole fleet off, not just this request — the quota is shared.
+        rateLimiter.penalize(backoff);
         warn(`[LiFi/Jumper] 429 rate limited, retrying in ${backoff}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
         await delay(backoff);
         continue;
