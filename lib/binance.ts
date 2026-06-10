@@ -8,11 +8,17 @@ interface BinanceDepthResponse {
   asks: Array<[string, string]>; // [price, qty] where qty is base (USDC)
 }
 
+// api.binance.com geo-blocks restricted regions (e.g. US) with HTTP 451. The
+// data-api.binance.vision host serves the same public market-data endpoints
+// (/api/v3/depth) without geo-restriction and needs no API key. Override with
+// BINANCE_API_BASE (e.g. to point at a proxy).
+const BINANCE_API_BASE = process.env.BINANCE_API_BASE || 'https://data-api.binance.vision';
+
 // axios 会自动使用环境变量中的代理：HTTP_PROXY, HTTPS_PROXY, NO_PROXY
 const axiosInstance = axios.create({
   timeout: 10000, // 10秒超时
   headers: {
-    'User-Agent': 'stablejet-monitor/1.0',
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
     'Accept': 'application/json'
   }
 });
@@ -50,10 +56,10 @@ const rateLimiter = (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] || new BinanceR
 if (process.env.NODE_ENV !== 'production') (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] = rateLimiter;
 
 async function getBinanceDepth(limit: number, symbol: string): Promise<BinanceDepthResponse> {
-  const url = `https://api.binance.com/api/v3/depth?symbol=${symbol}&limit=${limit}`;
+  const url = `${BINANCE_API_BASE}/api/v3/depth?symbol=${symbol}&limit=${limit}`;
 
   try {
-    log(`[Binance] Fetching depth data for ${symbol} from api.binance.com...`);
+    log(`[Binance] Fetching depth data for ${symbol} from ${BINANCE_API_BASE}...`);
 
     // 等待速率限制器允许
     await rateLimiter.waitForSlot();

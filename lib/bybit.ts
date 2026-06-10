@@ -14,10 +14,15 @@ interface BybitDepthResponse {
   };
 }
 
+// api.bybit.com geo-blocks restricted regions (e.g. US) with HTTP 403 at the
+// CDN edge. api.bytick.com is Bybit's official mirror with the identical v5 API.
+// Override with BYBIT_API_BASE (e.g. to point at a proxy).
+const BYBIT_API_BASE = process.env.BYBIT_API_BASE || 'https://api.bytick.com';
+
 const axiosInstance = axios.create({
   timeout: 10000,
   headers: {
-    'User-Agent': 'stablejet-monitor/1.0',
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
     'Accept': 'application/json'
   }
 });
@@ -53,10 +58,10 @@ const rateLimiter = (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] || new BybitRat
 if (process.env.NODE_ENV !== 'production') (globalThis as any)[GLOBAL_RATE_LIMITER_KEY] = rateLimiter;
 
 async function getBybitDepth(limit: number, symbol: string): Promise<{ bids: Array<[string, string]>; asks: Array<[string, string]> }> {
-  const url = `https://api.bybit.com/v5/market/orderbook?category=spot&symbol=${symbol}&limit=${limit}`;
+  const url = `${BYBIT_API_BASE}/v5/market/orderbook?category=spot&symbol=${symbol}&limit=${limit}`;
 
   try {
-    log('[Bybit] Fetching depth data from api.bybit.com...');
+    log(`[Bybit] Fetching depth data from ${BYBIT_API_BASE}...`);
 
     await rateLimiter.waitForSlot();
 
