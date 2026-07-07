@@ -1,162 +1,51 @@
 import { ChainSwapData } from './types';
-import { error } from './logger';
-import { getDatabase, initDatabase } from './db';
 
 export interface HistoryDataPoint {
   timestamp: string;
   data: ChainSwapData[];
 }
 
-const MAX_HISTORY_POINTS = 100; // 保留最近100个数据点
+// In-memory history store. History was previously persisted to SQLite on a
+// Railway volume, but only the most recent points were ever kept, so a
+// process-lifetime ring buffer serves the same purpose without any disk state.
+// History resets on each deploy and refills from the background fetcher.
+const MAX_HISTORY_POINTS = Number(process.env.MAX_HISTORY_POINTS) || 100;
 
-function safelyParseRoute(value: string) {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return undefined;
-  }
-}
-
-// 初始化数据库（如果还没初始化）
-initDatabase();
+// Survive Next.js dev-server HMR module reloads
+const GLOBAL_HISTORY_KEY = Symbol.for('stablejet.history.points');
+const historyPoints: HistoryDataPoint[] =
+  (globalThis as any)[GLOBAL_HISTORY_KEY] || [];
+(globalThis as any)[GLOBAL_HISTORY_KEY] = historyPoints;
 
 // 保存新的数据点
 export function saveDataPoint(data: ChainSwapData[], pairId: string) {
-  const db = getDatabase();
   const timestamp = new Date().toISOString();
+  const quoteTimestamp = timestamp;
 
-  try {
-    // 使用事务确保数据一致性
-    const insertPoint = db.prepare(`
-      INSERT INTO history_points (timestamp)
-      VALUES (?)
-    `);
+  historyPoints.push({
+    timestamp,
+    data: data.map(item => ({
+      ...item,
+      pairId: item.pairId || pairId,
+      quoteTimestamp: item.quoteTimestamp || quoteTimestamp
+    }))
+  });
 
-    const insertChainSwap = db.prepare(`
-      INSERT INTO chain_swaps (
-        history_point_id, chain, chain_key, data_source, pair_id, amount, quote_timestamp,
-        token_a_to_b_input, token_a_to_b_output, token_a_to_b_output_usd, token_a_to_b_error, token_a_to_b_route,
-        token_b_to_a_input, token_b_to_a_output, token_b_to_a_output_usd, token_b_to_a_error, token_b_to_a_route
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    const transaction = db.transaction((data: ChainSwapData[], pairId: string) => {
-      // 插入历史数据点
-      const result = insertPoint.run(timestamp);
-      const historyPointId = result.lastInsertRowid;
-
-      // 插入每条链的数据
-      for (const item of data) {
-        const quoteTimestamp = item.quoteTimestamp || new Date().toISOString();
-        insertChainSwap.run(
-          historyPointId,
-          item.chain,
-          item.chainKey,
-          item.dataSource || 'unknown',
-          item.pairId || pairId,
-          item.amount,
-          quoteTimestamp,
-          item.tokenAToB?.input || null,
-          item.tokenAToB?.output || null,
-          item.tokenAToB?.outputUsd || null,
-          item.tokenAToB?.error || null,
-          item.tokenAToB?.route ? JSON.stringify(item.tokenAToB.route) : null,
-          item.tokenBToA?.input || null,
-          item.tokenBToA?.output || null,
-          item.tokenBToA?.outputUsd || null,
-          item.tokenBToA?.error || null,
-          item.tokenBToA?.route ? JSON.stringify(item.tokenBToA.route) : null
-        );
-      }
-    });
-
-    transaction(data, pairId);
-
-    // 清理旧数据，只保留最近的数据点
-    cleanupOldData();
-  } catch (err) {
-    error('Error saving data point:', err);
-  }
-}
-
-// 清理旧数据
-function cleanupOldData() {
-  const db = getDatabase();
-
-  try {
-    // 删除超过 MAX_HISTORY_POINTS 的旧数据
-    db.prepare(`
-      DELETE FROM history_points
-      WHERE id NOT IN (
-        SELECT id FROM history_points
-        ORDER BY created_at DESC
-        LIMIT ?
-      )
-    `).run(MAX_HISTORY_POINTS);
-  } catch (err) {
-    error('Error cleaning up old data:', err);
+  // 清理旧数据，只保留最近的数据点
+  if (historyPoints.length > MAX_HISTORY_POINTS) {
+    historyPoints.splice(0, historyPoints.length - MAX_HISTORY_POINTS);
   }
 }
 
 // 获取指定时间范围的历史数据
 export function getHistoryInRange(hours: number = 24, pairId?: string): HistoryDataPoint[] {
-  const db = getDatabase();
   const cutoffTime = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
 
-  try {
-    // 获取所有符合时间范围的历史数据点
-    const points = db.prepare(`
-      SELECT id, timestamp
-      FROM history_points
-      WHERE timestamp >= ?
-      ORDER BY timestamp ASC
-    `).all(cutoffTime) as Array<{ id: number; timestamp: string }>;
-
-    // 为每个数据点获取链数据
-    const getChainDataQuery = pairId
-      ? `SELECT * FROM chain_swaps WHERE history_point_id = ? AND pair_id = ?`
-      : `SELECT * FROM chain_swaps WHERE history_point_id = ?`;
-
-    const getChainData = db.prepare(getChainDataQuery);
-
-    const historyPoints: HistoryDataPoint[] = points.map(point => {
-      const chainDataRows = pairId
-        ? getChainData.all(point.id, pairId) as Array<any>
-        : getChainData.all(point.id) as Array<any>;
-
-      const data: ChainSwapData[] = chainDataRows.map(row => ({
-        chain: row.chain,
-        chainKey: row.chain_key,
-        dataSource: (row.data_source || 'unknown'),
-        pairId: row.pair_id || undefined,
-        amount: row.amount,
-        quoteTimestamp: row.quote_timestamp || point.timestamp,
-        tokenAToB: row.token_a_to_b_input ? {
-          input: row.token_a_to_b_input,
-          output: row.token_a_to_b_output,
-          outputUsd: row.token_a_to_b_output_usd,
-          error: row.token_a_to_b_error || undefined,
-          route: row.token_a_to_b_route ? safelyParseRoute(row.token_a_to_b_route) : undefined
-        } : undefined,
-        tokenBToA: row.token_b_to_a_input ? {
-          input: row.token_b_to_a_input,
-          output: row.token_b_to_a_output,
-          outputUsd: row.token_b_to_a_output_usd,
-          error: row.token_b_to_a_error || undefined,
-          route: row.token_b_to_a_route ? safelyParseRoute(row.token_b_to_a_route) : undefined
-        } : undefined
-      }));
-
-      return {
-        timestamp: point.timestamp,
-        data
-      };
-    });
-
-    // Filter out points with no data
-    return historyPoints.filter(point => point.data.length > 0);
-  } catch (err) {
-    error('Error reading history:', err);
-    return [];
-  }
+  return historyPoints
+    .filter(point => point.timestamp >= cutoffTime)
+    .map(point => ({
+      timestamp: point.timestamp,
+      data: pairId ? point.data.filter(item => item.pairId === pairId) : point.data
+    }))
+    .filter(point => point.data.length > 0);
 }
