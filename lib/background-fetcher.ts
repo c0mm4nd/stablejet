@@ -12,10 +12,23 @@ import { getOkxRateLimiterStatus } from './okx';
 import { getConfig } from './server-config';
 import { sendBarkNotification } from './bark';
 import { saveNotification } from './db';
-import { ChainSwapData } from './types';
+import { ChainAppConfig, ChainSwapData, TradingPairConfig } from './types';
 
-// Concurrency limit for parallel pair fetching
-const PAIR_FETCH_CONCURRENCY = 8;
+// Concurrency limit for parallel pair fetching. Railway can get upstream-API
+// challenged more aggressively, so keep this tunable without a deploy diff.
+const PAIR_FETCH_CONCURRENCY = Math.max(
+  1,
+  Number(process.env.PAIR_FETCH_CONCURRENCY) || 8
+);
+const FETCH_ACTIVE_PAIR_ONLY = process.env.FETCH_ACTIVE_PAIR_ONLY === '1';
+const SMALL_LIFI_PAIR_MAX_CHAINS = Math.max(
+  0,
+  Number(process.env.SMALL_LIFI_PAIR_MAX_CHAINS) || 3
+);
+const SMALL_LIFI_PAIR_FETCH_INTERVAL_MS = Math.max(
+  0,
+  (Number(process.env.SMALL_LIFI_PAIR_FETCH_INTERVAL_SECONDS) || 90) * 1000
+);
 
 // Worker-pool: runs up to `limit` tasks concurrently
 async function runWithConcurrency<T>(
@@ -42,6 +55,43 @@ const notifyCooldown = new Map<string, number>();
 
 // price change tracker: `pairId|chain|dataSource|direction` -> last rate
 const lastRates = new Map<string, number>();
+
+const GLOBAL_PAIR_FETCH_TIMES_KEY = Symbol.for('stablejet.backgroundFetcher.pairFetchTimes');
+const pairLastFetchTimes: Map<string, number> =
+  (globalThis as any)[GLOBAL_PAIR_FETCH_TIMES_KEY] || new Map<string, number>();
+(globalThis as any)[GLOBAL_PAIR_FETCH_TIMES_KEY] = pairLastFetchTimes;
+
+function countLiFiEnabledChains(
+  pairConfig: TradingPairConfig,
+  chainsConfig: Record<string, ChainAppConfig>
+) {
+  return Object.entries(pairConfig.chains || {}).filter(([chainKey, chainPair]) => {
+    const chainConfig = chainsConfig[chainKey];
+    return (
+      chainConfig?.lifiChainId &&
+      !chainConfig.disabled &&
+      !chainPair.disabled &&
+      chainPair.addressA &&
+      chainPair.addressB
+    );
+  }).length;
+}
+
+function getSmallLiFiPairCooldownMs(
+  pairConfig: TradingPairConfig,
+  chainsConfig: Record<string, ChainAppConfig>
+) {
+  if (SMALL_LIFI_PAIR_MAX_CHAINS <= 0 || SMALL_LIFI_PAIR_FETCH_INTERVAL_MS <= 0) {
+    return 0;
+  }
+
+  const lifiChainCount = countLiFiEnabledChains(pairConfig, chainsConfig);
+  if (lifiChainCount === 0 || lifiChainCount > SMALL_LIFI_PAIR_MAX_CHAINS) {
+    return 0;
+  }
+
+  return SMALL_LIFI_PAIR_FETCH_INTERVAL_MS;
+}
 
 function detectBestArb(data: ChainSwapData[], amount: number): { profitBps: number; sellChain: string; buyChain: string } | null {
   const valid = data.filter(d => {
@@ -166,14 +216,29 @@ class BackgroundFetcher {
           return;
         }
 
-        const pairIds = Object.keys(config.pairs).filter(pairId => !config.pairs[pairId]?.disabled);
+        const enabledPairIds = Object.keys(config.pairs).filter(pairId => !config.pairs[pairId]?.disabled);
+        const activePairId = this.state.activePairId;
+        const pairIds = FETCH_ACTIVE_PAIR_ONLY && activePairId && activePairId !== 'all' && config.pairs[activePairId] && !config.pairs[activePairId]?.disabled
+          ? [activePairId]
+          : enabledPairIds;
 
-        log(`[BackgroundFetcher] Fetching data for ${pairIds.length} trading pairs (concurrency: ${PAIR_FETCH_CONCURRENCY}): ${pairIds.join(', ')}`);
+        log(`[BackgroundFetcher] Fetching data for ${pairIds.length} trading pairs (concurrency: ${PAIR_FETCH_CONCURRENCY}${FETCH_ACTIVE_PAIR_ONLY ? ', active-pair-only' : ''}): ${pairIds.join(', ')}`);
 
         const pairTasks = pairIds.map(pairId => async () => {
           try {
             log(`[BackgroundFetcher] === Fetching ${pairId} ===`);
             const pairConfig = config.pairs[pairId];
+            const smallLiFiPairCooldownMs = getSmallLiFiPairCooldownMs(pairConfig, config.chains);
+            if (smallLiFiPairCooldownMs > 0) {
+              const lastPairFetchTime = pairLastFetchTimes.get(pairId) ?? 0;
+              const elapsedMs = Date.now() - lastPairFetchTime;
+              if (elapsedMs < smallLiFiPairCooldownMs) {
+                const waitSeconds = Math.ceil((smallLiFiPairCooldownMs - elapsedMs) / 1000);
+                log(`[BackgroundFetcher] ${pairId}: small EVM-aggregator pair, skipping this cycle (next fetch in ${waitSeconds}s)`);
+                return;
+              }
+              pairLastFetchTimes.set(pairId, Date.now());
+            }
 
             const data = await getSwapDataForPair(pairConfig, config.chains, config.sources);
 
