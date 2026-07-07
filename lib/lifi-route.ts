@@ -73,7 +73,7 @@ export function mapLiFiRouteAlternative(route: any): RouteAlternative {
 }
 
 export function extractLiFiAlternatives(route?: RouteInfo): RouteAlternative[] {
-  if (!route || route.type !== 'lifi') {
+  if (!route || (route.type !== 'lifi' && route.type !== 'llamaswap')) {
     return [];
   }
 

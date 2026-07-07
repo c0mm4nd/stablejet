@@ -1,6 +1,7 @@
 import { ConfigData, DataSource } from './types';
 
 export const DEFAULT_SOURCES: ConfigData['sources'] = {
+  llamaswap: true,
   lifi: true,
   cetus: true,
   jupiter: true,
@@ -17,6 +18,7 @@ export const DEFAULT_SOURCES: ConfigData['sources'] = {
 };
 
 export const SOURCE_INFO: Record<DataSource, { name: string; color: string; shortName: string }> = {
+  llamaswap: { name: 'LlamaSwap', color: 'text-teal-600', shortName: 'LS' },
   lifi: { name: 'Li.Fi', color: 'text-teal-600', shortName: 'LF' },
   cetus: { name: 'Cetus', color: 'text-sky-700', shortName: 'CT' },
   jupiter: { name: 'Jupiter', color: 'text-fuchsia-600', shortName: 'JP' },
@@ -42,8 +44,9 @@ export function normalizeSources(
 }
 
 export function getSourceInfo(source?: string) {
-  if (source?.startsWith('lifi/')) {
-    const toolName = source.slice(5);
+  const toolPrefix = ['llamaswap/', 'lifi/'].find(prefix => source?.startsWith(prefix));
+  if (source && toolPrefix) {
+    const toolName = source.slice(toolPrefix.length);
     return {
       name: toolName,
       color: 'text-teal-600',

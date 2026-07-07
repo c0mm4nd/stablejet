@@ -356,16 +356,17 @@ function RouteDirectionPanel({
     return null;
   }
 
-  // ── LiFi routes ──────────────────────────────────────────────────────────
+  // ── Aggregator routes (LlamaSwap; legacy LiFi rows) ───────────────────────
   const lifiAlternatives = extractLiFiAlternatives(route);
   if (lifiAlternatives.length > 0) {
     const toolLabel = getLiFiPrimaryToolLabel(route);
+    const aggregatorLabel = route.type === 'lifi' ? 'Li.Fi' : 'LlamaSwap';
     return (
       <section className="rounded-2xl border border-gray-200 bg-white/90 p-4">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 pb-3">
           <div>
             <div className="text-base font-semibold text-gray-900">{title}</div>
-            {toolLabel && <div className="mt-1 text-sm text-gray-500">via Li.Fi · {toolLabel}</div>}
+            {toolLabel && <div className="mt-1 text-sm text-gray-500">via {aggregatorLabel} · {toolLabel}</div>}
           </div>
           {toolLabel && (
             <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">

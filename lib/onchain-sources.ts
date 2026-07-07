@@ -1,17 +1,54 @@
 import { fromWei, toWei } from './config';
 import { ChainAppConfig, ChainSwapData, QuoteResult, ConfigData } from './types';
 import { getLiFiQuotesByChainId } from './lifi';
+import { getLlamaSwapQuotes } from './llamaswap';
 import { getCetusQuote } from './cetus';
 import { getJupiterQuote } from './jupiter';
 import { getPanoraQuote } from './panora';
 import { getAftermathQuote } from './aftermath';
 import { normalizeSources } from './source-metadata';
+import { warn } from './logger';
 
 type SourceEntry = {
   source: string;
   aToB: QuoteResult;
   bToA: QuoteResult;
 };
+
+const AGGREGATOR_PAIR_TIMEOUT_MS = Number(process.env.LLAMASWAP_PAIR_TIMEOUT_MS)
+  || Number(process.env.LIFI_PAIR_TIMEOUT_MS)
+  || 30000;
+
+async function withAggregatorTimeout<T>(
+  operation: (signal: AbortSignal) => Promise<T>,
+  sourceLabel: string,
+  label: string
+): Promise<T | null> {
+  let timeoutId: NodeJS.Timeout | null = null;
+  const controller = new AbortController();
+  const timeout = new Promise<null>(resolve => {
+    timeoutId = setTimeout(() => {
+      warn(`[${sourceLabel}] ${label} timed out after ${AGGREGATOR_PAIR_TIMEOUT_MS}ms; continuing without ${sourceLabel} for this quote`);
+      controller.abort();
+      resolve(null);
+    }, AGGREGATOR_PAIR_TIMEOUT_MS);
+  });
+
+  try {
+    return await Promise.race([
+      operation(controller.signal).catch(err => {
+        if (controller.signal.aborted) {
+          return null;
+        }
+        warn(`[${sourceLabel}] ${label} failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        return null;
+      }),
+      timeout
+    ]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+}
 
 interface OnchainSourceParams {
   pairId: string;
@@ -41,8 +78,9 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
   } = params;
   const normalizedSources = normalizeSources(sources);
 
-  const lifiChainId = appChainConfig.lifiChainId;
-  const enableLiFi = normalizedSources.lifi !== false && !!lifiChainId;
+  const evmChainId = appChainConfig.lifiChainId;
+  const enableLlamaSwap = normalizedSources.llamaswap !== false && !!evmChainId;
+  const enableLiFi = normalizedSources.lifi !== false && !!evmChainId;
   const enableCetus = normalizedSources.cetus !== false && chainKey === 'sui';
   const enableJupiter = normalizedSources.jupiter !== false && chainKey === 'solana';
   const enablePanora = normalizedSources.panora !== false && chainKey === 'aptos';
@@ -54,10 +92,33 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
 
   const sourceEntries: SourceEntry[] = [];
 
-  const lifiPromise = enableLiFi && lifiChainId
-    ? Promise.all([
-        getLiFiQuotesByChainId(String(lifiChainId), tokenAAddress, tokenBAddress, amountInAToB),
-        getLiFiQuotesByChainId(String(lifiChainId), tokenBAddress, tokenAAddress, amountInBToA)
+  const llamaSwapOperation = enableLlamaSwap && evmChainId
+    ? (signal: AbortSignal) => Promise.all([
+        getLlamaSwapQuotes({
+          chainId: String(evmChainId),
+          kyberChain: appChainConfig.kyberCode,
+          fromToken: tokenAAddress,
+          toToken: tokenBAddress,
+          amountDecimals: amountInAToB,
+          fromDecimals: tokenADecimals,
+          toDecimals: tokenBDecimals
+        }, { signal }),
+        getLlamaSwapQuotes({
+          chainId: String(evmChainId),
+          kyberChain: appChainConfig.kyberCode,
+          fromToken: tokenBAddress,
+          toToken: tokenAAddress,
+          amountDecimals: amountInBToA,
+          fromDecimals: tokenBDecimals,
+          toDecimals: tokenADecimals
+        }, { signal })
+      ])
+    : null;
+
+  const lifiOperation = enableLiFi && evmChainId
+    ? (signal: AbortSignal) => Promise.all([
+        getLiFiQuotesByChainId(String(evmChainId), tokenAAddress, tokenBAddress, amountInAToB, { signal }),
+        getLiFiQuotesByChainId(String(evmChainId), tokenBAddress, tokenAAddress, amountInBToA, { signal })
       ])
     : null;
 
@@ -85,21 +146,31 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
         .then(bToA => ({ source: 'aftermath' as const, aToB, bToA })))
     : null;
 
-  const [fetched, lifiPair] = await Promise.all([
+  const pairLabel = `${pairId}/${chainKey}/${amount}`;
+  const [fetched, llamaSwapPair, lifiPair] = await Promise.all([
     Promise.all([
       ...(cetusPromise ? [cetusPromise] : []),
       ...(jupiterPromise ? [jupiterPromise] : []),
       ...(panoraPromise ? [panoraPromise] : []),
       ...(aftermathPromise ? [aftermathPromise] : [])
     ]),
-    lifiPromise ?? Promise.resolve(null)
+    llamaSwapOperation
+      ? withAggregatorTimeout(llamaSwapOperation, 'LlamaSwap', pairLabel)
+      : Promise.resolve(null),
+    lifiOperation
+      ? withAggregatorTimeout(lifiOperation, 'LiFi/Jumper', pairLabel)
+      : Promise.resolve(null)
   ]);
 
   sourceEntries.push(...fetched);
 
-  // Expand LiFi results: pair A→B and B→A alternatives by tool name
-  if (lifiPair) {
-    const [atoBResults, btoAResults] = lifiPair;
+  // Expand aggregator results: pair A→B and B→A quotes by tool name
+  function expandAggregatorPair(
+    pair: [QuoteResult[], QuoteResult[]] | null,
+    sourcePrefix: string
+  ) {
+    if (!pair) return;
+    const [atoBResults, btoAResults] = pair;
     const btoAByTool = new Map<string, QuoteResult>();
     for (const r of btoAResults) {
       const tool = r.route?.selectedTool || '';
@@ -108,9 +179,12 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
     for (const aToBResult of atoBResults) {
       const tool = aToBResult.route?.selectedTool || '';
       const bToAResult = btoAByTool.get(tool) ?? { success: false };
-      sourceEntries.push({ source: `lifi/${tool}`, aToB: aToBResult, bToA: bToAResult });
+      sourceEntries.push({ source: `${sourcePrefix}/${tool}`, aToB: aToBResult, bToA: bToAResult });
     }
   }
+
+  expandAggregatorPair(llamaSwapPair, 'llamaswap');
+  expandAggregatorPair(lifiPair, 'lifi');
 
   const results: ChainSwapData[] = [];
 

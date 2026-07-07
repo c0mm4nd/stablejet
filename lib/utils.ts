@@ -99,8 +99,12 @@ export function isSourceEnabled(
 ): boolean {
   const normalized = (source || 'unknown').toLowerCase();
   if (!sources) return true;
-  // 'lifi/ToolName' → check sources.lifi
-  const baseSource = normalized.startsWith('lifi/') ? 'lifi' : normalized;
+  // 'llamaswap/ToolName' → sources.llamaswap, 'lifi/ToolName' → sources.lifi
+  const baseSource = normalized.startsWith('llamaswap/')
+    ? 'llamaswap'
+    : normalized.startsWith('lifi/')
+      ? 'lifi'
+      : normalized;
   if (baseSource in sources) {
     return sources[baseSource as keyof ConfigData['sources']] !== false;
   }

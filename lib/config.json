@@ -4127,6 +4127,7 @@
   "sources": {
     "kyberswap": true,
     "nordstern": false,
+    "llamaswap": true,
     "lifi": true,
     "zerox": true,
     "cetus": true,

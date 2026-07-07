@@ -484,6 +484,14 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
                       <input
                         type="checkbox"
+                        checked={!!editingSources.llamaswap}
+                        onChange={e => setEditingSources({ ...editingSources, llamaswap: e.target.checked })}
+                      />
+                      <span className="font-medium text-gray-700">LlamaSwap (DefiLlama)</span>
+                    </label>
+                    <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
+                      <input
+                        type="checkbox"
                         checked={!!editingSources.lifi}
                         onChange={e => setEditingSources({ ...editingSources, lifi: e.target.checked })}
                       />
@@ -611,7 +619,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
                       <div className="p-4 bg-gray-50 rounded-lg">
                         <div>
-                          <label className="block text-xs font-medium text-gray-500 mb-1">Li.Fi Chain ID</label>
+                          <label className="block text-xs font-medium text-gray-500 mb-1">EVM Chain ID</label>
                           <input
                             className="w-full text-sm border border-gray-200 rounded px-3 py-2"
                             placeholder="1"
@@ -629,7 +637,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     <div className="grid grid-cols-3 gap-4">
                       <input placeholder="ID (e.g. base)" value={newChainId} onChange={e => setNewChainId(e.target.value)} className="border rounded px-3 py-2 text-sm" />
                       <input placeholder="Name (e.g. Base)" value={newChainName} onChange={e => setNewChainName(e.target.value)} className="border rounded px-3 py-2 text-sm" />
-                      <input placeholder="Li.Fi Chain ID" value={newLiFiChainId} onChange={e => setNewLiFiChainId(e.target.value)} className="border rounded px-3 py-2 text-sm" />
+                      <input placeholder="EVM Chain ID" value={newLiFiChainId} onChange={e => setNewLiFiChainId(e.target.value)} className="border rounded px-3 py-2 text-sm" />
                       <button onClick={handleAddChain} className="bg-blue-600 text-white rounded px-4 py-2 text-sm font-semibold col-span-3 hover:bg-blue-700">Add Chain Configuration</button>
                     </div>
                   </div>

@@ -71,6 +71,7 @@ export interface RouteAlternative {
 }
 
 export type RouteType =
+  | 'llamaswap'
   | 'lifi'
   | 'cetus'
   | 'jupiter'
@@ -80,6 +81,7 @@ export type RouteType =
   | 'unknown';
 
 export type DataSource =
+  | 'llamaswap'
   | 'lifi'
   | 'cetus'
   | 'jupiter'
@@ -95,6 +97,7 @@ export type DataSource =
   | 'okx';
 
 export interface SourceConfig {
+  llamaswap: boolean;
   lifi: boolean;
   cetus: boolean;
   jupiter: boolean;
@@ -126,7 +129,7 @@ export interface ChainSwapData {
   chainKey: string;
   amount: number;
   pairId?: string; // Trading pair identifier
-  dataSource?: string; // DataSource or 'lifi/ToolName' for split LiFi results
+  dataSource?: string; // DataSource or 'llamaswap/ToolName' / 'lifi/ToolName' for split aggregator results
   quoteTimestamp?: string; // ISO timestamp for this specific quote
   // Generic swap results for any pair
   tokenAToB?: SwapResult; // tokenA -> tokenB
@@ -152,7 +155,8 @@ export interface QuoteResult {
 
 export interface ChainAppConfig {
   name: string;
-  lifiChainId?: string;   // e.g. "1"
+  lifiChainId?: string;   // EVM numeric chain id, e.g. "1" (key name kept for saved-config compat)
+  kyberCode?: string;     // KyberSwap chain slug, e.g. "ethereum"
   disabled?: boolean;
 }
 
