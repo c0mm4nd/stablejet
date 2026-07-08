@@ -11,9 +11,10 @@ export async function GET(request: Request) {
     const hours = parseInt(searchParams.get('hours') || '24', 10);
     const pairId = searchParams.get('pair') || undefined; // Optional pair filter
 
-    if (pairId) {
-      backgroundFetcher.setActivePair(pairId);
-    }
+    // Track what the client is looking at: a specific pair narrows the fetch
+    // loop to that pair; a no-filter request (triangular/quadrilateral modes
+    // need cross-pair data) switches it back to fetching all pairs.
+    backgroundFetcher.setActivePair(pairId || 'all');
 
     // 确保后台数据获取任务已启动（首次请求时自动拉起）
     const status = backgroundFetcher.getStatus();
