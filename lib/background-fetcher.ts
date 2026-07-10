@@ -182,6 +182,10 @@ class BackgroundFetcher {
     if (pairId === this.state.activePairId) return;
     this.state.activePairId = pairId;
     log(`[BackgroundFetcher] Active pair set to: ${pairId || 'none'}`);
+    // Immediately fetch data for the new pair so clients don't see
+    // "Waiting for data..." until the next scheduled cycle.  Schedule
+    // after 1.1s to bypass the debounce guard in fetchData().
+    setTimeout(() => this.fetchData(), 1100);
   }
 
   getActivePair() {

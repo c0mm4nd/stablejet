@@ -85,7 +85,7 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
     return qs ? `${cleanPath}?${qs}` : cleanPath;
   };
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (): Promise<boolean> => {
     try {
       const includeAllPairs = activeTab === 'arbitrage' && (arbitrageMode === 'triangular' || arbitrageMode === 'quadrilateral');
       const historyResponse = await fetch(
@@ -98,11 +98,14 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
         setHistory(historyResult.data);
         setTimestamp(historyResult.data[historyResult.data.length - 1].timestamp);
         setError(null);
+        return true;
       } else {
         setHistory([]);
+        return false;
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
+      return false;
     } finally {
       setIsLoading(false);
       setCountdown(clientRefreshInterval);
@@ -160,7 +163,19 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
     }).catch(() => {});
 
     setIsLoading(true);
-    fetchData();
+    setHistory([]);
+
+    let retryTimer: NodeJS.Timeout | null = null;
+    let cancelled = false;
+
+    const fetchWithRetry = async () => {
+      const hasData = await fetchData();
+      if (!hasData && !cancelled) {
+        retryTimer = setTimeout(fetchWithRetry, 2000);
+      }
+    };
+
+    fetchWithRetry();
 
     const fetchInterval = setInterval(fetchData, clientRefreshInterval * 1000);
     const countdownInterval = setInterval(() => {
@@ -168,6 +183,8 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
     }, 1000);
 
     return () => {
+      cancelled = true;
+      if (retryTimer) clearTimeout(retryTimer);
       clearInterval(fetchInterval);
       clearInterval(countdownInterval);
     };
