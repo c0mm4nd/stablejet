@@ -17,7 +17,7 @@ type SourceEntry = {
 
 const AGGREGATOR_PAIR_TIMEOUT_MS = Number(process.env.LLAMASWAP_PAIR_TIMEOUT_MS)
   || Number(process.env.LIFI_PAIR_TIMEOUT_MS)
-  || 30000;
+  || 90000;
 
 async function withAggregatorTimeout<T>(
   operation: (signal: AbortSignal) => Promise<T>,

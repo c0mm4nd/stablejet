@@ -24,6 +24,13 @@ export async function GET(request: Request) {
 
     const history = getHistoryInRange(hours, pairId);
 
+    // When the client gets no data (e.g. after a pair switch), kick off an
+    // immediate background fetch so data arrives sooner than the next scheduled
+    // cycle.  Fire-and-forget — the client retries on its own.
+    if (history.length === 0 && !status.isFetching) {
+      backgroundFetcher.fetchData();
+    }
+
     return NextResponse.json({
       success: true,
       data: history,
