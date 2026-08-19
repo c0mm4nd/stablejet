@@ -3105,11 +3105,6 @@
               "symbol": "USDat",
               "address": "0x23238f20b894f29041f48d88ee91131c395aaa71",
               "decimals": 6
-            },
-            {
-              "symbol": "mUSD",
-              "address": "0xaca92e438df0b2401ff60da7e4337b687a2435da",
-              "decimals": 6
             }
           ]
         },
@@ -3139,11 +3134,6 @@
             {
               "symbol": "USDat",
               "address": "0x23238f20b894f29041f48d88ee91131c395aaa71",
-              "decimals": 6
-            },
-            {
-              "symbol": "mUSD",
-              "address": "0xaca92e438df0b2401ff60da7e4337b687a2435da",
               "decimals": 6
             }
           ]
@@ -4314,6 +4304,52 @@
           "decimalsA": 8,
           "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
           "decimalsB": 8
+        }
+      }
+    },
+    "mUSD_USDC": {
+      "id": "mUSD_USDC",
+      "name": "mUSD/USDC",
+      "tokenA": "mUSD",
+      "tokenB": "USDC",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xaca92e438df0b2401ff60da7e4337b687a2435da",
+          "decimalsA": 6,
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsB": 6
+        },
+        "linea": {
+          "addressA": "0xaca92e438df0b2401ff60da7e4337b687a2435da",
+          "decimalsA": 6,
+          "addressB": "0x176211869cA2b568f2A7D4EE941E073a821EE1ff",
+          "decimalsB": 6
+        }
+      }
+    },
+    "mUSD_USDT": {
+      "id": "mUSD_USDT",
+      "name": "mUSD/USDT",
+      "tokenA": "mUSD",
+      "tokenB": "USDT",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0xaca92e438df0b2401ff60da7e4337b687a2435da",
+          "decimalsA": 6,
+          "addressB": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "decimalsB": 6
+        },
+        "linea": {
+          "addressA": "0xaca92e438df0b2401ff60da7e4337b687a2435da",
+          "decimalsA": 6,
+          "addressB": "0xA219439258ca9da29E9Cc4cE5596924745e12B93",
+          "decimalsB": 6
         }
       }
     }
