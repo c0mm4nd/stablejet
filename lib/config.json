@@ -3107,11 +3107,6 @@
               "decimals": 6
             },
             {
-              "symbol": "M",
-              "address": "0x866A2BF4E572CbCF37D5071A7a58503Bfb36be1b",
-              "decimals": 6
-            },
-            {
               "symbol": "mUSD",
               "address": "0xaca92e438df0b2401ff60da7e4337b687a2435da",
               "decimals": 6
@@ -3144,11 +3139,6 @@
             {
               "symbol": "USDat",
               "address": "0x23238f20b894f29041f48d88ee91131c395aaa71",
-              "decimals": 6
-            },
-            {
-              "symbol": "M",
-              "address": "0x866A2BF4E572CbCF37D5071A7a58503Bfb36be1b",
               "decimals": 6
             },
             {
