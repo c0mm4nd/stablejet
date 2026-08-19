@@ -1,5 +1,6 @@
 import { fromWei, toWei } from './config';
-import { ChainAppConfig, ChainSwapData, QuoteResult, ConfigData } from './types';
+import { ChainAppConfig, ChainSwapData, QuoteResult, ConfigData, PoolConfig } from './types';
+import { getPoolQuotes, poolLabel } from './direct-pools';
 import { getLiFiQuotesByChainId } from './lifi';
 import { getLlamaSwapQuotes } from './llamaswap';
 import { getCetusQuote } from './cetus';
@@ -62,6 +63,7 @@ interface OnchainSourceParams {
   appChainConfig: ChainAppConfig;
   sources?: ConfigData['sources'];
   direction?: 'AtoB' | 'BtoA' | 'both'; // 只询单方向可省一半外部请求
+  pools?: PoolConfig[]; // 直连 DEX 池子（与聚合器并列作为独立报价源）
 }
 
 export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): Promise<ChainSwapData[]> {
@@ -76,7 +78,8 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
     tokenBDecimals,
     appChainConfig,
     sources,
-    direction = 'both'
+    direction = 'both',
+    pools
   } = params;
   const needAtoB = direction !== 'BtoA';
   const needBtoA = direction !== 'AtoB';
@@ -155,14 +158,48 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
         .then(bToA => ({ source: 'aftermath' as const, aToB, bToA })))
     : null;
 
+  // 直连池子：批量 eth_call 询价，单池出独立报价源，多池额外出最优拆单 pool/Split
+  const baseChainKey = chainKey.split('@')[0];
+  const poolsPromise = (pools && pools.length > 0)
+    ? (async (): Promise<SourceEntry[]> => {
+        const common = {
+          pools,
+          chainKey: baseChainKey,
+          rpcUrl: appChainConfig.rpcUrl,
+          tokenAAddress,
+          tokenBAddress,
+          tokenADecimals,
+          tokenBDecimals,
+          amount,
+        };
+        const [aRes, bRes] = await Promise.all([
+          needAtoB ? getPoolQuotes({ ...common, direction: 'AtoB' }) : Promise.resolve(null),
+          needBtoA ? getPoolQuotes({ ...common, direction: 'BtoA' }) : Promise.resolve(null)
+        ]);
+        const entries: SourceEntry[] = pools.map((pool, i) => ({
+          source: `pool/${poolLabel(pool)}`,
+          aToB: aRes?.perPool[i]?.result ?? SKIPPED,
+          bToA: bRes?.perPool[i]?.result ?? SKIPPED
+        }));
+        if (aRes?.split || bRes?.split) {
+          entries.push({ source: 'pool/Split', aToB: aRes?.split ?? SKIPPED, bToA: bRes?.split ?? SKIPPED });
+        }
+        return entries;
+      })().catch(err => {
+        warn(`[DirectPool] ${pairId}/${chainKey} failed: ${err instanceof Error ? err.message : 'unknown'}`);
+        return [] as SourceEntry[];
+      })
+    : Promise.resolve([] as SourceEntry[]);
+
   const pairLabel = `${pairId}/${chainKey}/${amount}`;
-  const [fetched, llamaSwapPair, lifiPair] = await Promise.all([
+  const [fetched, poolEntries, llamaSwapPair, lifiPair] = await Promise.all([
     Promise.all([
       ...(cetusPromise ? [cetusPromise] : []),
       ...(jupiterPromise ? [jupiterPromise] : []),
       ...(panoraPromise ? [panoraPromise] : []),
       ...(aftermathPromise ? [aftermathPromise] : [])
     ]),
+    poolsPromise,
     llamaSwapOperation
       ? withAggregatorTimeout(llamaSwapOperation, 'LlamaSwap', pairLabel)
       : Promise.resolve(null),
@@ -172,6 +209,7 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
   ]);
 
   sourceEntries.push(...fetched);
+  sourceEntries.push(...poolEntries);
 
   // Expand aggregator results: pair A→B and B→A quotes by tool name
   function expandAggregatorPair(

@@ -5,7 +5,8 @@
       "kyberCode": "ethereum",
       "nordsternCode": "1",
       "lifiChainId": "1",
-      "zeroXChainId": "1"
+      "zeroXChainId": "1",
+      "rpcUrl": "https://ethereum-rpc.publicnode.com"
     },
     "polygon": {
       "name": "Polygon",
@@ -3105,6 +3106,22 @@
               "symbol": "USDat",
               "address": "0x23238f20b894f29041f48d88ee91131c395aaa71",
               "decimals": 6
+            }
+          ],
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x970a7749ecaa4394c8b2bf5f2471f41fd6b79288",
+              "fee": 100,
+              "label": "UniV3 wM 0.01%"
+            },
+            {
+              "dex": "curve",
+              "address": "0xf4d0cf32908b2c7f1021339c43df0f77f06896d7",
+              "indexA": 1,
+              "indexB": 0,
+              "wrapper": "USDat",
+              "label": "Curve USDat"
             }
           ]
         },

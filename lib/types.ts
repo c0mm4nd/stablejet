@@ -78,6 +78,7 @@ export type RouteType =
   | 'panora'
   | 'aftermath'
   | 'cex'
+  | 'pool'
   | 'unknown';
 
 export type DataSource =
@@ -157,7 +158,19 @@ export interface ChainAppConfig {
   name: string;
   lifiChainId?: string;   // EVM numeric chain id, e.g. "1" (key name kept for saved-config compat)
   kyberCode?: string;     // KyberSwap chain slug, e.g. "ethereum"
+  rpcUrl?: string;        // 直连池子询价用的 RPC（缺省用内置公共 RPC）
   disabled?: boolean;
+}
+
+// 直连 DEX 池子配置：绕过聚合器直接询价
+export interface PoolConfig {
+  dex: 'univ3' | 'univ2' | 'curve';
+  address: string;
+  label?: string;    // 展示名，如 "UniV3 0.01%"
+  fee?: number;      // univ3 fee tier（100/500/3000/10000）
+  indexA?: number;   // curve: tokenA 的 coin index
+  indexB?: number;   // curve: tokenB 的 coin index
+  wrapper?: string;  // 挂到某个 wrapper（tokenA 为该 wrapper）而非主 tokenA
 }
 
 export interface WrapperConfig {
@@ -167,6 +180,7 @@ export interface WrapperConfig {
 }
 
 export interface ChainPairConfig {
+  pools?: PoolConfig[]; // 直连池子（可与聚合器并存）
   addressA?: string;
   addressB?: string;
   decimalsA?: number;

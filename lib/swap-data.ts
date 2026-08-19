@@ -88,6 +88,8 @@ export async function getSwapDataForPair(
 
     if (!tokenAAddress || !tokenBAddress) continue;
 
+    const mainPools = (chainPairData.pools ?? []).filter(p => !p.wrapper);
+
     for (const amount of amounts) {
       const onchainTask = getOnchainSwapDataForAmount({
         pairId,
@@ -99,7 +101,8 @@ export async function getSwapDataForPair(
         tokenADecimals,
         tokenBDecimals,
         appChainConfig,
-        sources
+        sources,
+        pools: mainPools
       }).catch(err => {
         error(`[Onchain] Error fetching ${chainKey} data:`, err);
         return [];
@@ -109,6 +112,7 @@ export async function getSwapDataForPair(
 
     // Same-chain wrappers: fetch quotes using the wrapper address as tokenA
     for (const wrapper of (chainPairData.wrappers ?? [])) {
+      const wrapperPools = (chainPairData.pools ?? []).filter(p => p.wrapper === wrapper.symbol);
       for (const amount of amounts) {
         const wrapperChainKey = `${chainKey}@${wrapper.symbol}`;
         const wrapperChainName = `${appChainConfig.name} (${wrapper.symbol})`;
@@ -122,7 +126,8 @@ export async function getSwapDataForPair(
           tokenADecimals: wrapper.decimals,
           tokenBDecimals,
           appChainConfig,
-          sources
+          sources,
+          pools: wrapperPools
         }).catch(err => {
           error(`[Onchain] Error fetching ${wrapperChainKey} data:`, err);
           return [];

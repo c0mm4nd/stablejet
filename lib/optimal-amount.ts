@@ -106,6 +106,11 @@ async function quoteLeg({ pairId, chainKey, source, direction, amount }: LegPara
     (sources as unknown as Record<string, boolean>)[key] = key === baseSource;
   }
 
+  // 直连池子：只带上当前上下文（主 tokenA 或对应 wrapper）的池
+  const pools = (chainPair.pools ?? []).filter(p =>
+    wrapperSymbol ? p.wrapper === wrapperSymbol : !p.wrapper
+  );
+
   const rows = await getOnchainSwapDataForAmount({
     pairId,
     chainKey,
@@ -118,6 +123,7 @@ async function quoteLeg({ pairId, chainKey, source, direction, amount }: LegPara
     appChainConfig,
     sources,
     direction,
+    pools: baseSource === 'pool' ? pools : [],
   });
 
   // 同家族内取输出最高的工具（聚合器在不同金额下可能换最优工具）

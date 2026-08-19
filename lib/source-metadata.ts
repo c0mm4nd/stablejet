@@ -44,7 +44,7 @@ export function normalizeSources(
 }
 
 export function getSourceInfo(source?: string) {
-  const toolPrefix = ['llamaswap/', 'lifi/'].find(prefix => source?.startsWith(prefix));
+  const toolPrefix = ['llamaswap/', 'lifi/', 'pool/'].find(prefix => source?.startsWith(prefix));
   if (source && toolPrefix) {
     const toolName = source.slice(toolPrefix.length);
     return {
