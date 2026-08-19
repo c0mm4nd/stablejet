@@ -61,6 +61,7 @@ interface OnchainSourceParams {
   tokenBDecimals: number;
   appChainConfig: ChainAppConfig;
   sources?: ConfigData['sources'];
+  direction?: 'AtoB' | 'BtoA' | 'both'; // 只询单方向可省一半外部请求
 }
 
 export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): Promise<ChainSwapData[]> {
@@ -74,8 +75,12 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
     tokenADecimals,
     tokenBDecimals,
     appChainConfig,
-    sources
+    sources,
+    direction = 'both'
   } = params;
+  const needAtoB = direction !== 'BtoA';
+  const needBtoA = direction !== 'AtoB';
+  const SKIPPED: QuoteResult = { success: false };
   const normalizedSources = normalizeSources(sources);
 
   const evmChainId = appChainConfig.lifiChainId;
@@ -94,7 +99,7 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
 
   const llamaSwapOperation = enableLlamaSwap && evmChainId
     ? (signal: AbortSignal) => Promise.all([
-        getLlamaSwapQuotes({
+        needAtoB ? getLlamaSwapQuotes({
           chainId: String(evmChainId),
           kyberChain: appChainConfig.kyberCode,
           fromToken: tokenAAddress,
@@ -102,8 +107,8 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
           amountDecimals: amountInAToB,
           fromDecimals: tokenADecimals,
           toDecimals: tokenBDecimals
-        }, { signal }),
-        getLlamaSwapQuotes({
+        }, { signal }) : Promise.resolve([] as QuoteResult[]),
+        needBtoA ? getLlamaSwapQuotes({
           chainId: String(evmChainId),
           kyberChain: appChainConfig.kyberCode,
           fromToken: tokenBAddress,
@@ -111,38 +116,42 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
           amountDecimals: amountInBToA,
           fromDecimals: tokenBDecimals,
           toDecimals: tokenADecimals
-        }, { signal })
+        }, { signal }) : Promise.resolve([] as QuoteResult[])
       ])
     : null;
 
   const lifiOperation = enableLiFi && evmChainId
     ? (signal: AbortSignal) => Promise.all([
-        getLiFiQuotesByChainId(String(evmChainId), tokenAAddress, tokenBAddress, amountInAToB, { signal }),
-        getLiFiQuotesByChainId(String(evmChainId), tokenBAddress, tokenAAddress, amountInBToA, { signal })
+        needAtoB
+          ? getLiFiQuotesByChainId(String(evmChainId), tokenAAddress, tokenBAddress, amountInAToB, { signal })
+          : Promise.resolve([] as QuoteResult[]),
+        needBtoA
+          ? getLiFiQuotesByChainId(String(evmChainId), tokenBAddress, tokenAAddress, amountInBToA, { signal })
+          : Promise.resolve([] as QuoteResult[])
       ])
     : null;
 
   const cetusPromise = enableCetus
-    ? getCetusQuote(tokenAAddress, tokenBAddress, amountInAToB)
-      .then(aToB => getCetusQuote(tokenBAddress, tokenAAddress, amountInBToA)
+    ? (needAtoB ? getCetusQuote(tokenAAddress, tokenBAddress, amountInAToB) : Promise.resolve(SKIPPED))
+      .then(aToB => (needBtoA ? getCetusQuote(tokenBAddress, tokenAAddress, amountInBToA) : Promise.resolve(SKIPPED))
         .then(bToA => ({ source: 'cetus' as const, aToB, bToA })))
     : null;
 
   const jupiterPromise = enableJupiter
-    ? getJupiterQuote(tokenAAddress, tokenBAddress, amountInAToB)
-      .then(aToB => getJupiterQuote(tokenBAddress, tokenAAddress, amountInBToA)
+    ? (needAtoB ? getJupiterQuote(tokenAAddress, tokenBAddress, amountInAToB) : Promise.resolve(SKIPPED))
+      .then(aToB => (needBtoA ? getJupiterQuote(tokenBAddress, tokenAAddress, amountInBToA) : Promise.resolve(SKIPPED))
         .then(bToA => ({ source: 'jupiter' as const, aToB, bToA })))
     : null;
 
   const panoraPromise = enablePanora
-    ? getPanoraQuote(tokenAAddress, tokenBAddress, humanAmount, tokenBDecimals)
-      .then(aToB => getPanoraQuote(tokenBAddress, tokenAAddress, humanAmount, tokenADecimals)
+    ? (needAtoB ? getPanoraQuote(tokenAAddress, tokenBAddress, humanAmount, tokenBDecimals) : Promise.resolve(SKIPPED))
+      .then(aToB => (needBtoA ? getPanoraQuote(tokenBAddress, tokenAAddress, humanAmount, tokenADecimals) : Promise.resolve(SKIPPED))
         .then(bToA => ({ source: 'panora' as const, aToB, bToA })))
     : null;
 
   const aftermathPromise = enableAftermath
-    ? getAftermathQuote(tokenAAddress, tokenBAddress, amountInAToB)
-      .then(aToB => getAftermathQuote(tokenBAddress, tokenAAddress, amountInBToA)
+    ? (needAtoB ? getAftermathQuote(tokenAAddress, tokenBAddress, amountInAToB) : Promise.resolve(SKIPPED))
+      .then(aToB => (needBtoA ? getAftermathQuote(tokenBAddress, tokenAAddress, amountInBToA) : Promise.resolve(SKIPPED))
         .then(bToA => ({ source: 'aftermath' as const, aToB, bToA })))
     : null;
 
@@ -176,10 +185,17 @@ export async function getOnchainSwapDataForAmount(params: OnchainSourceParams): 
       const tool = r.route?.selectedTool || '';
       btoAByTool.set(tool, r);
     }
+    const seenTools = new Set<string>();
     for (const aToBResult of atoBResults) {
       const tool = aToBResult.route?.selectedTool || '';
+      seenTools.add(tool);
       const bToAResult = btoAByTool.get(tool) ?? { success: false };
       sourceEntries.push({ source: `${sourcePrefix}/${tool}`, aToB: aToBResult, bToA: bToAResult });
+    }
+    // 只询 B→A 方向时 atoBResults 为空，这里补上仅出现在 B→A 的工具
+    for (const [tool, bToAResult] of btoAByTool) {
+      if (seenTools.has(tool)) continue;
+      sourceEntries.push({ source: `${sourcePrefix}/${tool}`, aToB: { success: false }, bToA: bToAResult });
     }
   }
 
