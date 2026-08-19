@@ -58,7 +58,7 @@ function toBaseUnits(amount: number, decimals: number): bigint {
 
 interface RpcCall { to: string; data: string; }
 
-// 一次 HTTP 批量 eth_call，按序返回（失败项为 null）
+// JSON-RPC 批量 eth_call（Multicall3 不可用时的回退传输）
 async function ethCallBatch(rpcUrl: string, calls: RpcCall[]): Promise<(string | null)[]> {
   if (calls.length === 0) return [];
   const payload = calls.map((c, i) => ({
@@ -72,6 +72,95 @@ async function ethCallBatch(rpcUrl: string, calls: RpcCall[]): Promise<(string |
     byId.set(item.id, ok ? item.result : null);
   }
   return calls.map((_, i) => byId.get(i) ?? null);
+}
+
+// ---- 按链合并的调用队列：短窗口内的所有子调用合并成一次 Multicall3 eth_call ----
+
+const MULTICALL3 = '0xcA11bde05977b3631167028862bE2a173976CA11'; // 全链同地址
+const FLUSH_DELAY_MS = 40;   // 合并窗口
+const MAX_MULTICALL = 80;    // 单次 multicall 子调用上限（quoter 模拟耗 gas，防超 RPC gas cap）
+
+function encodeAggregate3(calls: RpcCall[]): string {
+  // aggregate3((address target, bool allowFailure, bytes callData)[])
+  const elems: string[] = [];
+  const sizes: number[] = [];
+  for (const c of calls) {
+    const dataHex = c.data.replace(/^0x/, '');
+    const n = dataHex.length / 2;
+    const padded = dataHex.padEnd(Math.ceil(n / 32) * 64, '0');
+    elems.push(addr32(c.to) + uint32(1) + uint32(0x60) + uint32(n) + padded);
+    sizes.push(4 * 32 + padded.length / 2);
+  }
+  let offset = calls.length * 32; // 元素偏移相对数组数据区起点（长度字之后）
+  const offsets: string[] = [];
+  for (const size of sizes) {
+    offsets.push(uint32(offset));
+    offset += size;
+  }
+  return '0x82ad56cb' + uint32(0x20) + uint32(calls.length) + offsets.join('') + elems.join('');
+}
+
+function decodeAggregate3(result: string, count: number): (string | null)[] {
+  // returns (bool success, bytes returnData)[]
+  const out: (string | null)[] = [];
+  const w = (i: number) => result.slice(2 + i * 64, 2 + (i + 1) * 64);
+  try {
+    const n = parseInt(w(1), 16);
+    for (let k = 0; k < Math.min(n, count); k++) {
+      const idx = 2 + parseInt(w(2 + k), 16) / 32;
+      const success = parseInt(w(idx), 16);
+      const len = parseInt(w(idx + 2), 16);
+      if (success !== 1 || len < 32) { out.push(null); continue; }
+      out.push('0x' + result.slice(2 + (idx + 3) * 64, 2 + (idx + 3) * 64 + len * 2));
+    }
+  } catch { /* 解码失败按全部 null 处理 */ }
+  while (out.length < count) out.push(null);
+  return out;
+}
+
+interface PendingCall extends RpcCall { resolve: (r: string | null) => void; }
+const callQueues = new Map<string, { rpcUrl: string; calls: PendingCall[]; timer: ReturnType<typeof setTimeout> | null }>();
+
+function scheduleEthCall(queueKey: string, rpcUrl: string, to: string, data: string): Promise<string | null> {
+  return new Promise(resolve => {
+    let q = callQueues.get(queueKey);
+    if (!q) {
+      q = { rpcUrl, calls: [], timer: null };
+      callQueues.set(queueKey, q);
+    }
+    q.calls.push({ to, data, resolve });
+    if (q.calls.length >= MAX_MULTICALL) {
+      void flushQueue(queueKey);
+    } else if (!q.timer) {
+      q.timer = setTimeout(() => void flushQueue(queueKey), FLUSH_DELAY_MS);
+    }
+  });
+}
+
+async function flushQueue(queueKey: string): Promise<void> {
+  const q = callQueues.get(queueKey);
+  if (!q) return;
+  if (q.timer) { clearTimeout(q.timer); q.timer = null; }
+  const batch = q.calls.splice(0, q.calls.length);
+  if (batch.length === 0) return;
+  try {
+    const res = await axios.post(q.rpcUrl, {
+      jsonrpc: '2.0', id: 1, method: 'eth_call',
+      params: [{ to: MULTICALL3, data: encodeAggregate3(batch) }, 'latest'],
+    }, { timeout: 15000 });
+    const result = res.data?.result;
+    if (typeof result !== 'string' || result.length < 130) throw new Error(res.data?.error?.message || 'multicall failed');
+    const decoded = decodeAggregate3(result, batch.length);
+    batch.forEach((c, i) => c.resolve(decoded[i]));
+  } catch {
+    // 回退：JSON-RPC 批量单发
+    try {
+      const results = await ethCallBatch(q.rpcUrl, batch);
+      batch.forEach((c, i) => c.resolve(results[i]));
+    } catch {
+      batch.forEach(c => c.resolve(null));
+    }
+  }
 }
 
 export function poolLabel(pool: PoolConfig): string {
@@ -152,7 +241,8 @@ export async function getPoolQuotes(params: PoolsQuoteParams): Promise<PoolsQuot
       callIndex.push(idxs);
     });
 
-    const results = await ethCallBatch(rpcUrl, calls);
+    const queueKey = `${chainKey}|${rpcUrl}`;
+    const results = await Promise.all(calls.map(c => scheduleEthCall(queueKey, rpcUrl, c.to, c.data)));
 
     // curve 的 int128 签名失败时，用 uint256 签名（crypto 池）重试一轮
     const retryCalls: RpcCall[] = [];
@@ -170,7 +260,7 @@ export async function getPoolQuotes(params: PoolsQuoteParams): Promise<PoolsQuot
       });
     });
     if (retryCalls.length > 0) {
-      const retried = await ethCallBatch(rpcUrl, retryCalls);
+      const retried = await Promise.all(retryCalls.map(c => scheduleEthCall(queueKey, rpcUrl, c.to, c.data)));
       retried.forEach((r, k) => {
         if (r !== null) results[callIndex[retryMap[k].poolIdx][retryMap[k].stepIdx]] = r;
       });

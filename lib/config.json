@@ -1152,7 +1152,15 @@
           "addressA": "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3",
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
           "decimalsA": 18,
-          "decimalsB": 6
+          "decimalsB": 6,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0xe6d7ebb9f1a9519dc06d557e03c522d53520e76a",
+              "fee": 100,
+              "label": "UniV3 0.01%"
+            }
+          ]
         },
         "arbitrum": {
           "addressA": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
@@ -1611,7 +1619,16 @@
           "addressA": "0xC139190F447e929f090Edeb554D95AbB8b18aC1C",
           "decimalsA": 18,
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "pools": [
+            {
+              "dex": "curve",
+              "address": "0xc2921134073151490193ac7369313c8e0b08e1e7",
+              "indexA": 1,
+              "indexB": 0,
+              "label": "Curve"
+            }
+          ]
         },
         "arbitrum": {
           "addressA": "0xc708B6887DB46005dA033501f8aeBee72d191a5d",
@@ -1675,6 +1692,15 @@
               "symbol": "USDai",
               "address": "0x0a1a1a107E45b7Ced86833863f482BC5f4ed82EF",
               "decimals": 18
+            }
+          ],
+          "pools": [
+            {
+              "dex": "curve",
+              "address": "0x383e6b4437b59fff47b619cba855ca29342a8559",
+              "indexA": 0,
+              "indexB": 1,
+              "label": "Curve"
             }
           ]
         },
@@ -1788,7 +1814,22 @@
           "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
           "decimalsA": 6,
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0xbafead7c60ea473758ed6c6021505e8bbd7e8e5d",
+              "fee": 100,
+              "label": "UniV3 0.01%"
+            },
+            {
+              "dex": "curve",
+              "address": "0xe79c1c7e24755574438a26d5e062ad2626c04662",
+              "indexA": 1,
+              "indexB": 0,
+              "label": "Curve"
+            }
+          ]
         },
         "arbitrum": {
           "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
@@ -1937,7 +1978,16 @@
           "addressA": "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E",
           "decimalsA": 18,
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "pools": [
+            {
+              "dex": "curve",
+              "address": "0x4dece678ceceb27446b35c672dc7d61f30bad69e",
+              "indexA": 1,
+              "indexB": 0,
+              "label": "Curve"
+            }
+          ]
         },
         "arbitrum": {
           "addressA": "0x498Bf2b1E120FeD3ad3D42EA2165E9b73f99C1e5",
@@ -2045,7 +2095,15 @@
           "addressA": "0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c",
           "decimalsA": 6,
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x95dbb3c7546f22bce375900abfdd64a4e5bd73d6",
+              "fee": 500,
+              "label": "UniV3 0.05%"
+            }
+          ]
         },
         "base": {
           "addressA": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1ADb42",
@@ -2083,7 +2141,16 @@
           "addressA": "0xe343167631d89B6Ffc58B88d6b7fB0228795491D",
           "decimalsA": 6,
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "pools": [
+            {
+              "dex": "curve",
+              "address": "0xc061caa073f3d95f80f8e5428d32d2d76f5e1622",
+              "indexA": 0,
+              "indexB": 1,
+              "label": "Curve"
+            }
+          ]
         },
         "ink": {
           "addressA": "0xe343167631d89B6Ffc58B88d6b7fB0228795491D",
@@ -2267,7 +2334,16 @@
           "addressA": "0xFa2B947eEc368f42195f24F36d2aF29f7c24CeC2",
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
           "decimalsA": 18,
-          "decimalsB": 6
+          "decimalsB": 6,
+          "pools": [
+            {
+              "dex": "curve",
+              "address": "0x72310daaed61321b02b08a547150c07522c6a976",
+              "indexA": 1,
+              "indexB": 0,
+              "label": "Curve"
+            }
+          ]
         },
         "base": {
           "addressA": "0x8210c0634AB8f273806e4b7866E9Db353773c44B",
@@ -2407,7 +2483,15 @@
           "addressA": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
           "decimalsA": 8,
           "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-          "decimalsB": 8
+          "decimalsB": 8,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0xe8f7c89c5efa061e340f2d2f206ec78fd8f7e124",
+              "fee": 100,
+              "label": "UniV3 0.01%"
+            }
+          ]
         },
         "base": {
           "addressA": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
@@ -2442,7 +2526,22 @@
           "addressA": "0x18084fbA666a33d37592fA2633fD49a74DD93a88",
           "decimalsA": 18,
           "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-          "decimalsB": 8
+          "decimalsB": 8,
+          "pools": [
+            {
+              "dex": "curve",
+              "address": "0xb7ecb2aa52aa64a717180e030241bc75cd946726",
+              "indexA": 1,
+              "indexB": 0,
+              "label": "Curve"
+            },
+            {
+              "dex": "univ3",
+              "address": "0x73a38006d23517a1d383c88929b2014f8835b38b",
+              "fee": 100,
+              "label": "UniV3 0.01%"
+            }
+          ]
         },
         "base": {
           "addressA": "0x236aa50979D5f3De3Bd1Eeb40E81137F22ab794b",
@@ -2472,7 +2571,21 @@
           "addressA": "0x8236a87084f8B84306f72007F36F2618A5634494",
           "decimalsA": 8,
           "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-          "decimalsB": 8
+          "decimalsB": 8,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x87428a53e14d24ab19c6ca4939b4df93b8996ca9",
+              "fee": 500,
+              "label": "UniV3 0.05%"
+            },
+            {
+              "dex": "univ3",
+              "address": "0x0b599ebf4e05af48b56d38e2dde520570c366460",
+              "fee": 100,
+              "label": "UniV3 0.01%"
+            }
+          ]
         },
         "berachain": {
           "addressA": "0xecAc9C5F704e954931349Da37F60E39f515c11c1",
@@ -2495,7 +2608,15 @@
           "addressA": "0x004E9C3EF86bc1ca1f0bB5C7662861Ee93350568",
           "decimalsA": 8,
           "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-          "decimalsB": 8
+          "decimalsB": 8,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x3a32f5040bc4d8417e78e236eb2c48c90e003fda",
+              "fee": 500,
+              "label": "UniV3 0.05%"
+            }
+          ]
         },
         "base": {
           "addressA": "0x93919784C523f39CACaa98Ee0a9d96c3F32b593e",
@@ -2543,7 +2664,15 @@
           "addressA": "0x7A56E1C57C7475CCf742a1832B028F0456652F97",
           "decimalsA": 18,
           "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-          "decimalsB": 8
+          "decimalsB": 8,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x5738df8073ad05d0c0fcf60e358033268ebf16cc",
+              "fee": 500,
+              "label": "UniV3 0.05%"
+            }
+          ]
         },
         "berachain": {
           "addressA": "0x541FD749419CA806a8bc7da8ac23D346f2dF8B77",
@@ -2647,7 +2776,15 @@
           "addressA": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
           "decimalsA": 18,
           "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa",
+              "fee": 100,
+              "label": "UniV3 0.01%"
+            }
+          ]
         },
         "arbitrum": {
           "addressA": "0x5979D7b546E38E414F7E9822514be443A4800529",
@@ -2733,7 +2870,28 @@
           "addressA": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
           "decimalsA": 18,
           "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "pools": [
+            {
+              "dex": "curve",
+              "address": "0xdb74dfdd3bb46be8ce6c33dc9d82777bcfc3ded5",
+              "indexA": 1,
+              "indexB": 0,
+              "label": "Curve"
+            },
+            {
+              "dex": "univ3",
+              "address": "0x7a415b19932c0105c82fdb6b720bb01b0cc2cae3",
+              "fee": 500,
+              "label": "UniV3 0.05%"
+            },
+            {
+              "dex": "univ3",
+              "address": "0x202a6012894ae5c288ea824cbc8a9bfb26a49b93",
+              "fee": 100,
+              "label": "UniV3 0.01%"
+            }
+          ]
         },
         "arbitrum": {
           "addressA": "0x35751007a407ca6FEFfE80b3cB397736D2cf4dbe",
@@ -2924,7 +3082,15 @@
           "addressA": "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704",
           "decimalsA": 18,
           "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x840deeef2f115cf50da625f7368c24af6fe74410",
+              "fee": 500,
+              "label": "UniV3 0.05%"
+            }
+          ]
         },
         "arbitrum": {
           "addressA": "0x1DEBd73E752bEaF79865Fd6446b0c970EaE7732f",
@@ -2959,7 +3125,15 @@
           "addressA": "0xae78736Cd615f374D3085123A210448E74Fc6393",
           "decimalsA": 18,
           "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x553e9c493678d8606d6a5ba284643db2110df823",
+              "fee": 100,
+              "label": "UniV3 0.01%"
+            }
+          ]
         },
         "arbitrum": {
           "addressA": "0xEC70Dcb4A1EFa46b8F2D97C310C9c4790ba5ffa8",
@@ -3077,7 +3251,15 @@
           "addressA": "0xC96dE26018A54D51c097160568752c4E3BD6C364",
           "decimalsA": 8,
           "addressB": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-          "decimalsB": 8
+          "decimalsB": 8,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x9dbe5dffaeb4ac2e0ac14f8b4e08b3bc55de5232",
+              "fee": 3000,
+              "label": "UniV3 0.3%"
+            }
+          ]
         },
         "arbitrum": {
           "addressA": "0xC96dE26018A54D51c097160568752c4E3BD6C364",
@@ -3176,7 +3358,22 @@
           "addressA": "0x73A15FeD60Bf67631dC6cd7Bc5B6e8da8190aCF5",
           "decimalsA": 18,
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x4e665157291dbcb25152ebb01061e4012f58add2",
+              "fee": 100,
+              "label": "UniV3 0.01%"
+            },
+            {
+              "dex": "curve",
+              "address": "0x14100f81e33c33ecc7cdac70181fb45b6e78569f",
+              "indexA": 0,
+              "indexB": 1,
+              "label": "Curve"
+            }
+          ]
         },
         "arbitrum": {
           "addressA": "0x35f1C5cB7Fb977E669fD244C567Da99d8a3a6850",
@@ -3391,7 +3588,16 @@
           "addressA": "0x98a878b1cd98131b271883b390f68d2c90674665",
           "decimalsA": 18,
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "pools": [
+            {
+              "dex": "curve",
+              "address": "0x6f63deedc9870d6c16fc644c6654748352cdc87c",
+              "indexA": 0,
+              "indexB": 1,
+              "label": "Curve"
+            }
+          ]
         },
         "base": {
           "addressA": "0xD993935E13851dd7517af10687EC7e5022127228",
@@ -3466,7 +3672,15 @@
           "addressA": "0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa",
           "decimalsA": 18,
           "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x04708077eca6bb527a5bbbd6358ffb043a9c1c14",
+              "fee": 500,
+              "label": "UniV3 0.05%"
+            }
+          ]
         },
         "mantle": {
           "addressA": "0xcDA86A272531e8640cD7F1a92c01839911B90bb0",
@@ -3793,7 +4007,16 @@
           "addressA": "0x5E8422345238F34275888049021821E8E08CAA1f",
           "decimalsA": 18,
           "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "pools": [
+            {
+              "dex": "curve",
+              "address": "0x9c3b46c0ceb5b9e304fcd6d88fc50f7dd24b31bc",
+              "indexA": 1,
+              "indexB": 0,
+              "label": "Curve"
+            }
+          ]
         },
         "arbitrum": {
           "addressA": "0x178412e79c25968a32e89b11f63B33F733770c2A",
@@ -3892,7 +4115,22 @@
           "addressA": "0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD",
           "decimalsA": 18,
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "pools": [
+            {
+              "dex": "curve",
+              "address": "0xd001ae433f254283fece51d4acce8c53263aa186",
+              "indexA": 1,
+              "indexB": 0,
+              "label": "Curve"
+            },
+            {
+              "dex": "univ3",
+              "address": "0xcc6d2f26d363836f85a42d249e145ec0320d3e55",
+              "fee": 100,
+              "label": "UniV3 0.01%"
+            }
+          ]
         }
       }
     },
@@ -4235,7 +4473,21 @@
           "addressA": "0x68749665FF8D2d112Fa859AA293F07A622782F38",
           "decimalsA": 6,
           "addressB": "0x45804880De22913dAFE09f4980848ECE6EcbAf78",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0xc756bba710d45647715079ce50aa16aab36ded42",
+              "fee": 100,
+              "label": "UniV3 0.01%"
+            },
+            {
+              "dex": "univ3",
+              "address": "0xed7ef9a9a05a48858a507c080def0405ad1eaa3e",
+              "fee": 500,
+              "label": "UniV3 0.05%"
+            }
+          ]
         }
       }
     },
@@ -4252,7 +4504,15 @@
           "addressA": "0xD9A442856C234a39a81a089C06451EBAa4306a72",
           "decimalsA": 18,
           "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0xbdb04e915b94fbfd6e8552ff7860e59db7d4499a",
+              "fee": 3000,
+              "label": "UniV3 0.3%"
+            }
+          ]
         }
       }
     },
@@ -4269,7 +4529,16 @@
           "addressA": "0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3",
           "decimalsA": 18,
           "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "pools": [
+            {
+              "dex": "curve",
+              "address": "0xcc7d5785ad5755b6164e21495e07adb0ff11c2a8",
+              "indexA": 0,
+              "indexB": 1,
+              "label": "Curve"
+            }
+          ]
         }
       }
     },
@@ -4286,7 +4555,15 @@
           "addressA": "0x8c1BEd5b9a0928467c9B1341Da1D7BD5e10b6549",
           "decimalsA": 18,
           "addressB": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x6e7ff51ff35e4748346411c7adb1ce1a103e6162",
+              "fee": 100,
+              "label": "UniV3 0.01%"
+            }
+          ]
         }
       }
     },
