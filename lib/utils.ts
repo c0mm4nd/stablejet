@@ -76,10 +76,12 @@ const ETH_TOKENS = new Set(['ETH', 'wstETH', 'weETH', 'rsETH', 'ezETH', 'stETH',
   'ETHx', 'mETH', 'cmETH', 'osETH', 'frxETH', 'sfrxETH', 'OETH', 'pufETH',
   'wbETH', 'rswETH', 'tETH', 'STONE', 'pzETH', 'agETH',
   'uniETH', 'pxETH', 'lsETH', 'ankrETH']);
+const GOLD_TOKENS = new Set(['XAUt', 'PAXG', 'XAUM', 'KAU', 'VNXAU']);
 
-export type PairCategory = 'stable' | 'eth' | 'btc';
+export type PairCategory = 'stable' | 'gold' | 'eth' | 'btc';
 
 export function getPairCategory(tokenA: string, tokenB: string): PairCategory {
+  if ([tokenA, tokenB].some(t => GOLD_TOKENS.has(t))) return 'gold';
   if ([tokenA, tokenB].some(t => BTC_TOKENS.has(t))) return 'btc';
   if ([tokenA, tokenB].some(t => ETH_TOKENS.has(t))) return 'eth';
   return 'stable';
@@ -87,11 +89,12 @@ export function getPairCategory(tokenA: string, tokenB: string): PairCategory {
 
 export const CATEGORY_LABEL: Record<PairCategory, string> = {
   stable: 'Stablecoin',
+  gold: 'Gold',
   eth: 'ETH LST/LRT',
   btc: 'BTC',
 };
 
-export const CATEGORY_ORDER: PairCategory[] = ['stable', 'eth', 'btc'];
+export const CATEGORY_ORDER: PairCategory[] = ['stable', 'gold', 'eth', 'btc'];
 
 export function isSourceEnabled(
   source: string | undefined,
