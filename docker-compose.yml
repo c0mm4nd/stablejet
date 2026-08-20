@@ -5,7 +5,7 @@ services:
     ports:
       - "127.0.0.1:3000:3000"
     volumes:
-      - ./config.json:/app/lib/config.json:ro
+      - ./config.json:/app/lib/config.json
       - ./data:/app/data
     labels:
       - "com.centurylinklabs.watchtower.scope=stablejet"
