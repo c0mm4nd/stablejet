@@ -168,12 +168,14 @@ export interface PoolConfig {
   address: string;
   label?: string;    // 展示名，如 "UniV3 0.01%"
   fee?: number;      // univ3 fee tier（100/500/3000/10000）
+  quoter?: string;   // univ3 fork 的 QuoterV2 地址（覆盖链级默认）
   indexA?: number;   // curve: tokenA 的 coin index
   indexB?: number;   // curve: tokenB 的 coin index
   wrapper?: string;  // 挂到某个 wrapper（tokenA 为该 wrapper）而非主 tokenA
 }
 
 export interface WrapperConfig {
+  oneWay?: 'AtoB' | 'BtoA'; // 单向报价限制
   symbol: string;   // e.g. "USDat"
   address: string;  // wrapper token address (replaces tokenA on this chain)
   decimals: number;
@@ -181,6 +183,7 @@ export interface WrapperConfig {
 
 export interface ChainPairConfig {
   pools?: PoolConfig[]; // 直连池子（可与聚合器并存）
+  oneWay?: 'AtoB' | 'BtoA'; // 单向报价（如 USDm 只能卖出不能买入）
   addressA?: string;
   addressB?: string;
   decimalsA?: number;

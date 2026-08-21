@@ -68,12 +68,14 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
         .filter(d => isSourceEnabled(d.dataSource, sources));
 
     const opportunities = useMemo((): ArbOpportunity[] => {
-        // Pre-filter: exclude data points where either direction is missing,
-        // rates are not finite/positive, or the same-source same-chain roundtrip > 0.1 bps.
+        // Sanity filter: when BOTH directions exist, drop rows whose same-source
+        // same-chain roundtrip > 0.1 bps (bad data). One-way rows (e.g. oneWay
+        // pairs like USDm) keep whichever single direction they have.
         const validData = data.filter(d => {
             const outAtoB = d.tokenAToB?.output;
             const outBtoA = d.tokenBToA?.output;
-            if (!outAtoB || !outBtoA) return false;
+            if (!outAtoB && !outBtoA) return false;
+            if (!outAtoB || !outBtoA) return true;
             const inputAtoB = (d.tokenAToB!.input > 0) ? d.tokenAToB!.input : amount;
             const inputBtoA = (d.tokenBToA!.input > 0) ? d.tokenBToA!.input : amount;
             const rateAtoB = outAtoB / inputAtoB;
@@ -88,8 +90,10 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
             .map(d => {
                 const input = (d.tokenAToB!.input > 0) ? d.tokenAToB!.input : amount;
                 const output = d.tokenAToB!.output!;
-                return { chain: d.chain, chainKey: d.chainKey, source: d.dataSource || 'unknown', rate: output / input, input, output };
-            });
+                const rate = output / input;
+                return { chain: d.chain, chainKey: d.chainKey, source: d.dataSource || 'unknown', rate, input, output };
+            })
+            .filter(s => isFinite(s.rate) && s.rate > 0);
 
         // buys: 用 tokenB 换回 tokenA（B→A），买回 tokenA 的那一腿
         const buys = validData
@@ -97,8 +101,10 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
             .map(d => {
                 const input = (d.tokenBToA!.input > 0) ? d.tokenBToA!.input : amount;
                 const output = d.tokenBToA!.output!;
-                return { chain: d.chain, chainKey: d.chainKey, source: d.dataSource || 'unknown', rate: output / input, input, output };
-            });
+                const rate = output / input;
+                return { chain: d.chain, chainKey: d.chainKey, source: d.dataSource || 'unknown', rate, input, output };
+            })
+            .filter(b => isFinite(b.rate) && b.rate > 0);
 
         const opps: ArbOpportunity[] = [];
         for (const sell of sells) {

@@ -102,7 +102,8 @@ export async function getSwapDataForPair(
         tokenBDecimals,
         appChainConfig,
         sources,
-        pools: mainPools
+        pools: mainPools,
+        direction: chainPairData.oneWay ?? 'both'
       }).catch(err => {
         error(`[Onchain] Error fetching ${chainKey} data:`, err);
         return [];
@@ -127,7 +128,8 @@ export async function getSwapDataForPair(
           tokenBDecimals,
           appChainConfig,
           sources,
-          pools: wrapperPools
+          pools: wrapperPools,
+          direction: wrapper.oneWay ?? 'both'
         }).catch(err => {
           error(`[Onchain] Error fetching ${wrapperChainKey} data:`, err);
           return [];

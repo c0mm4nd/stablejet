@@ -563,7 +563,8 @@
     "megaeth": {
       "name": "MegaETH",
       "nordsternCode": "4326",
-      "lifiChainId": "4326"
+      "lifiChainId": "4326",
+      "rpcUrl": "https://mainnet.megaeth.com/rpc"
     },
     "x_layer": {
       "name": "XLayer",
@@ -897,6 +898,22 @@
           "decimalsA": 6,
           "addressB": "0xbB06DCA3AE6887fAbF931640f67cab3e3a16F4dC",
           "decimalsB": 6
+        },
+        "megaeth": {
+          "addressA": "0xFaFdDbb3FC7688494971A79cc65DCa3Ef82079e7",
+          "decimalsA": 18,
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsB": 6,
+          "oneWay": "AtoB",
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x6c8e5d463a2473b1a8bcd87e1cea2724203a1d8f",
+              "fee": 100,
+              "quoter": "0x1F1a8dC7E138C34b503Ca080962aC10B75384a27",
+              "label": "Kumbaya 0.01%"
+            }
+          ]
         }
       }
     },

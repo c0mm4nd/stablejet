@@ -19,6 +19,7 @@ const RPC_FALLBACK: Record<string, string> = {
   mantle: 'https://mantle-rpc.publicnode.com',
   sonic: 'https://sonic-rpc.publicnode.com',
   unichain: 'https://unichain-rpc.publicnode.com',
+  megaeth: 'https://mainnet.megaeth.com/rpc',
 };
 
 // Uniswap V3 QuoterV2（canonical 部署，多链同地址；base/bnb 用官方部署地址）
@@ -225,7 +226,7 @@ export async function getPoolQuotes(params: PoolsQuoteParams): Promise<PoolsQuot
       for (const stepIn of stepAmounts) {
         idxs.push(calls.length);
         if (pool.dex === 'univ3') {
-          const quoter = UNIV3_QUOTER[chainKey];
+          const quoter = pool.quoter || UNIV3_QUOTER[chainKey];
           // quoteExactInputSingle((tokenIn,tokenOut,amountIn,fee,sqrtPriceLimitX96))
           calls.push({
             to: quoter || '0x0000000000000000000000000000000000000000',
