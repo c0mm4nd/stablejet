@@ -39,7 +39,7 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
     const tabParam = searchParams.get('tab');
     return (tabParam === 'arbitrage' || tabParam === 'quotes') ? tabParam : 'quotes';
   });
-  const [arbitrageMode, setArbitrageMode] = useState<'roundtrip' | 'triangular' | 'quadrilateral'>(() => {
+  const [arbitrageMode, setArbitrageMode] = useState<'roundtrip' | 'globalroundtrip' | 'triangular' | 'quadrilateral'>(() => {
     const modeParam = searchParams.get('mode');
     return (modeParam === 'triangular' || modeParam === 'roundtrip' || modeParam === 'quadrilateral') ? modeParam as 'roundtrip' | 'triangular' | 'quadrilateral' : 'roundtrip';
   });
@@ -87,7 +87,7 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
 
   const fetchData = useCallback(async (): Promise<boolean> => {
     try {
-      const includeAllPairs = activeTab === 'arbitrage' && (arbitrageMode === 'triangular' || arbitrageMode === 'quadrilateral');
+      const includeAllPairs = activeTab === 'arbitrage' && (arbitrageMode === 'globalroundtrip' || arbitrageMode === 'triangular' || arbitrageMode === 'quadrilateral');
       const historyResponse = await fetch(
         buildApiUrl('/api/history', { hours: 24, pair: includeAllPairs ? undefined : pairId, _ts: Date.now() }),
         { cache: 'no-store' }
@@ -146,13 +146,13 @@ export default function SwapDataGrid({ pairId }: SwapDataGridProps) {
     if (tabParam && (tabParam === 'quotes' || tabParam === 'arbitrage') && tabParam !== activeTab) {
       setActiveTab(tabParam);
     }
-    if (modeParam && (modeParam === 'roundtrip' || modeParam === 'triangular' || modeParam === 'quadrilateral') && modeParam !== arbitrageMode) {
+    if (modeParam && (modeParam === 'roundtrip' || modeParam === 'globalroundtrip' || modeParam === 'triangular' || modeParam === 'quadrilateral') && modeParam !== arbitrageMode) {
       setArbitrageMode(modeParam);
     }
   }, [searchParams]);
 
   useEffect(() => {
-    const nextActivePair = activeTab === 'arbitrage' && (arbitrageMode === 'triangular' || arbitrageMode === 'quadrilateral')
+    const nextActivePair = activeTab === 'arbitrage' && (arbitrageMode === 'globalroundtrip' || arbitrageMode === 'triangular' || arbitrageMode === 'quadrilateral')
       ? 'all'
       : pairId;
 
