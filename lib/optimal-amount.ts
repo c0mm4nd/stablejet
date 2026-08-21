@@ -22,10 +22,12 @@ const CEX_FETCHERS: Record<string, (amounts: number[], symbol: string) => Promis
   okx: getOkxSwapData,
 };
 
-// 探测档位：以当前展示金额为基准的倍率（等比 ~1.8）。爬山搜索按需评估，
-// 找到网格峰值后再在两侧几何中点细化一轮（分辨率 ~1.34x）
-const LADDER_MULTIPLIERS = [0.1, 0.18, 0.3, 0.55, 1, 1.8, 3, 5.5, 10];
-const BASE_INDEX = 4; // 1x
+// 自适应搜索参数：无固定档位。先按 EXPAND_RATIO 动态扩展包围利润峰值，
+// 再在区间内做对数空间黄金分割，收敛到相邻评估点比率 < TOLERANCE_RATIO
+const EXPAND_RATIO = 2.5;
+const SEARCH_BOUND = 64;       // 搜索范围：base/64 ~ base*64
+const TOLERANCE_RATIO = 1.15;  // 收敛精度 ±7%
+const MAX_EVALS = 14;          // 单次探测评估上限
 
 const ONCHAIN_SOURCE_KEYS = ['llamaswap', 'lifi', 'cetus', 'jupiter', 'panora', 'aftermath'] as const;
 
@@ -186,47 +188,72 @@ export async function probeOptimalAmount(params: ProbeParams): Promise<ProbeResu
   probeInFlight = true;
   try {
     const evaluated = new Map<number, ProbePoint>(); // key: 实际金额
+    let evals = 0;
     const ev = async (mult: number): Promise<ProbePoint> => {
       const amount = roundAmount(params.baseAmount * mult);
       let p = evaluated.get(amount);
       if (!p) {
+        evals++;
         p = await evalPoint(params, amount);
         evaluated.set(amount, p);
       }
       return p;
     };
     const profit = (p: ProbePoint) => p.profitAmount ?? -Infinity;
-    const G = LADDER_MULTIPLIERS;
+    const f = async (mult: number) => profit(await ev(mult));
 
-    // 阶段一：网格爬山
-    let peakIdx = BASE_INDEX;
-    const base = await ev(G[BASE_INDEX]);
-    const up = await ev(G[BASE_INDEX + 1]);
-    if (profit(up) > profit(base)) {
-      peakIdx = BASE_INDEX + 1;
-      while (peakIdx + 1 < G.length) {
-        const next = await ev(G[peakIdx + 1]);
-        if (profit(next) > profit(await ev(G[peakIdx]))) peakIdx++;
-        else break;
+    // 阶段一：从 1x 出发按 EXPAND_RATIO 动态扩展，包围利润峰值
+    const r = EXPAND_RATIO;
+    let lo = 1, hi = 1; // 包围区间（倍率）
+    const p1 = await f(1);
+    const pUp = await f(r);
+    if (pUp > p1) {
+      // 上行扩展直到回落
+      let prev = 1, cur = r;
+      let curP = pUp;
+      while (cur * r <= SEARCH_BOUND && evals < MAX_EVALS - 4) {
+        const nextP = await f(cur * r);
+        if (nextP <= curP) break;
+        prev = cur; cur *= r; curP = nextP;
       }
+      lo = prev; hi = Math.min(cur * r, SEARCH_BOUND);
     } else {
-      while (peakIdx - 1 >= 0) {
-        const prev = await ev(G[peakIdx - 1]);
-        if (profit(prev) > profit(await ev(G[peakIdx]))) peakIdx--;
-        else break;
+      const pDown = await f(1 / r);
+      if (pDown > p1) {
+        // 下行扩展直到回落
+        let prev = 1, cur = 1 / r;
+        let curP = pDown;
+        while (cur / r >= 1 / SEARCH_BOUND && evals < MAX_EVALS - 4) {
+          const nextP = await f(cur / r);
+          if (nextP <= curP) break;
+          prev = cur; cur /= r; curP = nextP;
+        }
+        lo = Math.max(cur / r, 1 / SEARCH_BOUND); hi = prev;
+      } else {
+        lo = 1 / r; hi = r; // 峰值在两侧邻点之间
       }
     }
 
-    // 阶段二：峰值两侧几何中点细化（凹曲线下真峰必在相邻网格区间内）
-    const peakPoint = await ev(G[peakIdx]);
-    if (profit(peakPoint) > -Infinity) {
-      const refines: number[] = [];
-      if (peakIdx - 1 >= 0) refines.push(Math.sqrt(G[peakIdx - 1] * G[peakIdx]));
-      if (peakIdx + 1 < G.length) refines.push(Math.sqrt(G[peakIdx] * G[peakIdx + 1]));
-      await Promise.all(refines.map(m => ev(m)));
+    // 阶段二：对数空间黄金分割，收敛到 TOLERANCE_RATIO
+    const PHI = (Math.sqrt(5) - 1) / 2; // 0.618
+    let a = Math.log(lo), b = Math.log(hi);
+    let x1 = b - PHI * (b - a);
+    let x2 = a + PHI * (b - a);
+    let f1 = await f(Math.exp(x1));
+    let f2 = await f(Math.exp(x2));
+    while (Math.exp(b - a) > TOLERANCE_RATIO && evals < MAX_EVALS) {
+      if (f1 >= f2) {
+        b = x2; x2 = x1; f2 = f1;
+        x1 = b - PHI * (b - a);
+        f1 = await f(Math.exp(x1));
+      } else {
+        a = x1; x1 = x2; f1 = f2;
+        x2 = a + PHI * (b - a);
+        f2 = await f(Math.exp(x2));
+      }
     }
 
-    const points = [...evaluated.values()].sort((a, b) => a.amount - b.amount);
+    const points = [...evaluated.values()].sort((a2, b2) => a2.amount - b2.amount);
     let best: ProbePoint | null = null;
     for (const p of points) {
       if (p.profitAmount === null) continue;
