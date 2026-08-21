@@ -1878,6 +1878,12 @@
           "addressB": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
           "decimalsB": 6,
           "disabled": true
+        },
+        "katana": {
+          "addressA": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+          "decimalsA": 6,
+          "addressB": "0x203a662b0bd271a6ed5a60edfbd04bfce608fd36",
+          "decimalsB": 6
         }
       }
     },
@@ -4660,6 +4666,40 @@
           "addressA": "0xaca92e438df0b2401ff60da7e4337b687a2435da",
           "decimalsA": 6,
           "addressB": "0xA219439258ca9da29E9Cc4cE5596924745e12B93",
+          "decimalsB": 6
+        }
+      }
+    },
+    "syrupUSDT_USDT": {
+      "id": "syrupUSDT_USDT",
+      "name": "syrupUSDT/USDT",
+      "tokenA": "syrupUSDT",
+      "tokenB": "USDT",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "plasma": {
+          "addressA": "0xc4374775489CB9C56003bF2C9B12495Fc64F0771",
+          "decimalsA": 6,
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsB": 6
+        }
+      }
+    },
+    "USDHL_USDT": {
+      "id": "USDHL_USDT",
+      "name": "USDHL/USDT",
+      "tokenA": "USDHL",
+      "tokenB": "USDT",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "hyperevm": {
+          "addressA": "0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5",
+          "decimalsA": 6,
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
           "decimalsB": 6
         }
       }
