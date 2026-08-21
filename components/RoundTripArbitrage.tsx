@@ -3,7 +3,7 @@
 import { Fragment, useMemo, useState } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
-import { isSourceEnabled } from '@/lib/utils';
+import { isSourceEnabled, getOneWay } from '@/lib/utils';
 
 interface ProbePoint {
     amount: number;
@@ -85,7 +85,9 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
         });
 
         // sells: 用 tokenA 换出 tokenB（A→B），卖出 tokenA 的那一腿
+        // oneWay 限制：只排除受限方向的套利腿，报价本身仍双向展示
         const sells = validData
+            .filter(d => getOneWay(configPair, d.chainKey) !== 'BtoA')
             .filter(d => d.tokenAToB?.output && d.tokenAToB.output > 0)
             .map(d => {
                 const input = (d.tokenAToB!.input > 0) ? d.tokenAToB!.input : amount;
@@ -97,6 +99,7 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
 
         // buys: 用 tokenB 换回 tokenA（B→A），买回 tokenA 的那一腿
         const buys = validData
+            .filter(d => getOneWay(configPair, d.chainKey) !== 'AtoB')
             .filter(d => d.tokenBToA?.output && d.tokenBToA.output > 0)
             .map(d => {
                 const input = (d.tokenBToA!.input > 0) ? d.tokenBToA!.input : amount;
@@ -134,7 +137,7 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
             }
         }
         return opps.sort((a, b) => b.profitBps - a.profitBps);
-    }, [data, amount]);
+    }, [data, amount, configPair]);
 
     const top = opportunities.slice(0, 20);
     const maxProfit = top.length > 0 ? top[0].profitBps : 0;

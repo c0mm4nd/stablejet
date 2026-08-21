@@ -96,6 +96,20 @@ export const CATEGORY_LABEL: Record<PairCategory, string> = {
 
 export const CATEGORY_ORDER: PairCategory[] = ['stable', 'gold', 'eth', 'btc'];
 
+// 单向限制：该 pair 在此 chainKey（可能带 @wrapper 后缀）上被限制的方向。
+// oneWay='AtoB' 表示只允许 A→B 作为套利腿（报价仍双向展示）。
+export function getOneWay(
+  pair: { chains?: Record<string, { oneWay?: 'AtoB' | 'BtoA'; wrappers?: { symbol: string; oneWay?: 'AtoB' | 'BtoA' }[] }> } | undefined,
+  chainKey: string | undefined
+): 'AtoB' | 'BtoA' | undefined {
+  if (!pair || !chainKey) return undefined;
+  const [base, wrapperSym] = chainKey.split('@');
+  const chain = pair.chains?.[base];
+  if (!chain) return undefined;
+  if (wrapperSym) return chain.wrappers?.find(w => w.symbol === wrapperSym)?.oneWay;
+  return chain.oneWay;
+}
+
 export function isSourceEnabled(
   source: string | undefined,
   sources?: Partial<ConfigData['sources']>

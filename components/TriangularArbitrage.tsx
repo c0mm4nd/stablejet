@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
-import { isSourceEnabled, getPairCategory, PairCategory } from '@/lib/utils';
+import { isSourceEnabled, getPairCategory, getOneWay, PairCategory } from '@/lib/utils';
 
 interface TriangularArbitrageProps {
     history: HistoryDataPoint[];
@@ -112,13 +112,16 @@ export default function TriangularArbitrage({ history, amount, pairId }: Triangu
                 if (product < 0.9) return;                // wrong token / bad liquidity
             }
 
+            // oneWay 限制：受限方向不进套利图（报价仍展示）
+            const oneWay = getOneWay(pair, item.chainKey);
+
             // A -> B
-            if (tokenAToB?.output && tokenAToB.output > 0) {
+            if (oneWay !== 'BtoA' && tokenAToB?.output && tokenAToB.output > 0) {
                 const rate = tokenAToB.output / tokenAToB.input;
                 addEdge(tA, tB, rate, item.chain, item.dataSource || 'unknown', tokenAToB.input);
             }
             // B -> A
-            if (tokenBToA?.output && tokenBToA.output > 0) {
+            if (oneWay !== 'AtoB' && tokenBToA?.output && tokenBToA.output > 0) {
                 const rate = tokenBToA.output / tokenBToA.input;
                 addEdge(tB, tA, rate, item.chain, item.dataSource || 'unknown', tokenBToA.input);
             }

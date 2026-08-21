@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
-import { isSourceEnabled, getPairCategory, PairCategory } from '@/lib/utils';
+import { isSourceEnabled, getPairCategory, getOneWay, PairCategory } from '@/lib/utils';
 
 interface QuadrilateralArbitrageProps {
     history: HistoryDataPoint[];
@@ -102,10 +102,13 @@ export default function QuadrilateralArbitrage({ history, amount, pairId }: Quad
                 if (product < 0.9) return;
             }
 
-            if (tokenAToB?.output && tokenAToB.output > 0) {
+            // oneWay 限制：受限方向不进套利图（报价仍展示）
+            const oneWay = getOneWay(pair, item.chainKey);
+
+            if (oneWay !== 'BtoA' && tokenAToB?.output && tokenAToB.output > 0) {
                 addEdge(tA, tB, tokenAToB.output / tokenAToB.input, item.chain, item.dataSource || 'unknown', tokenAToB.input);
             }
-            if (tokenBToA?.output && tokenBToA.output > 0) {
+            if (oneWay !== 'AtoB' && tokenBToA?.output && tokenBToA.output > 0) {
                 addEdge(tB, tA, tokenBToA.output / tokenBToA.input, item.chain, item.dataSource || 'unknown', tokenBToA.input);
             }
         });
