@@ -1884,6 +1884,12 @@
           "decimalsA": 6,
           "addressB": "0x203a662b0bd271a6ed5a60edfbd04bfce608fd36",
           "decimalsB": 6
+        },
+        "sui": {
+          "addressA": "0x2053d08c1e2bd02791056171aab0fd12bd7cd7efad2ab8f6b9c8902f14df2ff2::ausd::AUSD",
+          "decimalsA": 6,
+          "addressB": "0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC",
+          "decimalsB": 6
         }
       }
     },
@@ -2189,6 +2195,12 @@
         },
         "okx": {
           "cexPairSymbol": "USDG-USDC"
+        },
+        "solana": {
+          "addressA": "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH",
+          "decimalsA": 6,
+          "addressB": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "decimalsB": 6
         }
       }
     },
@@ -2221,6 +2233,12 @@
         },
         "okx": {
           "cexPairSymbol": "USDG-USDT"
+        },
+        "solana": {
+          "addressA": "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH",
+          "decimalsA": 6,
+          "addressB": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+          "decimalsB": 6
         }
       }
     },
@@ -2578,6 +2596,12 @@
           "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
           "decimalsB": 8,
           "disabled": true
+        },
+        "arbitrum": {
+          "addressA": "0x6c84a8f1c29108F47a79964b5Fe888D4f4D0dE40",
+          "decimalsA": 18,
+          "addressB": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
+          "decimalsB": 8
         }
       }
     },
@@ -2611,6 +2635,18 @@
           ]
         },
         "berachain": {
+          "addressA": "0xecAc9C5F704e954931349Da37F60E39f515c11c1",
+          "decimalsA": 8,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        },
+        "base": {
+          "addressA": "0xecAc9C5F704e954931349Da37F60E39f515c11c1",
+          "decimalsA": 8,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        },
+        "bnb_chain": {
           "addressA": "0xecAc9C5F704e954931349Da37F60E39f515c11c1",
           "decimalsA": 8,
           "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
@@ -2699,6 +2735,30 @@
         },
         "berachain": {
           "addressA": "0x541FD749419CA806a8bc7da8ac23D346f2dF8B77",
+          "decimalsA": 18,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        },
+        "bnb_chain": {
+          "addressA": "0x4aae823a6a0b376De6A78e74eCC5b079d38cBCf7",
+          "decimalsA": 18,
+          "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+          "decimalsB": 8
+        },
+        "avalanche": {
+          "addressA": "0xbc78D84Ba0c46dFe32cf2895a19939c86b81a777",
+          "decimalsA": 18,
+          "addressB": "0x50b7545627a5162F82A992c33b87aDc75187B218",
+          "decimalsB": 8
+        },
+        "arbitrum": {
+          "addressA": "0x3647c54c4c2C65bC7a2D63c0Da2809B399DBBDC0",
+          "decimalsA": 18,
+          "addressB": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
+          "decimalsB": 8
+        },
+        "base": {
+          "addressA": "0x3B86Ad95859b6AB773f55f8d94B4b9d443EE931f",
           "decimalsA": 18,
           "addressB": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
           "decimalsB": 8
@@ -4241,6 +4301,12 @@
           "decimalsA": 6,
           "addressB": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
           "decimalsB": 6
+        },
+        "sui": {
+          "addressA": "0xf16e6b723f242ec745dfd7634ad072c42d5c1d9ac9d62a39c381303eaa57693a::fdusd::FDUSD",
+          "decimalsA": 6,
+          "addressB": "0x375f70cf2ae4c00bf37117d0c85a2c71545e6ee05c4a5c7d282cd66a4504b068::usdt::USDT",
+          "decimalsB": 6
         }
       }
     },
@@ -4479,6 +4545,18 @@
           "addressA": "A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6",
           "decimalsA": 6,
           "addressB": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "decimalsB": 6
+        },
+        "sui": {
+          "addressA": "0x960b531667636f39e85867775f52f6b1f220a058c4de786905bdf761e06a56bb::usdy::USDY",
+          "decimalsA": 6,
+          "addressB": "0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC",
+          "decimalsB": 6
+        },
+        "aptos": {
+          "addressA": "0xcfea864b32833f157f042618bd845145256b1bf4c0da34a7013b76e42daa53cc",
+          "decimalsA": 6,
+          "addressB": "0xbae207659db88bea0cbead6da0ed00aac12edcdda169e591cd41c94180b46f3b",
           "decimalsB": 6
         }
       }
