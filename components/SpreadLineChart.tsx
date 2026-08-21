@@ -237,7 +237,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
 
   // 转换数据格式供 Recharts 使用，并过滤异常值
   const chartData = history.map(point => {
-    const timestamp = new Date(point.timestamp).toLocaleTimeString('zh-CN', {
+    const timestamp = new Date(point.timestamp).toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit'
@@ -284,7 +284,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">
-        {amount.toLocaleString()} {tokenAShort} - 双向报价偏差 (bps) ({pair?.name || '交易对'})
+        {amount.toLocaleString()} {tokenAShort} - Two-way quote deviation (bps) ({pair?.name || 'Pair'})
       </h2>
 
       <ResponsiveContainer width="100%" height={450}>
@@ -298,7 +298,7 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
           <YAxis
             stroke="#9ca3af"
             style={{ fontSize: '11px' }}
-            label={{ value: '报价偏差 (bps)', angle: -90, position: 'insideLeft', style: { fontSize: '11px' } }}
+            label={{ value: 'Quote deviation (bps)', angle: -90, position: 'insideLeft', style: { fontSize: '11px' } }}
           />
           <Tooltip content={<CustomTooltip pairConfig={pair} />} />
           <Legend
@@ -355,17 +355,17 @@ export default function SpreadLineChart({ history, amount, pairId }: SpreadLineC
         <div className="flex items-center justify-center gap-6 text-sm">
           <div className="flex items-center gap-2">
             <div className="w-8 h-0.5 bg-blue-500"></div>
-            <span className="text-gray-700">{pair.tokenA} → {pair.tokenB}（蓝色系）</span>
+            <span className="text-gray-700">{pair.tokenA} → {pair.tokenB} (blue)</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-8 h-0.5 bg-orange-500 border-t-2 border-dashed border-orange-500"></div>
-            <span className="text-gray-700">{pair.tokenB} → {pair.tokenA}（橙色系，虚线）</span>
+            <span className="text-gray-700">{pair.tokenB} → {pair.tokenA} (orange, dashed)</span>
           </div>
         </div>
         <p className="text-xs text-gray-600 text-center">
-          正值表示获利，负值表示损失 | bps = 基点 (1 bps = 0.01%) | 套利空间 = 两条线的差值
+          Positive = gain, negative = loss | bps = basis points (1 bps = 0.01%) | Arb spread = gap between the two lines
           <br />
-          已过滤超出中位数 ±10 bps 的异常值
+          Outliers beyond ±10 bps from the median are filtered out
         </p>
       </div>
     </div>

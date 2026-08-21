@@ -76,7 +76,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
   const latestData = recentHistory.length > 0
     ? recentHistory[recentHistory.length - 1]
     : history[history.length - 1];
-  const timestamp = new Date(latestData.timestamp).toLocaleString('zh-CN');
+  const timestamp = new Date(latestData.timestamp).toLocaleString('en-US');
 
   // 准备表格数据
   const tableData: TableRow[] = useMemo(() => {
@@ -178,10 +178,10 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
       />
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800">
-          输入数量: {amount.toLocaleString()} - 实时报价数据 (共 {sortedData.length} 个链)
+          Input amount: {amount.toLocaleString()} - Live quotes ({sortedData.length} chains)
         </h2>
         <span className="text-sm text-gray-500">
-          更新时间: {timestamp}
+          Updated: {timestamp}
         </span>
       </div>
 
@@ -194,7 +194,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                 onClick={() => handleSort('chain')}
               >
                 <div className="flex items-center gap-2">
-                  链名称
+                  Chain
                   <SortIcon columnKey="chain" />
                 </div>
               </th>
@@ -203,7 +203,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                 onClick={() => handleSort('dataSource')}
               >
                 <div className="flex items-center gap-2">
-                  数据源
+                  Source
                   <SortIcon columnKey="dataSource" />
                 </div>
               </th>
@@ -221,7 +221,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                 onClick={() => handleSort('spreadAtoB')}
               >
                 <div className="flex items-center justify-end gap-2">
-                  价差 (bps)
+                  Spread (bps)
                   <SortIcon columnKey="spreadAtoB" />
                 </div>
               </th>
@@ -239,7 +239,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                 onClick={() => handleSort('spreadBtoA')}
               >
                 <div className="flex items-center justify-end gap-2">
-                  价差 (bps)
+                  Spread (bps)
                   <SortIcon columnKey="spreadBtoA" />
                 </div>
               </th>
@@ -248,7 +248,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                 onClick={() => handleSort('arbitrageSpace')}
               >
                 <div className="flex items-center justify-end gap-2">
-                  套利空间 (bps)
+                  Arb spread (bps)
                   <SortIcon columnKey="arbitrageSpace" />
                 </div>
               </th>
@@ -257,7 +257,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
           <tbody className="divide-y divide-gray-100">
             {sortedData.map((row, idx) => {
               const sourceDisplayInfo = getSourceInfo(row.dataSource);
-              const rowTime = new Date(row.timestamp).toLocaleString('zh-CN');
+              const rowTime = new Date(row.timestamp).toLocaleString('en-US');
               const lifiRouteCounts = row.dataSource === 'lifi'
                 ? {
                   aToB: extractLiFiAlternatives(row.routeAtoB).length,
@@ -298,7 +298,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                         {row.outputAtoB.toFixed(6)}
                       </span>
                     ) : (
-                      <span className="text-red-500 text-xs">错误</span>
+                      <span className="text-red-500 text-xs">Error</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -316,7 +316,7 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
                         {row.outputBtoA.toFixed(6)}
                       </span>
                     ) : (
-                      <span className="text-red-500 text-xs">错误</span>
+                      <span className="text-red-500 text-xs">Error</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -345,9 +345,9 @@ export default function LiveQuotesTable({ history, amount, pairId }: LiveQuotesT
       </div>
 
       <div className="mt-4 text-xs text-gray-500 text-center">
-        价差 (bps) = 相对“全体中位数汇率”的偏差 |
-        套利空间 (bps) = ({pair.tokenA}→{pair.tokenB} 汇率 × {pair.tokenB}→{pair.tokenA} 汇率 - 1) × 10000 |
-        点击列标题可排序
+        Spread (bps) = deviation from the median rate across all sources |
+        Arb spread (bps) = ({pair.tokenA}→{pair.tokenB} rate × {pair.tokenB}→{pair.tokenA} rate - 1) × 10000 |
+        Click column headers to sort
       </div>
     </div>
   );

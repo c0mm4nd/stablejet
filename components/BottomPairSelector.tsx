@@ -72,7 +72,7 @@ export default function BottomPairSelector({ selectedPair, onPairChange }: Botto
                 </svg>
               </div>
               <div className="text-left">
-                <div className="text-xs text-gray-500">当前交易对</div>
+                <div className="text-xs text-gray-500">Current pair</div>
                 <div className="text-sm font-semibold text-gray-800">{selectedPairName}</div>
               </div>
             </div>
@@ -96,7 +96,7 @@ export default function BottomPairSelector({ selectedPair, onPairChange }: Botto
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="搜索交易对..."
+                    placeholder="Search pairs…"
                     className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-xl text-[16px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     autoFocus
                   />
@@ -154,8 +154,8 @@ export default function BottomPairSelector({ selectedPair, onPairChange }: Botto
                         d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <p className="font-medium">未找到匹配的交易对</p>
-                    <p className="text-xs mt-1">试试输入代币符号</p>
+                    <p className="font-medium">No matching pairs</p>
+                    <p className="text-xs mt-1">Try a token symbol</p>
                   </div>
                 )}
               </div>

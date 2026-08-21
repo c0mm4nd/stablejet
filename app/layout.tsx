@@ -16,11 +16,11 @@ export default function RootLayout({
     // Description
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', '跨链兑换监控工具');
+      metaDescription.setAttribute('content', 'Cross-chain swap monitor');
     } else {
       const meta = document.createElement('meta');
       meta.name = 'description';
-      meta.content = '跨链兑换监控工具';
+      meta.content = 'Cross-chain swap monitor';
       document.head.appendChild(meta);
     }
 
@@ -61,7 +61,7 @@ export default function RootLayout({
   }, []);
 
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
           <ConfigProvider>

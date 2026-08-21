@@ -70,7 +70,7 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
             {/* 桌面端显示标题 */}
             <div className="ml-3 hidden lg:block">
               <h1 className="text-xl font-bold text-gray-800">StableJet Monitor</h1>
-              <p className="text-xs text-gray-500">稳定交易对跨链套利监控</p>
+              <p className="text-xs text-gray-500">Cross-chain arbitrage monitor for pegged pairs</p>
             </div>
           </div>
 
@@ -78,7 +78,7 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
           <div className="hidden md:flex flex-1 max-w-md" ref={searchRef}>
             <div className="relative w-full">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500 whitespace-nowrap">交易对:</span>
+                <span className="text-sm text-gray-500 whitespace-nowrap">Pair:</span>
                 <div className="relative flex-1">
                   <input
                     type="text"
@@ -88,7 +88,7 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
                       setShowDropdown(true);
                     }}
                     onFocus={() => setShowDropdown(true)}
-                    placeholder={`当前: ${selectedPairName} (输入搜索...)`}
+                    placeholder={`Current: ${selectedPairName} (type to search…)`}
                     className="w-full px-4 py-2 border border-gray-200 rounded-lg text-[16px] md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -141,8 +141,8 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
                       <svg className="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <p>未找到匹配的交易对</p>
-                      <p className="text-xs mt-1">试试输入代币符号</p>
+                      <p>No matching pairs</p>
+                      <p className="text-xs mt-1">Try a token symbol</p>
                     </div>
                   )}
                 </div>
@@ -156,7 +156,7 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
             <Link
               href="/notifications"
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              title="提醒历史"
+              title="Notification history"
             >
               <svg className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -199,8 +199,8 @@ export default function Header({ countdown, selectedPair, onPairChange, onSettin
             <button
               onClick={onSettingsClick}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              title="设置"
-              aria-label="配置设置"
+              title="Settings"
+              aria-label="Configure settings"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

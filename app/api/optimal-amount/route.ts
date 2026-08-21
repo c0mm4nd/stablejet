@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, timestamp: new Date().toISOString(), ...result });
   } catch (error) {
     if (error instanceof ProbeBusyError) {
-      return NextResponse.json({ success: false, error: '已有探测在进行中，请稍候' }, { status: 429 });
+      return NextResponse.json({ success: false, error: 'Another probe is in progress, please retry shortly' }, { status: 429 });
     }
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : 'Unknown error' },

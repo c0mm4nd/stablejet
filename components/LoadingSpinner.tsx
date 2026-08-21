@@ -5,7 +5,7 @@ export default function LoadingSpinner() {
         <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200"></div>
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600 absolute top-0"></div>
       </div>
-      <p className="text-gray-600 text-lg mt-6 font-medium">加载数据中...</p>
+      <p className="text-gray-600 text-lg mt-6 font-medium">Loading data…</p>
     </div>
   );
 }

@@ -67,8 +67,8 @@ export default function NotificationsPage() {
             </svg>
           </Link>
           <div>
-            <h1 className="text-lg font-semibold text-gray-800">提醒历史</h1>
-            <p className="text-xs text-gray-500">共 {total} 条记录</p>
+            <h1 className="text-lg font-semibold text-gray-800">Notification history</h1>
+            <p className="text-xs text-gray-500">{total} records</p>
           </div>
           <div className="ml-auto flex gap-2">
             {(['', 'arb', 'price_change'] as const).map((t) => (
@@ -81,14 +81,14 @@ export default function NotificationsPage() {
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                {t === '' ? '全部' : t === 'arb' ? '套利' : '价格变动'}
+                {t === '' ? 'All' : t === 'arb' ? 'Arb' : 'Price change'}
               </button>
             ))}
             <button
               onClick={fetchData}
               className="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
             >
-              刷新
+              Refresh
             </button>
           </div>
         </div>
@@ -98,28 +98,28 @@ export default function NotificationsPage() {
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="py-16 text-center text-gray-400 text-sm">加载中...</div>
+            <div className="py-16 text-center text-gray-400 text-sm">Loading…</div>
           ) : rows.length === 0 ? (
-            <div className="py-16 text-center text-gray-400 text-sm">暂无提醒记录</div>
+            <div className="py-16 text-center text-gray-400 text-sm">No notifications yet</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">时间</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">类型</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">交易对</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">标题</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">内容</th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">利润 (bps)</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">链路</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Time</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Pair</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Title</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Body</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Profit (bps)</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Route</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {rows.map((row) => (
                     <tr key={row.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap tabular-nums">
-                        {new Date(row.created_at * 1000).toLocaleString('zh-CN', {
+                        {new Date(row.created_at * 1000).toLocaleString('en-US', {
                           month: '2-digit', day: '2-digit',
                           hour: '2-digit', minute: '2-digit', second: '2-digit',
                         })}
@@ -130,7 +130,7 @@ export default function NotificationsPage() {
                             ? 'bg-emerald-100 text-emerald-700'
                             : 'bg-blue-100 text-blue-700'
                         }`}>
-                          {row.type === 'arb' ? '套利' : '价格变动'}
+                          {row.type === 'arb' ? 'Arb' : 'Price change'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs font-medium text-gray-700 whitespace-nowrap">
@@ -160,21 +160,21 @@ export default function NotificationsPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
-              <span>第 {currentPage} / {totalPages} 页</span>
+              <span>Page {currentPage} / {totalPages}</span>
               <div className="flex gap-2">
                 <button
                   onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
                   disabled={offset === 0}
                   className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
-                  上一页
+                  Previous
                 </button>
                 <button
                   onClick={() => setOffset(offset + PAGE_SIZE)}
                   disabled={offset + PAGE_SIZE >= total}
                   className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
-                  下一页
+                  Next
                 </button>
               </div>
             </div>

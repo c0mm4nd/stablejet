@@ -22,9 +22,10 @@ const CEX_FETCHERS: Record<string, (amounts: number[], symbol: string) => Promis
   okx: getOkxSwapData,
 };
 
-// 探测档位：以当前展示金额为基准的倍率。爬山搜索按需评估，通常只探 3 档
-const LADDER_MULTIPLIERS = [0.1, 0.3, 1, 3, 10];
-const BASE_INDEX = 2; // 1x
+// 探测档位：以当前展示金额为基准的倍率（等比 ~1.8）。爬山搜索按需评估，
+// 找到网格峰值后再在两侧几何中点细化一轮（分辨率 ~1.34x）
+const LADDER_MULTIPLIERS = [0.1, 0.18, 0.3, 0.55, 1, 1.8, 3, 5.5, 10];
+const BASE_INDEX = 4; // 1x
 
 const ONCHAIN_SOURCE_KEYS = ['llamaswap', 'lifi', 'cetus', 'jupiter', 'panora', 'aftermath'] as const;
 
@@ -184,34 +185,45 @@ export async function probeOptimalAmount(params: ProbeParams): Promise<ProbeResu
   if (probeInFlight) throw new ProbeBusyError();
   probeInFlight = true;
   try {
-    const evaluated = new Map<number, ProbePoint>();
-    const evalIdx = async (i: number): Promise<ProbePoint> => {
-      let p = evaluated.get(i);
+    const evaluated = new Map<number, ProbePoint>(); // key: 实际金额
+    const ev = async (mult: number): Promise<ProbePoint> => {
+      const amount = roundAmount(params.baseAmount * mult);
+      let p = evaluated.get(amount);
       if (!p) {
-        p = await evalPoint(params, roundAmount(params.baseAmount * LADDER_MULTIPLIERS[i]));
-        evaluated.set(i, p);
+        p = await evalPoint(params, amount);
+        evaluated.set(amount, p);
       }
       return p;
     };
     const profit = (p: ProbePoint) => p.profitAmount ?? -Infinity;
+    const G = LADDER_MULTIPLIERS;
 
-    const base = await evalIdx(BASE_INDEX);
-    const up = await evalIdx(BASE_INDEX + 1);
-
+    // 阶段一：网格爬山
+    let peakIdx = BASE_INDEX;
+    const base = await ev(G[BASE_INDEX]);
+    const up = await ev(G[BASE_INDEX + 1]);
     if (profit(up) > profit(base)) {
-      let i = BASE_INDEX + 1;
-      while (i + 1 < LADDER_MULTIPLIERS.length) {
-        const next = await evalIdx(i + 1);
-        if (profit(next) > profit(evaluated.get(i)!)) i++;
+      peakIdx = BASE_INDEX + 1;
+      while (peakIdx + 1 < G.length) {
+        const next = await ev(G[peakIdx + 1]);
+        if (profit(next) > profit(await ev(G[peakIdx]))) peakIdx++;
         else break;
       }
     } else {
-      let i = BASE_INDEX;
-      while (i - 1 >= 0) {
-        const prev = await evalIdx(i - 1);
-        if (profit(prev) > profit(evaluated.get(i)!)) i--;
+      while (peakIdx - 1 >= 0) {
+        const prev = await ev(G[peakIdx - 1]);
+        if (profit(prev) > profit(await ev(G[peakIdx]))) peakIdx--;
         else break;
       }
+    }
+
+    // 阶段二：峰值两侧几何中点细化（凹曲线下真峰必在相邻网格区间内）
+    const peakPoint = await ev(G[peakIdx]);
+    if (profit(peakPoint) > -Infinity) {
+      const refines: number[] = [];
+      if (peakIdx - 1 >= 0) refines.push(Math.sqrt(G[peakIdx - 1] * G[peakIdx]));
+      if (peakIdx + 1 < G.length) refines.push(Math.sqrt(G[peakIdx] * G[peakIdx + 1]));
+      await Promise.all(refines.map(m => ev(m)));
     }
 
     const points = [...evaluated.values()].sort((a, b) => a.amount - b.amount);

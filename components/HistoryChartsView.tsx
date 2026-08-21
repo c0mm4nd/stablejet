@@ -22,8 +22,8 @@ export default function HistoryChartsView({ history, pairId }: HistoryChartsView
   if (history.length === 0) {
     return (
       <div className="bg-white rounded-2xl shadow-sm p-8 text-center border border-gray-100">
-        <p className="text-gray-600">暂无历史数据，请等待数据收集...</p>
-        <p className="text-sm text-gray-500 mt-2">数据每 10 秒更新一次</p>
+        <p className="text-gray-600">No history yet, collecting data…</p>
+        <p className="text-sm text-gray-500 mt-2">Updates every 10 seconds</p>
       </div>
     );
   }
@@ -53,7 +53,7 @@ export default function HistoryChartsView({ history, pairId }: HistoryChartsView
       {/* 全局时间窗口选择器 */}
       <div className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100">
         <div className="flex justify-center items-center gap-3 flex-wrap">
-          <span className="text-sm font-medium text-gray-600">时间范围</span>
+          <span className="text-sm font-medium text-gray-600">Time range</span>
           {[5, 10, 30, 60].map(minutes => (
             <button
               key={minutes}
@@ -63,11 +63,11 @@ export default function HistoryChartsView({ history, pairId }: HistoryChartsView
                   : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
                 }`}
             >
-              {minutes < 60 ? `${minutes}分钟` : '1小时'}
+              {minutes < 60 ? `${minutes}m` : '1h'}
             </button>
           ))}
           <span className="text-sm text-gray-400">
-            {filteredHistory.length} 个数据点
+            {filteredHistory.length} data points
           </span>
         </div>
       </div>

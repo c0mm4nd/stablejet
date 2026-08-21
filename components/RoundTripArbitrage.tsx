@@ -266,7 +266,7 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
                                                 <button
                                                     onClick={() => handleProbe(opp)}
                                                     className="font-mono text-[11px] text-blue-700 hover:text-blue-900 tabular-nums"
-                                                    title="点击展开/收起金额阶梯"
+                                                    title="Toggle amount ladder"
                                                 >
                                                     {formatQuoteAmount(result.best.amount)} {tokenA}
                                                     <span className="text-emerald-600 font-semibold ml-1">
@@ -275,7 +275,7 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
                                                 </button>
                                             ) : result && 'error' in result ? (
                                                 <button onClick={() => handleProbe(opp)} className="text-[11px] text-rose-500 hover:text-rose-700" title={result.error}>
-                                                    失败,重试
+                                                    Failed · Retry
                                                 </button>
                                             ) : (
                                                 <button
@@ -283,7 +283,7 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
                                                     disabled={probing !== null}
                                                     className="text-[11px] px-2 py-0.5 rounded-md border border-blue-200 text-blue-600 hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed"
                                                 >
-                                                    {isProbing ? '探测中…' : '⚡ 找最优'}
+                                                    {isProbing ? 'Probing…' : '⚡ Optimize'}
                                                 </button>
                                             )}
                                         </td>
@@ -292,7 +292,7 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
                                         <tr className="bg-blue-50/30">
                                             <td colSpan={8} className="px-4 py-3">
                                                 <div className="text-[11px] text-gray-500 mb-2">
-                                                    实时链式报价（{tokenA}→{tokenB} 输出作为回程输入）· 各金额档位利润：
+                                                    Live chained quotes ({tokenA}→{tokenB} output feeds the return leg) · profit by size:
                                                 </div>
                                                 <div className="flex flex-wrap gap-2">
                                                     {result.points.map((p, i) => {
@@ -306,9 +306,9 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
                                                                         {p.profitAmount! > 0 ? '+' : ''}{p.profitAmount!.toFixed(2)} ({p.profitBps!.toFixed(2)} bps)
                                                                     </div>
                                                                 ) : (
-                                                                    <div>无报价</div>
+                                                                    <div>No quote</div>
                                                                 )}
-                                                                {isBest && <div className="text-emerald-600 font-semibold">★ 最优</div>}
+                                                                {isBest && <div className="text-emerald-600 font-semibold">★ Best</div>}
                                                             </div>
                                                         );
                                                     })}

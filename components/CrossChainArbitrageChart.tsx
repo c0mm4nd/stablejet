@@ -49,7 +49,7 @@ const CustomTooltip = ({ active, payload, label, detailsMap }: any) => {
     <div className="bg-white border-2 border-gray-400 rounded-lg shadow-2xl min-w-[440px] max-w-[500px]">
       {/* 标题 */}
       <div className="font-semibold text-gray-800 px-4 pt-3 pb-2 text-sm border-b bg-gray-50 rounded-t-lg">
-        {label} {hasMore && <span className="text-gray-500 font-normal">(显示前 8 个)</span>}
+        {label} {hasMore && <span className="text-gray-500 font-normal">(top 8 shown)</span>}
       </div>
 
       {/* 内容区域 - 紧凑布局 */}
@@ -110,8 +110,8 @@ const CustomTooltip = ({ active, payload, label, detailsMap }: any) => {
 
       {/* 底部统计 */}
       <div className="px-4 py-2 text-xs text-gray-500 border-t bg-gray-50 rounded-b-lg flex justify-between">
-        <span>共 {sortedPayload.length} 个链对</span>
-        {hasMore && <span className="text-orange-600">还有 {sortedPayload.length - 8} 个未显示</span>}
+        <span>{sortedPayload.length} chain pairs</span>
+        {hasMore && <span className="text-orange-600">{sortedPayload.length - 8} more hidden</span>}
       </div>
     </div>
   );
@@ -252,7 +252,7 @@ export default function CrossChainArbitrageChart({ history, amount, pairId }: Cr
 
   // 转换数据格式供 Recharts 使用，并过滤异常值
   const chartData = history.map(point => {
-    const timestamp = new Date(point.timestamp).toLocaleTimeString('zh-CN', {
+    const timestamp = new Date(point.timestamp).toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit'
@@ -286,10 +286,10 @@ export default function CrossChainArbitrageChart({ history, amount, pairId }: Cr
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
       <h2 className="text-lg font-semibold text-gray-800 mb-2">
-        输入数量: {amount.toLocaleString()} - 跨链套利机会 (bps)
+        Input amount: {amount.toLocaleString()} - Cross-chain arbitrage opportunities (bps)
       </h2>
       <p className="text-xs text-gray-500 mb-4">
-        收益 (bps) = (链A {pair.tokenA}→{pair.tokenB} 汇率 × 链B {pair.tokenB}→{pair.tokenA} 汇率 - 1) × 10000（自动选择更优方向）
+        Profit (bps) = (Chain A {pair.tokenA}→{pair.tokenB} rate × Chain B {pair.tokenB}→{pair.tokenA} rate - 1) × 10000 (best direction auto-selected)
       </p>
 
       <ResponsiveContainer width="100%" height={450}>
@@ -303,7 +303,7 @@ export default function CrossChainArbitrageChart({ history, amount, pairId }: Cr
           <YAxis
             stroke="#9ca3af"
             style={{ fontSize: '11px' }}
-            label={{ value: '套利收益 (bps)', angle: -90, position: 'insideLeft', style: { fontSize: '11px' } }}
+            label={{ value: 'Arb profit (bps)', angle: -90, position: 'insideLeft', style: { fontSize: '11px' } }}
           />
           <Tooltip content={(props) => {
             // 从当前数据点获取详细信息
@@ -333,14 +333,14 @@ export default function CrossChainArbitrageChart({ history, amount, pairId }: Cr
 
       <div className="mt-4 space-y-2">
         <p className="text-xs text-gray-600 text-center">
-          显示平均收益最高的前 20 个链对（共 {totalPairsCount} 种可能组合） | 正值表示套利机会，负值表示亏损
+          Showing top 20 chain pairs by average profit ({totalPairsCount} possible combinations) | Positive = arbitrage opportunity, negative = loss
           <br />
-          已过滤超出中位数 ±10 bps 的异常值
+          Outliers beyond ±10 bps from the median are filtered out
         </p>
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <p className="text-xs text-blue-800">
-            <strong>套利说明：</strong>对于每个链对，系统会自动计算两个方向的跨链往返（{pair.tokenA}→{pair.tokenB}→{pair.tokenA} 和 {pair.tokenB}→{pair.tokenA}→{pair.tokenB}），
-            并显示收益更高的那个方向。收益为正表示存在套利机会。
+            <strong>How it works:</strong> For each chain pair, both cross-chain round-trip directions ({pair.tokenA}→{pair.tokenB}→{pair.tokenA} and {pair.tokenB}→{pair.tokenA}→{pair.tokenB}) are computed
+            and the more profitable one is shown. Positive profit indicates an arbitrage opportunity.
           </p>
         </div>
       </div>

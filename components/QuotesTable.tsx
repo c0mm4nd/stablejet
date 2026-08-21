@@ -168,8 +168,8 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
     );
 
     const latestTimestamp = new Date(latestData.timestamp);
-    const timeStr = latestTimestamp.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const dateStr = latestTimestamp.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+    const timeStr = latestTimestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const dateStr = latestTimestamp.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 overflow-hidden">
@@ -227,7 +227,7 @@ export default function QuotesTable({ history, amount, pairId }: QuotesTableProp
                             const isBestBtoA = bestRateBtoA !== null && row.rateBtoA === bestRateBtoA;
                             const isBestRoundtrip = bestRoundtrip !== null && row.roundtripBps === bestRoundtrip && bestRoundtrip > 0;
                             const rowTime = new Date(row.timestamp);
-                            const rowTimeStr = rowTime.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                            const rowTimeStr = rowTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                             return (
                                 <tr key={idx} className="hover:bg-blue-50/20 transition-colors group">
                                     {/* Chain */}
