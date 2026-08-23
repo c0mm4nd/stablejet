@@ -21,6 +21,12 @@ interface GlobalOpp {
     profitBps: number;
     profitAmount: number; // in tokenA units, based on the quoted input
     amount: number;       // quoted input (tokenA units)
+    sellRate: number;     // tokenB per tokenA
+    buyRate: number;      // tokenA per tokenB
+    sellInput: number;
+    sellOutput: number;
+    buyInput: number;
+    buyOutput: number;
 }
 
 const PAGE_SIZE = 30;
@@ -29,6 +35,11 @@ const TOP_PER_PAIR = 5;
 function formatProfit(value: number): string {
     if (!Number.isFinite(value)) return 'N/A';
     return Math.abs(value) >= 1 ? value.toFixed(2) : value.toFixed(4);
+}
+
+function formatQty(value: number): string {
+    if (!Number.isFinite(value)) return 'N/A';
+    return value.toLocaleString('en-US', { maximumFractionDigits: 6 });
 }
 
 export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArbitrageProps) {
@@ -91,6 +102,7 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
                     chain: d.chain,
                     source: d.dataSource || 'unknown',
                     input: d.tokenAToB!.input,
+                    output: d.tokenAToB!.output!,
                     rate: d.tokenAToB!.output! / d.tokenAToB!.input,
                 }))
                 .filter(s => isFinite(s.rate) && s.rate > 0);
@@ -100,6 +112,8 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
                 .map(d => ({
                     chain: d.chain,
                     source: d.dataSource || 'unknown',
+                    input: d.tokenBToA!.input,
+                    output: d.tokenBToA!.output!,
                     rate: d.tokenBToA!.output! / d.tokenBToA!.input,
                 }))
                 .filter(b => isFinite(b.rate) && b.rate > 0);
@@ -121,6 +135,12 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
                         profitBps,
                         profitAmount: sell.input * profitBps / 10000,
                         amount: sell.input,
+                        sellRate: sell.rate,
+                        buyRate: buy.rate,
+                        sellInput: sell.input,
+                        sellOutput: sell.output,
+                        buyInput: buy.input,
+                        buyOutput: buy.output,
                     });
                 }
             }
@@ -178,7 +198,8 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
                                 <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Pair</th>
                                 <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell</th>
                                 <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Buy back</th>
-                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Amount</th>
+                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell Rate</th>
+                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Buy Rate</th>
                                 <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Profit (bps)</th>
                                 <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Est. Profit</th>
                             </tr>
@@ -202,8 +223,17 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
                                         </div>
                                         <div className="text-[10px] text-gray-400">{opp.buySource}</div>
                                     </td>
-                                    <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-600">
-                                        {opp.amount.toLocaleString('en-US')} {opp.tokenA}
+                                    <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
+                                        <div>{opp.sellRate.toFixed(6)}</div>
+                                        <div className="mt-0.5 text-[10px] font-sans text-gray-400 whitespace-nowrap">
+                                            {formatQty(opp.sellInput)} {opp.tokenA} → {formatQty(opp.sellOutput)} {opp.tokenB}
+                                        </div>
+                                    </td>
+                                    <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
+                                        <div>{opp.buyRate.toFixed(6)}</div>
+                                        <div className="mt-0.5 text-[10px] font-sans text-gray-400 whitespace-nowrap">
+                                            {formatQty(opp.buyInput)} {opp.tokenB} → {formatQty(opp.buyOutput)} {opp.tokenA}
+                                        </div>
                                     </td>
                                     <td className="px-3 py-2 text-right tabular-nums">
                                         <span className="font-mono font-bold text-emerald-600">+{opp.profitBps.toFixed(4)}</span>
