@@ -13,6 +13,7 @@ interface GlobalOpp {
     pairId: string;
     pairName: string;
     tokenA: string;
+    tokenB: string;
     sellChain: string;
     sellSource: string;
     buyChain: string;
@@ -112,6 +113,7 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
                         pairId,
                         pairName,
                         tokenA,
+                        tokenB,
                         sellChain: sell.chain,
                         sellSource: sell.source,
                         buyChain: buy.chain,
@@ -187,11 +189,17 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
                                     <td className="px-3 py-2 text-gray-400 tabular-nums font-mono text-center">{idx + 1}</td>
                                     <td className="px-3 py-2 whitespace-nowrap font-medium text-gray-800">{opp.pairName}</td>
                                     <td className="px-3 py-2 whitespace-nowrap">
-                                        <div className="font-medium text-gray-800">{opp.sellChain}</div>
+                                        <div className="font-medium text-gray-800">
+                                            {opp.sellChain}
+                                            <span className="ml-1.5 font-mono text-[10px] font-normal text-blue-600">{opp.tokenA}→{opp.tokenB}</span>
+                                        </div>
                                         <div className="text-[10px] text-gray-400">{opp.sellSource}</div>
                                     </td>
                                     <td className="px-3 py-2 whitespace-nowrap">
-                                        <div className="font-medium text-gray-800">{opp.buyChain}</div>
+                                        <div className="font-medium text-gray-800">
+                                            {opp.buyChain}
+                                            <span className="ml-1.5 font-mono text-[10px] font-normal text-blue-600">{opp.tokenB}→{opp.tokenA}</span>
+                                        </div>
                                         <div className="text-[10px] text-gray-400">{opp.buySource}</div>
                                     </td>
                                     <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-600">
