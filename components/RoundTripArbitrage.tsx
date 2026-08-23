@@ -1,24 +1,10 @@
 'use client';
 
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useMemo } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
 import { isSourceEnabled, getOneWay } from '@/lib/utils';
-
-interface ProbePoint {
-    amount: number;
-    sellOutput: number | null;
-    buyOutput: number | null;
-    profitAmount: number | null;
-    profitBps: number | null;
-    sellTool?: string;
-    buyTool?: string;
-}
-
-interface ProbeResult {
-    points: ProbePoint[];
-    best: ProbePoint | null;
-}
+import { useOptimalProbe, OptimalCell, ProbeDetailRow } from './OptimalProbe';
 
 interface RoundTripArbitrageProps {
     history: HistoryDataPoint[];
@@ -58,9 +44,7 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
     const [fallbackA, fallbackB] = pairId.split('_');
     const tokenA = configPair?.tokenA || fallbackA || 'TokenA';
     const tokenB = configPair?.tokenB || fallbackB || 'TokenB';
-    const [probing, setProbing] = useState<string | null>(null);
-    const [probeResults, setProbeResults] = useState<Record<string, ProbeResult | { error: string }>>({});
-    const [expandedKey, setExpandedKey] = useState<string | null>(null);
+    const { probing, results: probeResults, expandedKey, runProbe } = useOptimalProbe();
 
     const latest = history.length > 0 ? history[history.length - 1] : null;
     const data = (latest?.data ?? [])
@@ -144,41 +128,14 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
 
     if (history.length === 0) return null;
 
-    const handleProbe = async (opp: ArbOpportunity) => {
-        const key = oppKey(opp);
-        const cached = probeResults[key];
-        if (cached && !('error' in cached)) {
-            setExpandedKey(expandedKey === key ? null : key);
-            return;
-        }
-        if (probing) return;
-        setProbing(key);
-        setExpandedKey(key);
-        try {
-            const res = await fetch('/api/optimal-amount', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    pairId,
-                    sellChainKey: opp.sellChainKey,
-                    sellSource: opp.sellSource,
-                    buyChainKey: opp.buyChainKey,
-                    buySource: opp.buySource,
-                    baseAmount: amount,
-                }),
-            });
-            const json = await res.json();
-            if (json.success) {
-                setProbeResults(prev => ({ ...prev, [key]: { points: json.points, best: json.best } }));
-            } else {
-                setProbeResults(prev => ({ ...prev, [key]: { error: json.error || 'Probe failed' } }));
-            }
-        } catch (e) {
-            setProbeResults(prev => ({ ...prev, [key]: { error: e instanceof Error ? e.message : 'Network error' } }));
-        } finally {
-            setProbing(null);
-        }
-    };
+    const handleProbe = (opp: ArbOpportunity) => runProbe(oppKey(opp), {
+        pairId,
+        sellChainKey: opp.sellChainKey,
+        sellSource: opp.sellSource,
+        buyChainKey: opp.buyChainKey,
+        buySource: opp.buySource,
+        baseAmount: amount,
+    });
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 overflow-hidden">
@@ -261,60 +218,16 @@ export default function RoundTripArbitrage({ history, amount, pairId }: RoundTri
                                                 ${opp.profitUsd.toFixed(2)}
                                             </span>
                                         </td>
-                                        <td className="px-3 py-2 text-right whitespace-nowrap">
-                                            {result && !('error' in result) && result.best ? (
-                                                <button
-                                                    onClick={() => handleProbe(opp)}
-                                                    className="font-mono text-[11px] text-blue-700 hover:text-blue-900 tabular-nums"
-                                                    title="Toggle amount ladder"
-                                                >
-                                                    {formatQuoteAmount(result.best.amount)} {tokenA}
-                                                    <span className="text-emerald-600 font-semibold ml-1">
-                                                        +{(result.best.profitAmount ?? 0).toFixed(2)}
-                                                    </span>
-                                                </button>
-                                            ) : result && 'error' in result ? (
-                                                <button onClick={() => handleProbe(opp)} className="text-[11px] text-rose-500 hover:text-rose-700" title={result.error}>
-                                                    Failed · Retry
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() => handleProbe(opp)}
-                                                    disabled={probing !== null}
-                                                    className="text-[11px] px-2 py-0.5 rounded-md border border-blue-200 text-blue-600 hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                                                >
-                                                    {isProbing ? 'Probing…' : '⚡ Optimize'}
-                                                </button>
-                                            )}
-                                        </td>
+                                        <OptimalCell
+                                            state={result}
+                                            isProbing={isProbing}
+                                            anyProbing={probing !== null}
+                                            tokenA={tokenA}
+                                            onClick={() => handleProbe(opp)}
+                                        />
                                     </tr>
                                     {isExpanded && result && !('error' in result) && (
-                                        <tr className="bg-blue-50/30">
-                                            <td colSpan={8} className="px-4 py-3">
-                                                <div className="text-[11px] text-gray-500 mb-2">
-                                                    Live chained quotes ({tokenA}→{tokenB} output feeds the return leg) · profit by size:
-                                                </div>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {result.points.map((p, i) => {
-                                                        const isBest = result.best && p.amount === result.best.amount && p.profitAmount === result.best.profitAmount;
-                                                        const ok = p.profitAmount !== null;
-                                                        return (
-                                                            <div key={i} className={`rounded-lg border px-3 py-1.5 text-[11px] tabular-nums ${isBest ? 'border-emerald-400 bg-emerald-50' : ok ? 'border-gray-200 bg-white' : 'border-gray-100 bg-gray-50 text-gray-400'}`}>
-                                                                <div className="font-mono font-medium">{formatQuoteAmount(p.amount)} {tokenA}</div>
-                                                                {ok ? (
-                                                                    <div className={`font-mono ${p.profitAmount! > 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
-                                                                        {p.profitAmount! > 0 ? '+' : ''}{p.profitAmount!.toFixed(2)} ({p.profitBps!.toFixed(2)} bps)
-                                                                    </div>
-                                                                ) : (
-                                                                    <div>No quote</div>
-                                                                )}
-                                                                {isBest && <div className="text-emerald-600 font-semibold">★ Best</div>}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        <ProbeDetailRow result={result} tokenA={tokenA} tokenB={tokenB} colSpan={8} />
                                     )}
                                     </Fragment>
                                 );

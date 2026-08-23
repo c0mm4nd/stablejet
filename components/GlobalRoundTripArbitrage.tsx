@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { HistoryDataPoint } from '@/lib/history';
 import { useConfig } from '@/contexts/ConfigContext';
 import { isSourceEnabled, getOneWay } from '@/lib/utils';
+import { useOptimalProbe, OptimalCell, ProbeDetailRow } from './OptimalProbe';
 
 interface GlobalRoundTripArbitrageProps {
     history: HistoryDataPoint[];
@@ -15,8 +16,10 @@ interface GlobalOpp {
     tokenA: string;
     tokenB: string;
     sellChain: string;
+    sellChainKey: string;
     sellSource: string;
     buyChain: string;
+    buyChainKey: string;
     buySource: string;
     profitBps: number;
     profitAmount: number; // in tokenA units, based on the quoted input
@@ -46,6 +49,17 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
     const { pairs, sources } = useConfig();
     const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
     const sentinelRef = useRef<HTMLDivElement>(null);
+    const { probing, results: probeResults, expandedKey, runProbe } = useOptimalProbe();
+
+    const oppKey = (o: GlobalOpp) => `${o.pairId}|${o.sellChainKey}|${o.sellSource}|${o.buyChainKey}|${o.buySource}`;
+    const handleProbe = (o: GlobalOpp) => runProbe(oppKey(o), {
+        pairId: o.pairId,
+        sellChainKey: o.sellChainKey,
+        sellSource: o.sellSource,
+        buyChainKey: o.buyChainKey,
+        buySource: o.buySource,
+        baseAmount: o.amount,
+    });
 
     const opportunities = useMemo((): GlobalOpp[] => {
         if (history.length === 0) return [];
@@ -100,6 +114,7 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
                 .filter(d => d.tokenAToB?.output && d.tokenAToB.output > 0)
                 .map(d => ({
                     chain: d.chain,
+                    chainKey: d.chainKey,
                     source: d.dataSource || 'unknown',
                     input: d.tokenAToB!.input,
                     output: d.tokenAToB!.output!,
@@ -111,6 +126,7 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
                 .filter(d => d.tokenBToA?.output && d.tokenBToA.output > 0)
                 .map(d => ({
                     chain: d.chain,
+                    chainKey: d.chainKey,
                     source: d.dataSource || 'unknown',
                     input: d.tokenBToA!.input,
                     output: d.tokenBToA!.output!,
@@ -129,8 +145,10 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
                         tokenA,
                         tokenB,
                         sellChain: sell.chain,
+                        sellChainKey: sell.chainKey,
                         sellSource: sell.source,
                         buyChain: buy.chain,
+                        buyChainKey: buy.chainKey,
                         buySource: buy.source,
                         profitBps,
                         profitAmount: sell.input * profitBps / 10000,
@@ -196,26 +214,25 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
                             <tr>
                                 <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wide w-6">#</th>
                                 <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Pair</th>
+                                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Buy</th>
                                 <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell</th>
-                                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Buy back</th>
-                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell Rate</th>
                                 <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Buy Rate</th>
+                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Sell Rate</th>
                                 <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Profit (bps)</th>
                                 <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Est. Profit</th>
+                                <th className="px-3 py-2 text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Optimal</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                            {visible.map((opp, idx) => (
-                                <tr key={`${opp.pairId}|${opp.sellChain}|${opp.sellSource}|${opp.buyChain}|${opp.buySource}`} className={`hover:bg-blue-50/20 transition-colors ${idx < 3 ? 'bg-emerald-50/20' : ''}`}>
+                            {visible.map((opp, idx) => {
+                                const key = oppKey(opp);
+                                const result = probeResults[key];
+                                const isExpanded = expandedKey === key;
+                                return (
+                                <Fragment key={key}>
+                                <tr className={`hover:bg-blue-50/20 transition-colors ${idx < 3 ? 'bg-emerald-50/20' : ''}`}>
                                     <td className="px-3 py-2 text-gray-400 tabular-nums font-mono text-center">{idx + 1}</td>
                                     <td className="px-3 py-2 whitespace-nowrap font-medium text-gray-800">{opp.pairName}</td>
-                                    <td className="px-3 py-2 whitespace-nowrap">
-                                        <div className="font-medium text-gray-800">
-                                            {opp.sellChain}
-                                            <span className="ml-1.5 font-mono text-[10px] font-normal text-blue-600">{opp.tokenA}→{opp.tokenB}</span>
-                                        </div>
-                                        <div className="text-[10px] text-gray-400">{opp.sellSource}</div>
-                                    </td>
                                     <td className="px-3 py-2 whitespace-nowrap">
                                         <div className="font-medium text-gray-800">
                                             {opp.buyChain}
@@ -223,16 +240,23 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
                                         </div>
                                         <div className="text-[10px] text-gray-400">{opp.buySource}</div>
                                     </td>
-                                    <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
-                                        <div>{opp.sellRate.toFixed(6)}</div>
-                                        <div className="mt-0.5 text-[10px] font-sans text-gray-400 whitespace-nowrap">
-                                            {formatQty(opp.sellInput)} {opp.tokenA} → {formatQty(opp.sellOutput)} {opp.tokenB}
+                                    <td className="px-3 py-2 whitespace-nowrap">
+                                        <div className="font-medium text-gray-800">
+                                            {opp.sellChain}
+                                            <span className="ml-1.5 font-mono text-[10px] font-normal text-blue-600">{opp.tokenA}→{opp.tokenB}</span>
                                         </div>
+                                        <div className="text-[10px] text-gray-400">{opp.sellSource}</div>
                                     </td>
                                     <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
                                         <div>{opp.buyRate.toFixed(6)}</div>
                                         <div className="mt-0.5 text-[10px] font-sans text-gray-400 whitespace-nowrap">
                                             {formatQty(opp.buyInput)} {opp.tokenB} → {formatQty(opp.buyOutput)} {opp.tokenA}
+                                        </div>
+                                    </td>
+                                    <td className="px-3 py-2 text-right tabular-nums font-mono text-gray-700">
+                                        <div>{opp.sellRate.toFixed(6)}</div>
+                                        <div className="mt-0.5 text-[10px] font-sans text-gray-400 whitespace-nowrap">
+                                            {formatQty(opp.sellInput)} {opp.tokenA} → {formatQty(opp.sellOutput)} {opp.tokenB}
                                         </div>
                                     </td>
                                     <td className="px-3 py-2 text-right tabular-nums">
@@ -243,8 +267,20 @@ export default function GlobalRoundTripArbitrage({ history }: GlobalRoundTripArb
                                             +{formatProfit(opp.profitAmount)} {opp.tokenA}
                                         </span>
                                     </td>
+                                    <OptimalCell
+                                        state={result}
+                                        isProbing={probing === key}
+                                        anyProbing={probing !== null}
+                                        tokenA={opp.tokenA}
+                                        onClick={() => handleProbe(opp)}
+                                    />
                                 </tr>
-                            ))}
+                                {isExpanded && result && !('error' in result) && (
+                                    <ProbeDetailRow result={result} tokenA={opp.tokenA} tokenB={opp.tokenB} colSpan={9} />
+                                )}
+                                </Fragment>
+                                );
+                            })}
                         </tbody>
                     </table>
                     <div ref={sentinelRef} className="py-3 text-center text-[11px] text-gray-400">
