@@ -4810,6 +4810,32 @@
           "decimalsB": 6
         }
       }
+    },
+    "USDe_USDB": {
+      "id": "USDe_USDB",
+      "name": "USDe/USDB",
+      "tokenA": "USDe",
+      "tokenB": "USDB",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "robinhood": {
+          "addressA": "0x5d3A1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "decimalsA": 18,
+          "addressB": "0x65f1f83dd8b702A195e24Ea171f8136fB1888888",
+          "decimalsB": 8,
+          "pools": [
+            {
+              "dex": "univ3",
+              "address": "0x45d9235a15141c598139fe3e8baa9b1e1a7d5a66",
+              "fee": 500,
+              "quoter": "0x33e885ed0ec9bf04ecfb19341582aadcb4c8a9e7",
+              "label": "UniV3 0.05%"
+            }
+          ]
+        }
+      }
     }
   },
   "clientRefreshInterval": 20,
