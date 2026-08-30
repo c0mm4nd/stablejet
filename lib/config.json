@@ -592,6 +592,12 @@
     },
     "tac": {
       "name": "TAC"
+    },
+    "robinhood": {
+      "name": "Robinhood Chain",
+      "lifiChainId": "4663",
+      "nordsternCode": "4663",
+      "rpcUrl": "https://rpc.mainnet.chain.robinhood.com"
     }
   },
   "pairs": {
@@ -4778,6 +4784,29 @@
           "addressA": "0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5",
           "decimalsA": 6,
           "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsB": 6
+        }
+      }
+    },
+    "USDe_USDG": {
+      "id": "USDe_USDG",
+      "name": "USDe/USDG",
+      "tokenA": "USDe",
+      "tokenB": "USDG",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3",
+          "decimalsA": 18,
+          "addressB": "0xe343167631d89B6Ffc58B88d6b7fB0228795491D",
+          "decimalsB": 6
+        },
+        "robinhood": {
+          "addressA": "0x5d3A1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+          "decimalsA": 18,
+          "addressB": "0x5FC5360d0400A0FD4F2Af552aDd042D716F1D168",
           "decimalsB": 6
         }
       }
