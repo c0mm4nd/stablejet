@@ -184,6 +184,7 @@ export interface WrapperConfig {
 export interface ChainPairConfig {
   pools?: PoolConfig[]; // 直连池子（可与聚合器并存）
   oneWay?: 'AtoB' | 'BtoA'; // 单向报价（如 USDm 只能卖出不能买入）
+  skipMain?: boolean; // 只报 wrappers，不报主 tokenA（主币在该链无真实市场时用）
   addressA?: string;
   addressB?: string;
   decimalsA?: number;

@@ -3422,7 +3422,8 @@
               "address": "0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5",
               "decimals": 6
             }
-          ]
+          ],
+          "skipMain": true
         }
       }
     },

@@ -90,7 +90,7 @@ export async function getSwapDataForPair(
 
     const mainPools = (chainPairData.pools ?? []).filter(p => !p.wrapper);
 
-    for (const amount of amounts) {
+    for (const amount of (chainPairData.skipMain ? [] : amounts)) {
       const onchainTask = getOnchainSwapDataForAmount({
         pairId,
         chainKey,
