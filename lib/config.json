@@ -3386,7 +3386,8 @@
           "addressA": "0x437cc33344a0B27A429f795ff6B469C72698B291",
           "decimalsA": 6,
           "addressB": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "disabled": true
         }
       }
     },
@@ -3409,7 +3410,8 @@
           "addressA": "0x437cc33344a0B27A429f795ff6B469C72698B291",
           "decimalsA": 6,
           "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "disabled": true
         },
         "hyperevm": {
           "addressA": "0x437cc33344a0B27A429f795ff6B469C72698B291",
@@ -3467,13 +3469,15 @@
           "addressA": "0x758a3e0b1F842C9306B783f8A4078C6C8C03a270",
           "decimalsA": 18,
           "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "disabled": true
         },
         "bnb_chain": {
           "addressA": "0x758a3e0b1f842c9306b783f8a4078c6c8c03a270",
           "decimalsA": 18,
           "addressB": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "disabled": true
         }
       }
     },
@@ -3502,13 +3506,15 @@
           "addressA": "0x758a3e0b1F842C9306B783f8A4078C6C8C03a270",
           "decimalsA": 18,
           "addressB": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
-          "decimalsB": 6
+          "decimalsB": 6,
+          "disabled": true
         },
         "bnb_chain": {
           "addressA": "0x758a3e0b1f842c9306b783f8a4078c6c8c03a270",
           "decimalsA": 18,
           "addressB": "0x55d398326f99059fF775485246999027B3197955",
-          "decimalsB": 18
+          "decimalsB": 18,
+          "disabled": true
         }
       }
     },
