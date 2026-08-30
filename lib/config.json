@@ -3688,7 +3688,7 @@
           ]
         },
         "base": {
-          "addressA": "0xD993935E13851dd7517af10687EC7e5022127228",
+          "addressA": "0xd993935e13851dd7517af10687ec7e5022127228",
           "decimalsA": 18,
           "addressB": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
           "decimalsB": 6
@@ -4898,6 +4898,23 @@
           "decimalsA": 6,
           "addressB": "HAYQtfJEQ9DbDbaHEhxfGsWbSZ3ywthdsVB3PuB72DYe",
           "decimalsB": 6
+        }
+      }
+    },
+    "apxUSD_USDT": {
+      "id": "apxUSD_USDT",
+      "name": "apxUSD/USDT",
+      "tokenA": "apxUSD",
+      "tokenB": "USDT",
+      "amounts": [
+        10000
+      ],
+      "chains": {
+        "bnb_chain": {
+          "addressA": "0x6b3788fd6604bbf03c5378d24e57bb334baad4af",
+          "decimalsA": 18,
+          "addressB": "0x55d398326f99059fF775485246999027B3197955",
+          "decimalsB": 18
         }
       }
     }
