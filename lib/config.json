@@ -182,7 +182,8 @@
       "name": "Monad",
       "kyberCode": "monad",
       "lifiChainId": "143",
-      "nordsternCode": "143"
+      "nordsternCode": "143",
+      "rpcUrl": "https://rpc.monad.xyz"
     },
     "opbnb": {
       "name": "opBNB",
@@ -3372,27 +3373,12 @@
           "decimalsA": 6,
           "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
           "decimalsB": 6,
-          "wrappers": [
-            {
-              "symbol": "USDat",
-              "address": "0x23238f20b894f29041f48d88ee91131c395aaa71",
-              "decimals": 6
-            }
-          ],
           "pools": [
             {
               "dex": "univ3",
               "address": "0x970a7749ecaa4394c8b2bf5f2471f41fd6b79288",
               "fee": 100,
               "label": "UniV3 wM 0.01%"
-            },
-            {
-              "dex": "curve",
-              "address": "0xf4d0cf32908b2c7f1021339c43df0f77f06896d7",
-              "indexA": 1,
-              "indexB": 0,
-              "wrapper": "USDat",
-              "label": "Curve USDat"
             }
           ]
         },
@@ -3417,14 +3403,7 @@
           "addressA": "0x437cc33344a0B27A429f795ff6B469C72698B291",
           "decimalsA": 6,
           "addressB": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-          "decimalsB": 6,
-          "wrappers": [
-            {
-              "symbol": "USDat",
-              "address": "0x23238f20b894f29041f48d88ee91131c395aaa71",
-              "decimals": 6
-            }
-          ]
+          "decimalsB": 6
         },
         "arbitrum": {
           "addressA": "0x437cc33344a0B27A429f795ff6B469C72698B291",
@@ -4808,6 +4787,64 @@
           "decimalsA": 18,
           "addressB": "0x5FC5360d0400A0FD4F2Af552aDd042D716F1D168",
           "decimalsB": 6
+        }
+      }
+    },
+    "USDat_USDC": {
+      "id": "USDat_USDC",
+      "name": "USDat/USDC",
+      "tokenA": "USDat",
+      "tokenB": "USDC",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "ethereum": {
+          "addressA": "0x23238f20b894f29041f48d88ee91131c395aaa71",
+          "decimalsA": 6,
+          "addressB": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimalsB": 6,
+          "pools": [
+            {
+              "dex": "curve",
+              "address": "0xf4d0cf32908b2c7f1021339c43df0f77f06896d7",
+              "indexA": 1,
+              "indexB": 0,
+              "label": "Curve"
+            }
+          ]
+        },
+        "monad": {
+          "addressA": "0x0bb150dfa86ea5d7742f07fefcd8e8eda81d64ef",
+          "decimalsA": 6,
+          "addressB": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+          "decimalsB": 6,
+          "pools": [
+            {
+              "dex": "curve",
+              "address": "0xfd945d71d4e9609a1fab0ae9c30da8088e7aee1e",
+              "indexA": 0,
+              "indexB": 1,
+              "label": "Curve"
+            }
+          ]
+        }
+      }
+    },
+    "USDat_USDT": {
+      "id": "USDat_USDT",
+      "name": "USDat/USDT",
+      "tokenA": "USDat",
+      "tokenB": "USDT",
+      "amounts": [
+        30000
+      ],
+      "chains": {
+        "bnb_chain": {
+          "addressA": "0x0bb150dfa86ea5d7742f07fefcd8e8eda81d64ef",
+          "decimalsA": 6,
+          "addressB": "0x55d398326f99059fF775485246999027B3197955",
+          "decimalsB": 18
         }
       }
     }
