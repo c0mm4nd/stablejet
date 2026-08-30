@@ -3410,6 +3410,19 @@
           "decimalsA": 6,
           "addressB": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
           "decimalsB": 6
+        },
+        "hyperevm": {
+          "addressA": "0x437cc33344a0B27A429f795ff6B469C72698B291",
+          "decimalsA": 6,
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsB": 6,
+          "wrappers": [
+            {
+              "symbol": "USDhl",
+              "address": "0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5",
+              "decimals": 6
+            }
+          ]
         }
       }
     },
@@ -4744,23 +4757,6 @@
       "chains": {
         "plasma": {
           "addressA": "0xc4374775489CB9C56003bF2C9B12495Fc64F0771",
-          "decimalsA": 6,
-          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
-          "decimalsB": 6
-        }
-      }
-    },
-    "USDHL_USDT": {
-      "id": "USDHL_USDT",
-      "name": "USDHL/USDT",
-      "tokenA": "USDHL",
-      "tokenB": "USDT",
-      "amounts": [
-        10000
-      ],
-      "chains": {
-        "hyperevm": {
-          "addressA": "0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5",
           "decimalsA": 6,
           "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
           "decimalsB": 6
