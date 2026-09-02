@@ -921,6 +921,12 @@
               "label": "Kumbaya 0.01%"
             }
           ]
+        },
+        "plasma": {
+          "addressA": "0x2d661C89D812261039AF9764eceaAee884f5F67F",
+          "decimalsA": 6,
+          "addressB": "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          "decimalsB": 6
         }
       }
     },
@@ -4574,6 +4580,12 @@
           "addressA": "0xcfea864b32833f157f042618bd845145256b1bf4c0da34a7013b76e42daa53cc",
           "decimalsA": 6,
           "addressB": "0xbae207659db88bea0cbead6da0ed00aac12edcdda169e591cd41c94180b46f3b",
+          "decimalsB": 6
+        },
+        "sei": {
+          "addressA": "0x54cd901491aef397084453f4372b93c33260e2a6",
+          "decimalsA": 18,
+          "addressB": "0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392",
           "decimalsB": 6
         }
       }
